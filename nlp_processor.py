@@ -1,123 +1,237 @@
 import re
-from typing import Dict, List, Tuple
+import unicodedata
+from typing import Dict, List, Optional
+
 
 class NLPProcessor:
-    """Procesador avanzado de lenguaje natural para NutriGPT."""
-    
+    """Procesador de lenguaje natural basado en reglas para NutriGPT."""
+
     def __init__(self):
-        # Palabras clave para cada intención
         self.palabras_recetas = {
-            'receta', 'recetas', 'puedo hacer', 'cómo hago', 'quiero', 'busco', 'dame', 
-            'muestra', 'con', 'haz', 'prepara', 'cocina', 'plato', 'comida', 'cena', 
-            'desayuno', 'almuerzo', 'merienda', 'idea', 'sugerencia', 'recomendación',
-            'qué puedo', 'qué hago', 'cómo preparo', 'cómo cocino', 'ingredientes'
+            "receta",
+            "recetas",
+            "hacer",
+            "preparar",
+            "prepara",
+            "cocinar",
+            "cocino",
+            "cocina",
+            "plato",
+            "platos",
+            "desayuno",
+            "almuerzo",
+            "comida",
+            "cena",
+            "merienda",
+            "idea",
+            "ideas",
+            "menu",
+            "menus",
+            "ingredientes",
         }
-        
+
         self.palabras_calorias = {
-            'calorías', 'calorias', 'cuántas calorías', 'cuantas calorias', 'valor nutricional',
-            'energía', 'kcal', 'kilocalorías', 'kilocalories', 'cuánto tiene', 'cuanto tiene',
-            'información nutricional', 'nutrientes', 'proteínas', 'grasas', 'carbohidratos',
-            'cuántas', 'cuantas', 'cuánto', 'cuanto', 'tiene', 'contiene'
+            "calorias",
+            "kcal",
+            "energia",
+            "valor nutricional",
+            "informacion nutricional",
+            "proteinas",
+            "grasas",
+            "carbohidratos",
+            "macros",
+            "nutrientes",
+            "cuantas calorias",
+            "cuanto tiene",
+            "cuanto aporta",
+            "cuantas tiene",
         }
-        
+
         self.palabras_ayuda = {
-            'hola', 'qué puedes', 'que puedes', 'ayuda', 'cómo funciona', 'como funciona',
-            'cuéntame', 'cuentame', 'quién eres', 'quien eres', 'qué eres', 'que eres',
-            'instrucciones', 'tutorial', 'guía', 'guia', 'inicio', 'bienvenida'
+            "hola",
+            "buenas",
+            "ayuda",
+            "como funciona",
+            "que puedes hacer",
+            "quien eres",
+            "inicio",
+            "help",
         }
-        
-        self.palabras_descarte = {
-            'el', 'la', 'de', 'del', 'una', 'un', 'unos', 'unas', 'los', 'las',
-            'por', 'para', 'en', 'a', 'al', 'con', 'sin', 'que', 'y', 'o', 'u',
-            'es', 'son', 'está', 'están', 'estoy', 'soy', 'eres', 'somos'
+
+        self.stopwords = {
+            "el",
+            "la",
+            "los",
+            "las",
+            "un",
+            "una",
+            "unos",
+            "unas",
+            "de",
+            "del",
+            "y",
+            "o",
+            "u",
+            "a",
+            "al",
+            "en",
+            "para",
+            "por",
+            "con",
+            "sin",
+            "que",
+            "me",
+            "mi",
+            "mis",
+            "tu",
+            "tus",
+            "quiero",
+            "puedo",
+            "hacer",
+            "preparar",
+            "prepara",
+            "cocinar",
+            "cocina",
+            "dame",
+            "busco",
+            "necesito",
+            "cuanto",
+            "cuanta",
+            "cuantas",
+            "cuantos",
+            "tiene",
+            "tienen",
+            "contiene",
+            "contienen",
+            "hay",
+            "es",
+            "son",
         }
-    
+
+    def _strip_accents(self, texto: str) -> str:
+        return "".join(
+            c for c in unicodedata.normalize("NFD", texto) if unicodedata.category(c) != "Mn"
+        )
+
     def limpiar_texto(self, texto: str) -> str:
-        """Limpia y normaliza el texto de entrada."""
-        # Convertir a minúsculas
-        texto = texto.lower()
-        # Remover puntuación innecesaria pero mantener espacios
-        texto = re.sub(r'[¿?¡!]', '', texto)
-        # Remover espacios múltiples
-        texto = re.sub(r'\s+', ' ', texto).strip()
+        texto = self._strip_accents(texto.lower())
+        texto = re.sub(r"[^a-z0-9,\s]", " ", texto)
+        texto = re.sub(r"\s+", " ", texto).strip()
         return texto
-    
+
     def extraer_palabras_clave(self, texto: str) -> List[str]:
-        """Extrae palabras clave relevantes del texto."""
-        palabras = texto.split()
-        # Filtrar palabras muy cortas y palabras de descarte
-        palabras_clave = [
-            p for p in palabras 
-            if len(p) > 2 and p not in self.palabras_descarte
-        ]
-        return palabras_clave
-    
+        texto_limpio = self.limpiar_texto(texto)
+        palabras = texto_limpio.split()
+        return [p for p in palabras if len(p) > 2 and p not in self.stopwords]
+
     def detectar_intencion(self, texto: str) -> str:
-        """Detecta la intención principal del usuario."""
         texto_limpio = self.limpiar_texto(texto)
-        
-        # Contar coincidencias por intención
-        puntos_recetas = sum(1 for palabra in self.palabras_recetas if palabra in texto_limpio)
-        puntos_calorias = sum(1 for palabra in self.palabras_calorias if palabra in texto_limpio)
-        puntos_ayuda = sum(1 for palabra in self.palabras_ayuda if palabra in texto_limpio)
-        
-        # Determinar intención por puntuación
+
+        puntos_recetas = sum(2 for palabra in self.palabras_recetas if palabra in texto_limpio)
+        puntos_calorias = sum(2 for palabra in self.palabras_calorias if palabra in texto_limpio)
+        puntos_ayuda = sum(2 for palabra in self.palabras_ayuda if palabra in texto_limpio)
+
+        if re.search(r"\b(receta|recetas|desayuno|almuerzo|comida|cena)\b", texto_limpio):
+            puntos_recetas += 3
+
+        if re.search(r"\b(calorias|kcal|proteinas|grasas|carbohidratos|nutricional)\b", texto_limpio):
+            puntos_calorias += 3
+
+        if re.search(r"\b(hola|buenas|ayuda)\b", texto_limpio) and len(texto_limpio.split()) <= 5:
+            puntos_ayuda += 3
+
+        if re.search(r"\b(tengo|con|usar|aprovechar)\b", texto_limpio):
+            puntos_recetas += 2
+
+        if re.search(r"\b(\d+)\s*(g|gramos|kg|ml|unidad|unidades)\b", texto_limpio):
+            puntos_calorias += 1
+
         intenciones = {
-            'recetas': puntos_recetas,
-            'calorias': puntos_calorias,
-            'ayuda': puntos_ayuda
+            "recetas": puntos_recetas,
+            "calorias": puntos_calorias,
+            "ayuda": puntos_ayuda,
         }
-        
+
         intencion_principal = max(intenciones, key=intenciones.get)
-        
-        # Si no hay coincidencias claras, usar heurísticas adicionales
         if intenciones[intencion_principal] == 0:
-            # Buscar números (posible búsqueda de calorías)
-            if re.search(r'\d+', texto):
-                return 'calorias'
-            # Buscar verbos de acción (posible búsqueda de recetas)
-            if any(verbo in texto_limpio for verbo in ['hacer', 'preparar', 'cocinar', 'haz', 'prepara']):
-                return 'recetas'
-            return 'general'
-        
+            return "general"
         return intencion_principal
-    
-    def extraer_ingredientes(self, texto: str) -> List[str]:
-        """Extrae ingredientes mencionados en el texto."""
-        palabras_clave = self.extraer_palabras_clave(self.limpiar_texto(texto))
-        # Filtrar palabras que probablemente sean ingredientes (más de 3 caracteres)
-        ingredientes = [p for p in palabras_clave if len(p) > 3]
-        return ingredientes
-    
-    def extraer_alimento(self, texto: str) -> str:
-        """Extrae el alimento principal del que se pregunta."""
-        # Buscar patrones comunes
-        patrones = [
-            r'(?:de|tiene|contiene|cuántas|cuantas)\s+([a-záéíóúñ]+)',
-            r'([a-záéíóúñ]+)(?:\s+tiene|\s+contiene)',
-            r'(?:un|una|el|la)\s+([a-záéíóúñ]+)'
-        ]
-        
+
+    def extraer_cantidad(self, texto: str) -> Dict[str, Optional[float]]:
         texto_limpio = self.limpiar_texto(texto)
-        
+        match = re.search(r"(\d+(?:[.,]\d+)?)\s*(kg|g|gramos|gramo|ml|unidad|unidades)", texto_limpio)
+        if not match:
+            return {"valor": None, "unidad": None}
+
+        valor = float(match.group(1).replace(",", "."))
+        unidad = match.group(2)
+        return {"valor": valor, "unidad": unidad}
+
+    def extraer_ingredientes(self, texto: str) -> List[str]:
+        texto_limpio = self.limpiar_texto(texto)
+        if self.detectar_intencion(texto) == "ayuda":
+            return []
+        candidatos: List[str] = []
+
+        patrones = [
+            r"(?:con|de|tengo|usar|aprovechar)\s+([a-z0-9,\s]+)",
+        ]
+
+        for patron in patrones:
+            for match in re.finditer(patron, texto_limpio):
+                fragmento = match.group(1)
+                fragmento = re.split(r"\b(para|que|porque|pero|aunque|cuantas|calorias)\b", fragmento)[0]
+                partes = re.split(r",| y ", fragmento)
+                for parte in partes:
+                    parte = parte.strip()
+                    parte = re.sub(r"\b(\d+(?:[.,]\d+)?)\s*(kg|g|gramos|gramo|ml|unidad|unidades)\b", "", parte).strip()
+                    if parte and parte not in self.stopwords and len(parte) > 2:
+                        candidatos.append(parte)
+
+        if not candidatos:
+            candidatos = self.extraer_palabras_clave(texto_limpio)
+
+        vistos = []
+        for item in candidatos:
+            if item not in vistos:
+                vistos.append(item)
+        return vistos[:6]
+
+    def extraer_alimento(self, texto: str) -> str:
+        texto_limpio = self.limpiar_texto(texto)
+
+        ingredientes = self.extraer_ingredientes(texto)
+        if self.detectar_intencion(texto) == "calorias" and ingredientes:
+            return ingredientes[0]
+
+        patrones = [
+            r"(?:calorias|proteinas|grasas|carbohidratos|nutricional)\s+(?:de|del|de la)?\s*([a-z0-9\s]+)",
+            r"(?:cuanto|cuanta|cuantas|cuantos)\s+(?:tiene|aporta|contiene)?\s*(?:de|del|de la)?\s*([a-z0-9\s]+)",
+            r"(?:el|la|los|las|un|una)\s+([a-z0-9\s]+)",
+        ]
+
         for patron in patrones:
             match = re.search(patron, texto_limpio)
             if match:
-                alimento = match.group(1)
-                if alimento not in self.palabras_descarte and len(alimento) > 2:
-                    return alimento
-        
-        # Si no encuentra patrón, devolver la última palabra significativa
+                candidato = match.group(1).strip()
+                candidato = re.split(r"\b(por|para|si|que|en)\b", candidato)[0].strip()
+                if candidato and candidato not in self.stopwords:
+                    return candidato
+
+        if ingredientes:
+            return ingredientes[0]
+
         palabras = self.extraer_palabras_clave(texto_limpio)
-        return palabras[-1] if palabras else ""
-    
+        return " ".join(palabras[:2]).strip()
+
     def procesar(self, texto: str) -> Dict:
-        """Procesa el texto y devuelve un diccionario con información extraída."""
+        texto_limpio = self.limpiar_texto(texto)
         return {
-            'texto_original': texto,
-            'texto_limpio': self.limpiar_texto(texto),
-            'intencion': self.detectar_intencion(texto),
-            'palabras_clave': self.extraer_palabras_clave(self.limpiar_texto(texto)),
-            'ingredientes': self.extraer_ingredientes(texto),
-            'alimento': self.extraer_alimento(texto)
+            "texto_original": texto,
+            "texto_limpio": texto_limpio,
+            "intencion": self.detectar_intencion(texto),
+            "palabras_clave": self.extraer_palabras_clave(texto_limpio),
+            "ingredientes": self.extraer_ingredientes(texto),
+            "alimento": self.extraer_alimento(texto),
+            "cantidad": self.extraer_cantidad(texto),
         }
