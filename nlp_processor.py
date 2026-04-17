@@ -34,17 +34,54 @@ class NLPProcessor:
             "calorias",
             "kcal",
             "energia",
-            "valor nutricional",
-            "informacion nutricional",
-            "proteinas",
-            "grasas",
-            "carbohidratos",
-            "macros",
-            "nutrientes",
             "cuantas calorias",
             "cuanto tiene",
             "cuanto aporta",
-            "cuantas tiene",
+            "valor energetico",
+        }
+
+        self.palabras_nutricion = {
+            "saludable",
+            "sano",
+            "proteina",
+            "proteinas",
+            "fibra",
+            "grasa saludable",
+            "grasas saludables",
+            "hidratos",
+            "carbohidratos",
+            "saciedad",
+            "dieta",
+            "nutricion",
+            "alimentacion",
+            "adelgazar",
+            "perder grasa",
+            "perder peso",
+            "ganar musculo",
+            "masa muscular",
+            "hidratar",
+            "hidratacion",
+            "desayuno saludable",
+            "cena ligera",
+            "merienda saludable",
+            "pre entreno",
+            "post entreno",
+            "beneficios",
+            "aporta",
+            "azucar",
+            "ultraprocesado",
+            "ultraprocesados",
+            "colesterol",
+            "saciante",
+            "hambre",
+            "antojos",
+            "ansiedad",
+            "digestivo",
+            "estrenimiento",
+            "omega 3",
+            "agua",
+            "deshidratacion",
+            "merienda",
         }
 
         self.palabras_ayuda = {
@@ -106,6 +143,16 @@ class NLPProcessor:
             "hay",
             "es",
             "son",
+            "esa",
+            "ese",
+            "esta",
+            "este",
+            "bueno",
+            "buena",
+            "sirve",
+            "conviene",
+            "mejor",
+            "recomiendas",
         }
 
     def _strip_accents(self, texto: str) -> str:
@@ -129,13 +176,20 @@ class NLPProcessor:
 
         puntos_recetas = sum(2 for palabra in self.palabras_recetas if palabra in texto_limpio)
         puntos_calorias = sum(2 for palabra in self.palabras_calorias if palabra in texto_limpio)
+        puntos_nutricion = sum(2 for palabra in self.palabras_nutricion if palabra in texto_limpio)
         puntos_ayuda = sum(2 for palabra in self.palabras_ayuda if palabra in texto_limpio)
 
-        if re.search(r"\b(receta|recetas|desayuno|almuerzo|comida|cena)\b", texto_limpio):
+        if re.search(r"\b(receta|recetas|desayuno|almuerzo|comida|cena|merienda)\b", texto_limpio):
             puntos_recetas += 3
 
-        if re.search(r"\b(calorias|kcal|proteinas|grasas|carbohidratos|nutricional)\b", texto_limpio):
-            puntos_calorias += 3
+        if re.search(r"\b(calorias|kcal|energia)\b", texto_limpio):
+            puntos_calorias += 4
+
+        if re.search(
+            r"\b(proteina|proteinas|fibra|dieta|nutricion|alimentacion|saludable|saciedad|hambre|omega|hidratacion)\b",
+            texto_limpio,
+        ):
+            puntos_nutricion += 4
 
         if re.search(r"\b(hola|buenas|ayuda)\b", texto_limpio) and len(texto_limpio.split()) <= 5:
             puntos_ayuda += 3
@@ -144,11 +198,18 @@ class NLPProcessor:
             puntos_recetas += 2
 
         if re.search(r"\b(\d+)\s*(g|gramos|kg|ml|unidad|unidades)\b", texto_limpio):
-            puntos_calorias += 1
+            puntos_calorias += 2
+
+        if re.search(
+            r"\b(adelgazar|perder peso|perder grasa|ganar musculo|masa muscular|saciedad|hambre|antojos|ansiedad)\b",
+            texto_limpio,
+        ):
+            puntos_nutricion += 3
 
         intenciones = {
             "recetas": puntos_recetas,
             "calorias": puntos_calorias,
+            "nutricion": puntos_nutricion,
             "ayuda": puntos_ayuda,
         }
 
@@ -201,12 +262,12 @@ class NLPProcessor:
         texto_limpio = self.limpiar_texto(texto)
 
         ingredientes = self.extraer_ingredientes(texto)
-        if self.detectar_intencion(texto) == "calorias" and ingredientes:
+        if self.detectar_intencion(texto) in {"calorias", "nutricion"} and ingredientes:
             return ingredientes[0]
 
         patrones = [
-            r"(?:calorias|proteinas|grasas|carbohidratos|nutricional)\s+(?:de|del|de la)?\s*([a-z0-9\s]+)",
-            r"(?:cuanto|cuanta|cuantas|cuantos)\s+(?:tiene|aporta|contiene)?\s*(?:de|del|de la)?\s*([a-z0-9\s]+)",
+            r"(?:calorias|proteina|proteinas|fibra|grasas|carbohidratos|nutricional)\s+(?:de|del|de la)?\s*([a-z0-9\s]+)",
+            r"(?:cuanto|cuanta|cuantas|cuantos|aporta|beneficios)\s+(?:tiene|aporta|contiene)?\s*(?:de|del|de la)?\s*([a-z0-9\s]+)",
             r"(?:el|la|los|las|un|una)\s+([a-z0-9\s]+)",
         ]
 
