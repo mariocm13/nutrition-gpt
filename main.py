@@ -9,13 +9,13 @@ def load_data(file_path):
     return {}
 
 def show_calories(food_name, calories_data):
-    """Busca y muestra las calorías de un alimento."""
+    """Busca y muestra las calorias de un alimento."""
     for item in calories_data.get('alimentos', []):
         if food_name.lower() in item['nombre'].lower():
             print(f"Alimento: {item['nombre']}")
-            print(f"Calorías: {item['calorias']} kcal por {item['unidad']}")
+            print(f"Calorias: {item['calorias']} kcal por {item['unidad']}")
             return
-    print(f"No se encontró información para '{food_name}'.")
+    print(f"No se encontro informacion para '{food_name}'.")
 
 def show_recipes(recipes_data):
     """Muestra todas las recetas disponibles."""
@@ -24,7 +24,7 @@ def show_recipes(recipes_data):
         print(f"{i}. {recipe['nombre']} ({recipe['calorias_aprox']} kcal)")
 
 def show_recipe_details(recipe_index, recipes_data):
-    """Muestra los detalles de una receta específica."""
+    """Muestra los detalles de una receta especifica."""
     recipes = recipes_data.get('recetas', [])
     if 0 <= recipe_index < len(recipes):
         recipe = recipes[recipe_index]
@@ -35,37 +35,37 @@ def show_recipe_details(recipe_index, recipes_data):
         print("\nInstrucciones:")
         for step in recipe['instrucciones']:
             print(f"- {step}")
-        print(f"\nCalorías aproximadas: {recipe['calorias_aprox']} kcal")
+        print(f"\nCalorias aproximadas: {recipe['calorias_aprox']} kcal")
     else:
-        print("Índice de receta no válido.")
+        print("Indice de receta no valido.")
 
 def main():
     calories_data = load_data('data/calories.json')
-    recipes_data = load_data('data/recipes.json')
+    recipes_data = load_data('data/recipes_large.json')
 
-    print("¡Bienvenido a tu Asistente de Nutrición GPT!")
+    print("Bienvenido a tu Asistente de Nutricion GPT!")
     
     while True:
-        print("\n¿Qué te gustaría hacer?")
-        print("1. Consultar calorías de un alimento")
+        print("\nQue te gustaria hacer?")
+        print("1. Consultar calorias de un alimento")
         print("2. Ver recetas saludables")
         print("3. Salir")
         
-        choice = input("Selecciona una opción (1-3): ")
+        choice = input("Selecciona una opcion (1-3): ")
         
         if choice == '1':
             food = input("Introduce el nombre del alimento: ")
             show_calories(food, calories_data)
         elif choice == '2':
             show_recipes(recipes_data)
-            recipe_choice = input("\nIntroduce el número de la receta para ver detalles (o Enter para volver): ")
+            recipe_choice = input("\nIntroduce el numero de la receta para ver detalles (o Enter para volver): ")
             if recipe_choice.isdigit():
                 show_recipe_details(int(recipe_choice) - 1, recipes_data)
         elif choice == '3':
-            print("¡Hasta luego! Mantente saludable.")
+            print("Hasta luego! Mantente saludable.")
             break
         else:
-            print("Opción no válida. Inténtalo de nuevo.")
+            print("Opcion no valida. Intentalo de nuevo.")
 
 if __name__ == "__main__":
     main()
