@@ -52,25 +52,34 @@ HTML_PAGE = """<!DOCTYPE html>
   --text:#111827;--muted:#6b7280;--accent:#16a34a;
   --user:#111827;--r:10px
 }
+html.dark{
+  --bg:#0f1117;--surface:#1a1d27;--border:#2d3040;
+  --text:#e8eaf0;--muted:#8b90a0;--accent:#22c55e;
+  --user:#22c55e
+}
 html,body{height:100%}
-body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
-.app{max-width:680px;height:100vh;margin:0 auto;display:flex;flex-direction:column;background:var(--surface);border-left:1px solid var(--border);border-right:1px solid var(--border)}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;transition:background .2s,color .2s}
+.app{max-width:680px;height:100vh;margin:0 auto;display:flex;flex-direction:column;background:var(--surface);border-left:1px solid var(--border);border-right:1px solid var(--border);transition:background .2s,border-color .2s}
 .header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
 .icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .icon svg{width:15px;height:15px;fill:#fff}
 .header h1{font-size:15px;font-weight:600}
 .header p{font-size:12px;color:var(--muted);margin-top:1px}
+.header-end{margin-left:auto}
+#dm{width:30px;height:30px;background:none;border:1px solid var(--border);border-radius:7px;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:border-color .15s,color .15s}
+#dm:hover{border-color:var(--accent);color:var(--accent);opacity:1}
+#dm svg{width:15px;height:15px;fill:currentColor}
 .msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px}
 .m{display:flex}
 .m.u{justify-content:flex-end}
-.b{max-width:80%;padding:10px 14px;border-radius:var(--r);line-height:1.65;font-size:14px}
+.b{max-width:80%;padding:10px 14px;border-radius:var(--r);line-height:1.65;font-size:14px;transition:background .2s,border-color .2s}
 .m.bot .b{background:var(--surface);border:1px solid var(--border)}
 .m.u .b{background:var(--user);color:#fff}
 .typing .b{color:var(--muted);font-style:italic}
 .composer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
-input{flex:1;padding:9px 13px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+input{flex:1;padding:9px 13px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s,background .2s,color .2s}
 input:focus{border-color:var(--accent)}
-button{padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .15s}
+button{padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .15s,background .2s}
 button:hover{opacity:.85}
 small{font-size:12px}
 @media(max-width:680px){.app{border:none}}
@@ -85,6 +94,11 @@ small{font-size:12px}
     <div>
       <h1>NutriGPT</h1>
       <p>Asistente de nutrici\u00f3n y recetas</p>
+    </div>
+    <div class="header-end">
+      <button id="dm" title="Modo oscuro" aria-label="Alternar modo oscuro">
+        <svg id="dm-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
     </div>
   </div>
   <div class="msgs" id="msgs">
@@ -107,7 +121,22 @@ small{font-size:12px}
 const msgs=document.getElementById('msgs');
 const inp=document.getElementById('inp');
 const btn=document.getElementById('btn');
+const dmBtn=document.getElementById('dm');
+const dmIcon=document.getElementById('dm-icon');
 let ctx={last_recipe_ids:[],last_selected_recipe_id:null};
+
+const SUN='<path d="M12 4.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 4.5zm0 13.5a.75.75 0 01.75.75v.75a.75.75 0 01-1.5 0v-.75A.75.75 0 0112 18zm7.5-6.75a.75.75 0 010 1.5h-.75a.75.75 0 010-1.5h.75zm-15 0a.75.75 0 010 1.5H3.75a.75.75 0 010-1.5H4.5zm12.86-5.61a.75.75 0 010 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 011.06 0zm-10.6 10.6a.75.75 0 010 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 011.06 0zm10.6 0a.75.75 0 011.06 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 010-1.06zM5.86 6.14a.75.75 0 011.06 0l.53.53A.75.75 0 016.39 7.73l-.53-.53a.75.75 0 010-1.06zM12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z"/>';
+const MOON='<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+
+function setDark(on){
+  document.documentElement.classList.toggle('dark',on);
+  dmIcon.innerHTML=on?SUN:MOON;
+  localStorage.setItem('nutrigpt-dark',on?'1':'0');
+}
+const saved=localStorage.getItem('nutrigpt-dark');
+const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+setDark(saved!==null ? saved==='1' : prefersDark);
+dmBtn.addEventListener('click',()=>setDark(!document.documentElement.classList.contains('dark')));
 function add(html,isUser,cls){
   const m=document.createElement('div');
   m.className='m '+(isUser?'u':'bot')+(cls?' '+cls:'');
