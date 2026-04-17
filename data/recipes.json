@@ -1,0 +1,36 @@
+{
+  "recetas": [
+    {
+      "nombre": "Ensalada de Pollo y Aguacate",
+      "ingredientes": [
+        "1 pechuga de pollo a la plancha",
+        "1 aguacate maduro",
+        "Hojas de espinaca fresca",
+        "Tomates cherry",
+        "Aceite de oliva y limón"
+      ],
+      "instrucciones": [
+        "Corta el pollo en tiras.",
+        "Trocea el aguacate y los tomates.",
+        "Mezcla todos los ingredientes en un bol.",
+        "Aliña con aceite de oliva y limón al gusto."
+      ],
+      "calorias_aprox": 450
+    },
+    {
+      "nombre": "Avena con Plátano y Nueces",
+      "ingredientes": [
+        "50g de avena",
+        "1 plátano",
+        "Un puñado de nueces",
+        "200ml de leche o bebida vegetal"
+      ],
+      "instrucciones": [
+        "Cocina la avena con la leche a fuego lento hasta que espese.",
+        "Sirve en un bol y añade el plátano en rodajas.",
+        "Decora con las nueces por encima."
+      ],
+      "calorias_aprox": 350
+    }
+  ]
+}

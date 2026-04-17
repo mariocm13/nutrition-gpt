@@ -1,0 +1,12 @@
+{
+  "alimentos": [
+    {"nombre": "Manzana", "calorias": 52, "unidad": "100g"},
+    {"nombre": "Pechuga de Pollo", "calorias": 165, "unidad": "100g"},
+    {"nombre": "Arroz Blanco", "calorias": 130, "unidad": "100g"},
+    {"nombre": "Huevo", "calorias": 155, "unit": "100g"},
+    {"nombre": "Aguacate", "calorias": 160, "unidad": "100g"},
+    {"nombre": "Avena", "calorias": 389, "unidad": "100g"},
+    {"nombre": "Plátano", "calorias": 89, "unidad": "100g"},
+    {"nombre": "Salmón", "calorias": 208, "unidad": "100g"}
+  ]
+}
