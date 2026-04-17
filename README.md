@@ -37,7 +37,17 @@ Tu NutriGPT está desplegado en línea y es accesible desde cualquier lugar:
 
 Simplemente abre el enlace en tu navegador desde cualquier dispositivo.
 
-### Opción 2: Ejecutar Localmente
+### Opción 2: Actualización y Despliegue Automático
+
+He incluido un script para facilitar las actualizaciones. Solo tienes que ejecutar:
+
+```bash
+./deploy.sh "Descripción de tus cambios"
+```
+
+Este script validará tu código y lo subirá a GitHub, lo que activará automáticamente el despliegue en Render.
+
+### Opción 3: Ejecutar Localmente
 
 Si quieres ejecutar la aplicación en tu ordenador:
 

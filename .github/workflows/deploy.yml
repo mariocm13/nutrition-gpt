@@ -1,0 +1,19 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Trigger Render Deployment
+        if: github.event_name == 'push'
+        run: |
+          # Este paso es opcional si tienes activado "Auto-Deploy" en Render.
+          # Si quieres forzarlo mediante API, podrías usar un curl aquí con el Deploy Hook de Render.
+          echo "Despliegue iniciado automáticamente por Render al detectar cambios en main."
