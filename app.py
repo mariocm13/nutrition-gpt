@@ -26,6 +26,21 @@ DRIVE_FILE_ID = "1pMn-MyxfEaag0rzZbwYSzSciYnRDOodw"
 CALORIES_DATA_PATH = "data/calories.json"
 RECIPES_DATA_PATH = "data/recipes_large.json"
 
+ORDINALES = {
+    "primera": 1,
+    "primero": 1,
+    "segunda": 2,
+    "segundo": 2,
+    "tercera": 3,
+    "tercero": 3,
+    "cuarta": 4,
+    "cuarto": 4,
+    "quinta": 5,
+    "quinto": 5,
+    "ultima": -1,
+    "ultimo": -1,
+}
+
 
 def normalizar_texto(texto):
     texto = texto.lower()
@@ -55,12 +70,15 @@ def tokens_relevantes(texto):
         "o",
         "que",
         "en",
+        "esa",
+        "ese",
+        "esta",
+        "este",
     }
     return [t for t in normalizar_texto(texto).split() if len(t) > 2 and t not in stopwords]
 
 
 def load_recipes_from_drive():
-    """Carga las recetas desde Google Drive."""
     url = f"https://docs.google.com/uc?export=download&id={DRIVE_FILE_ID}"
     try:
         response = requests.get(url, timeout=10)
@@ -75,7 +93,6 @@ def load_recipes_from_drive():
 
 
 def load_calories():
-    """Carga datos de calorias localmente."""
     if os.path.exists(CALORIES_DATA_PATH):
         with open(CALORIES_DATA_PATH, "r", encoding="utf-8") as file:
             return json.load(file)
@@ -84,10 +101,10 @@ def load_calories():
 
 recipes_db = load_recipes_from_drive()
 calories_db = load_calories()
+recipes_by_id = {receta["id"]: receta for receta in recipes_db.get("recetas", [])}
 
 
 def buscar_recetas(terminos):
-    """Busca recetas por nombre o ingredientes con un ranking simple."""
     if isinstance(terminos, str):
         terminos = tokens_relevantes(terminos)
 
@@ -115,7 +132,6 @@ def buscar_recetas(terminos):
 
 
 def buscar_alimentos_similares(termino):
-    """Busca alimentos por coincidencia exacta, parcial y por tokens."""
     termino_normalizado = normalizar_texto(termino)
     resultados = []
 
@@ -165,13 +181,23 @@ def calcular_calorias_estimadas(alimento_info, cantidad):
 
 def formatear_detalle_receta(receta):
     ingredientes = "".join(f"- {ing}<br>" for ing in receta["ingredientes"][:8])
-    pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:4], 1))
+    pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:5], 1))
     return (
         f"<strong>{receta['nombre']}</strong><br><br>"
         f"<strong>Calorias aproximadas:</strong> {receta['calorias_aprox']} kcal<br><br>"
         f"<strong>Ingredientes:</strong><br>{ingredientes}<br>"
         f"<strong>Pasos principales:</strong><br>{pasos}"
     )
+
+
+def formatear_ingredientes_receta(receta):
+    ingredientes = "".join(f"- {ing}<br>" for ing in receta["ingredientes"][:10])
+    return f"<strong>Ingredientes de {receta['nombre']}:</strong><br><br>{ingredientes}"
+
+
+def formatear_preparacion_receta(receta):
+    pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:8], 1))
+    return f"<strong>Preparacion de {receta['nombre']}:</strong><br><br>{pasos}"
 
 
 def explicar_capacidades():
@@ -187,12 +213,112 @@ Puedo ayudarte con:
 - \"Cuantas calorias tiene el arroz\"<br>
 - \"Cuantas calorias tienen 250 g de salmon\"<br><br>
 
-<strong>Consejo</strong><br>
-Si me das un alimento, una cantidad o varios ingredientes, suelo responder mejor."""
+<strong>Seguimiento de recetas</strong><br>
+Despues de darte opciones, puedes decirme \"la 2\", \"la primera\", \"dame ingredientes\" o \"como se hace\"."""
 
 
-def generar_respuesta(mensaje):
-    """Genera una respuesta conversacional segun la intencion detectada."""
+def es_pregunta_sobre_receta(texto_normalizado):
+    pistas = [
+        "la receta",
+        "esa receta",
+        "ese plato",
+        "esa opcion",
+        "la opcion",
+        "ingredientes",
+        "como se hace",
+        "preparacion",
+        "pasos",
+        "primera",
+        "segunda",
+        "tercera",
+        "cuarta",
+        "quinta",
+    ]
+    if re.search(r"\b[1-5]\b", texto_normalizado):
+        return True
+    return any(pista in texto_normalizado for pista in pistas)
+
+
+def extraer_indice_receta(texto_normalizado, total):
+    match = re.search(r"\b([1-9])\b", texto_normalizado)
+    if match:
+        valor = int(match.group(1))
+        if 1 <= valor <= total:
+            return valor - 1
+
+    for palabra, indice in ORDINALES.items():
+        if palabra in texto_normalizado:
+            if indice == -1:
+                return total - 1
+            if 1 <= indice <= total:
+                return indice - 1
+    return None
+
+
+def buscar_receta_por_nombre(texto, recetas_contexto):
+    texto_normalizado = normalizar_texto(texto)
+    for receta in recetas_contexto:
+        nombre = normalizar_texto(receta["nombre"])
+        if nombre and (nombre in texto_normalizado or texto_normalizado in nombre):
+            return receta
+
+        tokens_nombre = set(tokens_relevantes(receta["nombre"]))
+        tokens_texto = set(tokens_relevantes(texto))
+        if tokens_nombre and len(tokens_nombre & tokens_texto) >= max(1, min(2, len(tokens_nombre))):
+            return receta
+    return None
+
+
+def obtener_recetas_contexto(contexto):
+    recipe_ids = contexto.get("last_recipe_ids", []) if contexto else []
+    return [recipes_by_id[recipe_id] for recipe_id in recipe_ids if recipe_id in recipes_by_id]
+
+
+def resolver_receta_referenciada(mensaje, contexto):
+    recetas_contexto = obtener_recetas_contexto(contexto)
+    if not recetas_contexto:
+        return None
+
+    texto_normalizado = normalizar_texto(mensaje)
+    receta_por_nombre = buscar_receta_por_nombre(mensaje, recetas_contexto)
+    if receta_por_nombre:
+        return receta_por_nombre
+
+    indice = extraer_indice_receta(texto_normalizado, len(recetas_contexto))
+    if indice is not None:
+        return recetas_contexto[indice]
+
+    recipe_id = contexto.get("last_selected_recipe_id") if contexto else None
+    if recipe_id in recipes_by_id and (
+        "esa" in texto_normalizado
+        or "ese" in texto_normalizado
+        or "receta" in texto_normalizado
+        or "ingredientes" in texto_normalizado
+        or "pasos" in texto_normalizado
+        or "preparacion" in texto_normalizado
+        or "como se hace" in texto_normalizado
+    ):
+        return recipes_by_id[recipe_id]
+
+    return None
+
+
+def responder_detalle_receta(receta, mensaje):
+    texto_normalizado = normalizar_texto(mensaje)
+    if "ingredientes" in texto_normalizado:
+        return formatear_ingredientes_receta(receta)
+    if "como se hace" in texto_normalizado or "preparacion" in texto_normalizado or "pasos" in texto_normalizado:
+        return formatear_preparacion_receta(receta)
+    if "calorias" in texto_normalizado or "kcal" in texto_normalizado:
+        return (
+            f"<strong>{receta['nombre']}</strong><br><br>"
+            f"Tiene aproximadamente <strong>{receta['calorias_aprox']} kcal</strong>."
+        )
+    return formatear_detalle_receta(receta)
+
+
+def generar_respuesta(mensaje, contexto=None):
+    contexto = contexto or {}
     analisis = nlp.procesar(mensaje)
     intencion = analisis["intencion"]
     palabras_clave = analisis["palabras_clave"]
@@ -201,19 +327,34 @@ def generar_respuesta(mensaje):
     cantidad = analisis["cantidad"]
     texto_normalizado = normalizar_texto(mensaje)
 
+    receta_referenciada = resolver_receta_referenciada(mensaje, contexto)
+    if receta_referenciada and (es_pregunta_sobre_receta(texto_normalizado) or intencion == "general"):
+        contexto["last_selected_recipe_id"] = receta_referenciada["id"]
+        return {
+            "respuesta": responder_detalle_receta(receta_referenciada, mensaje),
+            "contexto": contexto,
+        }
+
     if intencion == "ayuda":
-        return explicar_capacidades()
+        return {"respuesta": explicar_capacidades(), "contexto": contexto}
 
     if intencion == "recetas":
         terminos = ingredientes if ingredientes else palabras_clave
         recetas = buscar_recetas(terminos)
 
         if recetas:
-            if len(recetas) == 1 or "detalle" in texto_normalizado or "ingredientes" in texto_normalizado:
-                return formatear_detalle_receta(recetas[0])
+            recetas_top = recetas[:5]
+            contexto["last_recipe_ids"] = [receta["id"] for receta in recetas_top]
+            contexto["last_selected_recipe_id"] = recetas_top[0]["id"]
+
+            if len(recetas_top) == 1 or "detalle" in texto_normalizado or "ingredientes" in texto_normalizado:
+                return {
+                    "respuesta": formatear_detalle_receta(recetas_top[0]),
+                    "contexto": contexto,
+                }
 
             partes = [f"Encontre {len(recetas)} receta(s) que encajan con tu consulta:<br><br>"]
-            for i, receta in enumerate(recetas[:5], 1):
+            for i, receta in enumerate(recetas_top, 1):
                 contenido = normalizar_texto(" ".join([receta["nombre"]] + receta["ingredientes"]))
                 coincidencias = [t for t in terminos if normalizar_texto(t) in contenido]
                 motivo = f" Coincide con: {', '.join(coincidencias[:3])}." if coincidencias else ""
@@ -221,16 +362,20 @@ def generar_respuesta(mensaje):
                     f"<strong>{i}. {receta['nombre']}</strong> ({receta['calorias_aprox']} kcal).{motivo}<br>"
                 )
             partes.append(
-                "<br>Si quieres, te doy el detalle de una receta concreta o te busco opciones mas ligeras o mas proteicas."
+                "<br>Ahora puedes decirme cosas como <em>la 2</em>, <em>la primera</em>, "
+                "<em>dame los ingredientes de la 3</em> o <em>como se hace la receta 1</em>."
             )
-            return "".join(partes)
+            return {"respuesta": "".join(partes), "contexto": contexto}
 
         termino_busqueda = ", ".join(terminos) if terminos else "tu consulta"
-        return (
-            f"No encontre recetas claras con <strong>{termino_busqueda}</strong>.<br><br>"
-            "Prueba con 1 o 2 ingredientes principales, por ejemplo: <em>pollo y arroz</em>, "
-            "<em>salmon</em> o <em>desayuno con avena</em>."
-        )
+        return {
+            "respuesta": (
+                f"No encontre recetas claras con <strong>{termino_busqueda}</strong>.<br><br>"
+                "Prueba con 1 o 2 ingredientes principales, por ejemplo: <em>pollo y arroz</em>, "
+                "<em>salmon</em> o <em>desayuno con avena</em>."
+            ),
+            "contexto": contexto,
+        }
 
     if intencion == "calorias":
         candidatos = []
@@ -264,20 +409,26 @@ def generar_respuesta(mensaje):
                 )
 
             partes.append("<br><br>Si quieres, tambien puedo sugerirte recetas con este alimento.")
-            return "".join(partes)
+            return {"respuesta": "".join(partes), "contexto": contexto}
 
-        return (
-            "No encontre ese alimento en mi base de datos.<br><br>"
-            "Prueba con un nombre mas concreto, por ejemplo: <em>pechuga de pollo</em>, "
-            "<em>arroz blanco</em>, <em>salmon</em> o <em>manzana</em>."
-        )
+        return {
+            "respuesta": (
+                "No encontre ese alimento en mi base de datos.<br><br>"
+                "Prueba con un nombre mas concreto, por ejemplo: <em>pechuga de pollo</em>, "
+                "<em>arroz blanco</em>, <em>salmon</em> o <em>manzana</em>."
+            ),
+            "contexto": contexto,
+        }
 
-    return (
-        "No he entendido del todo tu consulta.<br><br>"
-        "Puedo ayudarte con recetas y calorias. Prueba algo como:<br>"
-        "- <em>Que puedo cocinar con pollo y espinacas</em><br>"
-        "- <em>Cuantas calorias tienen 200 g de arroz</em>"
-    )
+    return {
+        "respuesta": (
+            "No he entendido del todo tu consulta.<br><br>"
+            "Puedo ayudarte con recetas y calorias. Prueba algo como:<br>"
+            "- <em>Que puedo cocinar con pollo y espinacas</em><br>"
+            "- <em>Cuantas calorias tienen 200 g de arroz</em>"
+        ),
+        "contexto": contexto,
+    }
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -422,7 +573,7 @@ async def get_home():
             <div class="chat-shell">
                 <div class="header">
                     <h1>NutriGPT</h1>
-                    <p>Recetas, calorias y respuestas mas utiles con lenguaje natural.</p>
+                    <p>Ahora recuerda las recetas que te acaba de sugerir.</p>
                 </div>
                 <div class="messages" id="messages">
                     <div class="message">
@@ -431,7 +582,8 @@ async def get_home():
                             Puedo ayudarte con recetas y calorias.<br>
                             Prueba algo como:<br>
                             - <em>Que puedo cocinar con pollo y arroz</em><br>
-                            - <em>Cuantas calorias tienen 250 g de salmon</em>
+                            - <em>Luego dime la 2</em><br>
+                            - <em>O preguntame como se hace la primera</em>
                         </div>
                     </div>
                 </div>
@@ -447,6 +599,7 @@ async def get_home():
             const messagesDiv = document.getElementById("messages");
             const input = document.getElementById("message-input");
             const button = document.getElementById("send-btn");
+            let chatContext = { last_recipe_ids: [], last_selected_recipe_id: null };
 
             function addMessage(text, isUser = false, extraClass = "") {
                 const message = document.createElement("div");
@@ -473,10 +626,13 @@ async def get_home():
                     const response = await fetch("/api/chat", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ mensaje: message })
+                        body: JSON.stringify({ mensaje: message, contexto: chatContext })
                     });
                     const data = await response.json();
                     typing.remove();
+                    if (data.contexto) {
+                        chatContext = data.contexto;
+                    }
                     addMessage(data.respuesta, false);
                 } catch (error) {
                     typing.remove();
@@ -497,7 +653,8 @@ async def get_home():
 @app.post("/api/chat")
 async def chat(data: dict):
     mensaje = data.get("mensaje", "")
-    return {"respuesta": generar_respuesta(mensaje)}
+    contexto = data.get("contexto", {}) or {}
+    return generar_respuesta(mensaje, contexto)
 
 
 @app.get("/api/recipes")
