@@ -11,6 +11,12 @@ import requests
 from nlp_processor import NLPProcessor
 
 app = FastAPI(title="NutriGPT - Asistente de Nutricion")
+import os
+
+ALLOWED_ORIGINS = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "https://nutrigpt.onrender.com"
+).split(",")
 
 app.add_middleware(
     CORSMiddleware,
