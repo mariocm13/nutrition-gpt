@@ -29,7 +29,17 @@ Este es un asistente de nutrición accesible vía web, diseñado para proporcion
 
 ## Uso
 
-### Ejecutar la aplicación web
+### Opción 1: Acceso en Línea (Recomendado)
+
+Tu NutriGPT está desplegado en línea y es accesible desde cualquier lugar:
+
+**URL Pública**: [https://nutrigpt.onrender.com](https://nutrigpt.onrender.com)
+
+Simplemente abre el enlace en tu navegador desde cualquier dispositivo.
+
+### Opción 2: Ejecutar Localmente
+
+Si quieres ejecutar la aplicación en tu ordenador:
 
 ```bash
 python app.py
@@ -37,7 +47,7 @@ python app.py
 
 Luego abre tu navegador y ve a: **http://localhost:8000**
 
-### Ejecutar la versión CLI (línea de comandos)
+### Opción 3: Ejecutar la Versión CLI (Línea de Comandos)
 
 ```bash
 python main.py
