@@ -1,45 +1,118 @@
 from fastapi import FastAPI, Query
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import json
 import os
 import requests
+import re
 from typing import Optional
 
-app = FastAPI(title="Asistente de Nutrición Pro")
+app = FastAPI(title="NutriGPT - Asistente de Nutrición")
 
-# Configuración de la base de datos
-# Reemplaza este ID con el ID de tu archivo de Google Drive cuando lo tengas
-DRIVE_FILE_ID = "1_REEMPLAZA_CON_TU_ID_DE_GOOGLE_DRIVE"
-LOCAL_DATA_PATH = 'data/recipes_large.json'
+# Agregar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Configuración de Google Drive
+DRIVE_FILE_ID = "1pMn-MyxfEaag0rzZbwYSzSciYnRDOodw"
 CALORIES_DATA_PATH = 'data/calories.json'
 
-def load_data():
-    """Carga datos desde Google Drive o localmente como respaldo."""
-    # Intentar cargar desde Google Drive si hay un ID configurado
-    if DRIVE_FILE_ID and "REEMPLAZA" not in DRIVE_FILE_ID:
-        url = f"https://docs.google.com/uc?export=download&id={DRIVE_FILE_ID}"
-        try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                return response.json()
-        except Exception as e:
-            print(f"Error cargando desde Drive: {e}")
-    
-    # Respaldo: Cargar localmente
-    if os.path.exists(LOCAL_DATA_PATH):
-        with open(LOCAL_DATA_PATH, 'r', encoding='utf-8') as f:
-            return json.load(f)
+def load_recipes_from_drive():
+    """Carga las recetas desde Google Drive."""
+    url = f"https://docs.google.com/uc?export=download&id={DRIVE_FILE_ID}"
+    try:
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            return response.json()
+    except Exception as e:
+        print(f"Error cargando desde Drive: {e}")
     return {"recetas": []}
 
 def load_calories():
+    """Carga datos de calorías localmente."""
     if os.path.exists(CALORIES_DATA_PATH):
         with open(CALORIES_DATA_PATH, 'r', encoding='utf-8') as f:
             return json.load(f)
     return {"alimentos": []}
 
 # Carga inicial
-recipes_db = load_data()
+recipes_db = load_recipes_from_drive()
 calories_db = load_calories()
+
+def buscar_recetas(termino):
+    """Busca recetas por nombre o ingredientes."""
+    termino = termino.lower()
+    resultados = []
+    for receta in recipes_db.get('recetas', []):
+        if (termino in receta['nombre'].lower() or 
+            any(termino in ing.lower() for ing in receta['ingredientes'])):
+            resultados.append(receta)
+    return resultados[:10]  # Limitar a 10 resultados
+
+def buscar_alimento(termino):
+    """Busca información de calorías de un alimento."""
+    termino = termino.lower()
+    for alimento in calories_db.get('alimentos', []):
+        if termino in alimento['nombre'].lower():
+            return alimento
+    return None
+
+def generar_respuesta(mensaje):
+    """Genera una respuesta conversacional basada en el mensaje del usuario."""
+    mensaje_lower = mensaje.lower()
+    
+    # Detectar intención: búsqueda de recetas
+    if any(palabra in mensaje_lower for palabra in ['receta', 'puedo hacer', 'cómo hago', 'quiero', 'busco', 'dame', 'muestra', 'con']):
+        # Extraer ingredientes principales
+        palabras_clave = re.findall(r'\b\w+\b', mensaje_lower)
+        recetas = buscar_recetas(' '.join(palabras_clave))
+        
+        if recetas:
+            respuesta = f"🍳 Encontré {len(recetas)} receta(s) que te podrían interesar:\n\n"
+            for i, receta in enumerate(recetas[:5], 1):
+                respuesta += f"**{i}. {receta['nombre']}** ({receta['calorias_aprox']} kcal)\n"
+            respuesta += "\n¿Te gustaría conocer los detalles de alguna receta? Pregúntame por el número o el nombre."
+            return respuesta
+        else:
+            return "No encontré recetas con esos ingredientes. 😕 ¿Podrías ser más específico? Por ejemplo: 'Recetas con pollo' o 'Qué puedo hacer con arroz'."
+    
+    # Detectar intención: búsqueda de calorías
+    elif any(palabra in mensaje_lower for palabra in ['calorías', 'calorias', 'cuántas calorías', 'cuantas calorias', 'valor nutricional', 'energía', 'kcal']):
+        palabras_clave = re.findall(r'\b\w+\b', mensaje_lower)
+        for palabra in palabras_clave:
+            alimento = buscar_alimento(palabra)
+            if alimento:
+                return f"📊 **{alimento['nombre']}**\n\n🔥 Calorías: **{alimento['calorias']} kcal** por {alimento['unidad']}\n\nEsta información es por cada {alimento['unidad']}. ¿Hay algo más que quieras saber?"
+        
+        return "No encontré información de calorías para ese alimento. 🤔 Intenta con alimentos comunes como 'pollo', 'manzana', 'arroz', etc."
+    
+    # Detectar intención: información general
+    elif any(palabra in mensaje_lower for palabra in ['hola', 'qué puedes', 'ayuda', 'cómo funciona', 'cuéntame']):
+        return """👋 ¡Hola! Soy **NutriGPT**, tu asistente de nutrición inteligente.
+
+Puedo ayudarte de varias formas:
+
+🍽️ **Buscar Recetas**: Pregúntame "¿Qué puedo hacer con pollo?" o "Recetas con verduras"
+🔥 **Calorías**: Pregúntame "¿Cuántas calorías tiene una manzana?"
+📋 **Información Nutricional**: Dime el nombre de un alimento y te diré sus calorías
+
+Tengo acceso a **1000+ recetas** y una base de datos nutricional completa. ¿En qué puedo ayudarte?"""
+    
+    # Respuesta por defecto
+    else:
+        return """No estoy seguro de lo que preguntas. 🤔
+
+Puedo ayudarte con:
+- 🍽️ Buscar recetas (ej: "Recetas con pollo")
+- 🔥 Información de calorías (ej: "¿Cuántas calorías tiene un huevo?")
+- 📋 Detalles nutricionales de alimentos
+
+¿Qué te gustaría saber?"""
 
 @app.get("/", response_class=HTMLResponse)
 async def get_home():
@@ -49,173 +122,167 @@ async def get_home():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>NutriGPT Pro - 1000+ Recetas</title>
+        <title>NutriGPT - Asistente de Nutrición</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
-            .recipe-card:hover { transform: translateY(-5px); transition: all 0.3s; }
-            .loader { border-top-color: #3498db; animation: spinner 1.5s linear infinite; }
-            @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+            .chat-container { display: flex; flex-direction: column; height: 100vh; }
+            .messages-container { flex: 1; overflow-y: auto; padding: 20px; }
+            .message { margin-bottom: 16px; animation: slideIn 0.3s ease; }
+            @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .user-message { display: flex; justify-content: flex-end; }
+            .user-message .bubble { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+            .bot-message { display: flex; justify-content: flex-start; }
+            .bot-message .bubble { background: #f0f0f0; color: #333; }
+            .bubble { max-width: 70%; padding: 12px 16px; border-radius: 18px; word-wrap: break-word; line-height: 1.4; }
+            .input-area { padding: 20px; background: white; border-top: 1px solid #e0e0e0; }
+            .input-group { display: flex; gap: 10px; }
+            #message-input { flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 24px; outline: none; transition: all 0.3s; }
+            #message-input:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+            #send-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 24px; cursor: pointer; font-weight: 600; transition: transform 0.2s; }
+            #send-btn:hover { transform: scale(1.05); }
+            #send-btn:active { transform: scale(0.95); }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
+            .header h1 { margin: 0; font-size: 24px; font-weight: bold; }
+            .header p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; }
+            .typing { display: flex; gap: 4px; align-items: center; }
+            .typing span { width: 8px; height: 8px; background: #999; border-radius: 50%; animation: typing 1.4s infinite; }
+            .typing span:nth-child(2) { animation-delay: 0.2s; }
+            .typing span:nth-child(3) { animation-delay: 0.4s; }
+            @keyframes typing { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
+            .recipe-link { color: #667eea; cursor: pointer; text-decoration: underline; }
+            .recipe-link:hover { text-decoration: none; }
         </style>
     </head>
-    <body class="bg-gray-50 min-h-screen">
-        <nav class="bg-green-600 text-white p-4 shadow-lg">
-            <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-2xl font-bold"><i class="fas fa-utensils mr-2"></i>NutriGPT Pro</h1>
-                <span class="bg-green-700 px-3 py-1 rounded-full text-sm">1000+ Recetas Activas</span>
-            </div>
-        </nav>
-
-        <main class="container mx-auto p-6">
-            <div class="flex flex-wrap gap-4 mb-8">
-                <button onclick="showSection('calories')" class="flex-1 bg-white p-4 rounded-xl shadow hover:bg-green-50 transition border-b-4 border-green-500 font-bold text-green-700">
-                    <i class="fas fa-fire mr-2"></i>Contador de Calorías
-                </button>
-                <button onclick="showSection('recipes')" class="flex-1 bg-white p-4 rounded-xl shadow hover:bg-blue-50 transition border-b-4 border-blue-500 font-bold text-blue-700">
-                    <i class="fas fa-book-open mr-2"></i>Explorar 1000 Recetas
-                </button>
+    <body class="bg-gray-100">
+        <div class="chat-container">
+            <div class="header">
+                <h1><i class="fas fa-utensils mr-2"></i>NutriGPT</h1>
+                <p>Tu asistente de nutrición inteligente • 1000+ recetas</p>
             </div>
 
-            <!-- Sección Calorías -->
-            <div id="section-calories" class="section">
-                <div class="bg-white p-6 rounded-2xl shadow-sm mb-6">
-                    <div class="flex gap-2">
-                        <input type="text" id="food-search" placeholder="¿Qué alimento buscas?" class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
-                        <button onclick="searchCalories()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">Buscar</button>
-                    </div>
-                    <div id="calories-result" class="mt-4"></div>
-                </div>
-            </div>
-
-            <!-- Sección Recetas -->
-            <div id="section-recipes" class="section hidden">
-                <div class="bg-white p-6 rounded-2xl shadow-sm mb-6">
-                    <div class="flex gap-2 mb-4">
-                        <input type="text" id="recipe-search" onkeyup="filterRecipes()" placeholder="Filtrar por ingrediente o nombre..." class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div id="recipes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Las recetas se cargarán aquí -->
-                    </div>
-                    <div id="loading" class="flex justify-center my-10">
-                        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+            <div class="messages-container" id="messages">
+                <div class="message bot-message">
+                    <div class="bubble">
+                        👋 ¡Hola! Soy <strong>NutriGPT</strong>, tu asistente de nutrición. Puedo ayudarte a:
+                        <br><br>
+                        🍽️ <strong>Buscar recetas</strong> - Pregúntame "¿Qué puedo hacer con pollo?"
+                        <br>🔥 <strong>Calorías</strong> - Pregúntame "¿Cuántas calorías tiene una manzana?"
+                        <br>📋 <strong>Información nutricional</strong> - Dime un alimento
+                        <br><br>
+                        ¿En qué puedo ayudarte hoy?
                     </div>
                 </div>
             </div>
-        </main>
 
-        <!-- Modal de Receta -->
-        <div id="recipe-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-            <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative">
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
-                <div id="modal-content"></div>
+            <div class="input-area">
+                <div class="input-group">
+                    <input type="text" id="message-input" placeholder="Escribe tu pregunta aquí..." autocomplete="off">
+                    <button id="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane mr-2"></i>Enviar</button>
+                </div>
             </div>
         </div>
 
         <script>
-            let allRecipes = [];
+            const messagesDiv = document.getElementById('messages');
+            const input = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
 
-            function showSection(name) {
-                document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-                document.getElementById('section-' + name).classList.remove('hidden');
+            function scrollToBottom() {
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
 
-            async function searchCalories() {
-                const food = document.getElementById('food-search').value;
-                const res = await fetch(`/api/calories?food=${food}`);
-                const data = await res.json();
-                const container = document.getElementById('calories-result');
-                
-                if(data.found) {
-                    container.innerHTML = `
-                        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                            <h3 class="font-bold text-lg text-green-800">${data.nombre}</h3>
-                            <p class="text-green-700">${data.calorias} kcal por ${data.unidad}</p>
-                        </div>`;
-                } else {
-                    container.innerHTML = `<p class="text-red-500">No encontrado. Prueba con 'Pollo' o 'Manzana'.</p>`;
+            function addMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.innerHTML = text;
+                messageDiv.appendChild(bubble);
+                messagesDiv.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            function showTyping() {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot-message';
+                messageDiv.id = 'typing-indicator';
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+                messageDiv.appendChild(bubble);
+                messagesDiv.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            function removeTyping() {
+                const typing = document.getElementById('typing-indicator');
+                if (typing) typing.remove();
+            }
+
+            async function sendMessage() {
+                const message = input.value.trim();
+                if (!message) return;
+
+                addMessage(message, true);
+                input.value = '';
+                input.focus();
+
+                showTyping();
+
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mensaje: message })
+                    });
+                    const data = await response.json();
+                    removeTyping();
+                    addMessage(data.respuesta, false);
+                } catch (error) {
+                    removeTyping();
+                    addMessage('❌ Error al procesar tu mensaje. Intenta de nuevo.', false);
                 }
             }
 
-            async function loadRecipes() {
-                const res = await fetch('/api/recipes');
-                const data = await res.json();
-                allRecipes = data.recetas;
-                document.getElementById('loading').classList.add('hidden');
-                displayRecipes(allRecipes.slice(0, 50)); // Mostrar primeras 50 inicialmente
-            }
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
 
-            function displayRecipes(recipes) {
-                const grid = document.getElementById('recipes-grid');
-                grid.innerHTML = recipes.map(r => `
-                    <div class="bg-white border rounded-xl p-4 recipe-card cursor-pointer shadow-sm" onclick="openRecipe(${r.id})">
-                        <div class="text-blue-600 font-bold mb-2">#${r.id}</div>
-                        <h3 class="font-bold text-gray-800 mb-2">${r.nombre}</h3>
-                        <div class="flex justify-between text-sm text-gray-500">
-                            <span><i class="fas fa-fire mr-1"></i>${r.calorias_aprox} kcal</span>
-                            <span><i class="fas fa-list mr-1"></i>${r.ingredientes.length} ing.</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            function filterRecipes() {
-                const term = document.getElementById('recipe-search').value.toLowerCase();
-                const filtered = allRecipes.filter(r => 
-                    r.nombre.toLowerCase().includes(term) || 
-                    r.ingredientes.some(i => i.toLowerCase().includes(term))
-                );
-                displayRecipes(filtered.slice(0, 50));
-            }
-
-            function openRecipe(id) {
-                const r = allRecipes.find(recipe => recipe.id === id);
-                const modal = document.getElementById('recipe-modal');
-                const content = document.getElementById('modal-content');
-                
-                content.innerHTML = `
-                    <h2 class="text-3xl font-bold text-gray-800 mb-4">${r.nombre}</h2>
-                    <div class="bg-blue-50 p-4 rounded-xl mb-6 flex justify-around">
-                        <div class="text-center">
-                            <div class="text-blue-600 font-bold text-xl">${r.calorias_aprox}</div>
-                            <div class="text-xs text-blue-400 uppercase">Calorías</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-blue-600 font-bold text-xl">${r.ingredientes.length}</div>
-                            <div class="text-xs text-blue-400 uppercase">Ingredientes</div>
-                        </div>
-                    </div>
-                    <h3 class="font-bold text-lg mb-2 text-gray-700">Ingredientes</h3>
-                    <ul class="list-disc ml-5 mb-6 text-gray-600">
-                        ${r.ingredientes.map(i => `<li>${i}</li>`).join('')}
-                    </ul>
-                    <h3 class="font-bold text-lg mb-2 text-gray-700">Instrucciones</h3>
-                    <ol class="list-decimal ml-5 text-gray-600 space-y-2">
-                        ${r.instrucciones.map(i => `<li>${i}</li>`).join('')}
-                    </ol>
-                `;
-                modal.classList.remove('hidden');
-            }
-
-            function closeModal() {
-                document.getElementById('recipe-modal').classList.add('hidden');
-            }
-
-            window.onload = loadRecipes;
+            sendBtn.addEventListener('click', sendMessage);
         </script>
     </body>
     </html>
     """
 
-@app.get("/api/calories")
-async def get_calories(food: str):
-    for item in calories_db.get('alimentos', []):
-        if food.lower() in item['nombre'].lower():
-            return {"found": True, **item}
-    return {"found": False}
+@app.post("/api/chat")
+async def chat(data: dict):
+    """Endpoint para procesar mensajes de chat."""
+    mensaje = data.get('mensaje', '')
+    respuesta = generar_respuesta(mensaje)
+    return {"respuesta": respuesta}
 
 @app.get("/api/recipes")
 async def get_recipes():
+    """Endpoint para obtener todas las recetas."""
     return recipes_db
+
+@app.get("/api/calories")
+async def get_calories(food: str):
+    """Endpoint para buscar calorías de un alimento."""
+    alimento = buscar_alimento(food)
+    if alimento:
+        return {"found": True, **alimento}
+    return {"found": False}
+
+@app.get("/api/stats")
+async def get_stats():
+    """Endpoint para obtener estadísticas."""
+    return {
+        "total_recetas": len(recipes_db.get('recetas', [])),
+        "total_alimentos": len(calories_db.get('alimentos', []))
+    }
 
 if __name__ == "__main__":
     import uvicorn
