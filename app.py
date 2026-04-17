@@ -5,19 +5,12 @@ import json
 import os
 import re
 import unicodedata
-
 import requests
-
 from nlp_processor import NLPProcessor
 
-app = FastAPI(title="NutriGPT - Asistente de Nutricion")
-import os
+app = FastAPI(title="NutriGPT")
 
-ALLOWED_ORIGINS = os.environ.get(
-    "ALLOWED_ORIGINS",
-    "https://nutrigpt.onrender.com"
-).split(",")
-
+ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "https://nutrigpt.onrender.com").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -34,41 +27,129 @@ RECIPES_DATA_PATH = "data/recipes_large.json"
 NUTRITION_KNOWLEDGE_PATH = "data/nutrition_knowledge.json"
 
 ORDINALES = {
-    "primera": 1,
-    "primero": 1,
-    "segunda": 2,
-    "segundo": 2,
-    "tercera": 3,
-    "tercero": 3,
-    "cuarta": 4,
-    "cuarto": 4,
-    "quinta": 5,
-    "quinto": 5,
-    "ultima": -1,
-    "ultimo": -1,
+    "primera": 1, "primero": 1, "segunda": 2, "segundo": 2,
+    "tercera": 3, "tercero": 3, "cuarta": 4, "cuarto": 4,
+    "quinta": 5, "quinto": 5, "ultima": -1, "ultimo": -1,
 }
 
 MEDICAL_RISK_KEYWORDS = {
-    "diabetes",
-    "embarazo",
-    "embarazada",
-    "renal",
-    "rinon",
-    "hipertension",
-    "alergia",
-    "medicacion",
-    "trigliceridos",
-    "colesterol",
-    "trastorno alimentario",
-    "anemia",
+    "diabetes", "embarazo", "embarazada", "renal", "rinon",
+    "hipertension", "alergia", "medicacion", "trigliceridos",
+    "colesterol", "trastorno alimentario", "anemia",
 }
+
+HTML_PAGE = """<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NutriGPT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f9fafb;--surface:#fff;--border:#e5e7eb;
+  --text:#111827;--muted:#6b7280;--accent:#16a34a;
+  --user:#111827;--r:10px
+}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.app{max-width:680px;height:100vh;margin:0 auto;display:flex;flex-direction:column;background:var(--surface);border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.icon svg{width:15px;height:15px;fill:#fff}
+.header h1{font-size:15px;font-weight:600}
+.header p{font-size:12px;color:var(--muted);margin-top:1px}
+.msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px}
+.m{display:flex}
+.m.u{justify-content:flex-end}
+.b{max-width:80%;padding:10px 14px;border-radius:var(--r);line-height:1.65;font-size:14px}
+.m.bot .b{background:var(--surface);border:1px solid var(--border)}
+.m.u .b{background:var(--user);color:#fff}
+.typing .b{color:var(--muted);font-style:italic}
+.composer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+input{flex:1;padding:9px 13px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+input:focus{border-color:var(--accent)}
+button{padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .15s}
+button:hover{opacity:.85}
+small{font-size:12px}
+@media(max-width:680px){.app{border:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 5-8 5"/></svg>
+    </div>
+    <div>
+      <h1>NutriGPT</h1>
+      <p>Asistente de nutrici\u00f3n y recetas</p>
+    </div>
+  </div>
+  <div class="msgs" id="msgs">
+    <div class="m bot">
+      <div class="b">
+        Hola, soy <strong>NutriGPT</strong>.<br><br>
+        Preg\u00fantame sobre recetas, calor\u00edas o nutrici\u00f3n. Por ejemplo:<br>
+        \u2014 <em>Qu\u00e9 puedo cocinar con pollo y arroz</em><br>
+        \u2014 <em>Cu\u00e1ntas calor\u00edas tiene el salm\u00f3n</em><br>
+        \u2014 <em>La avena es buena para desayunar?</em>
+      </div>
+    </div>
+  </div>
+  <div class="composer">
+    <input id="inp" type="text" placeholder="Escribe tu pregunta..." autocomplete="off">
+    <button id="btn">Enviar</button>
+  </div>
+</div>
+<script>
+const msgs=document.getElementById('msgs');
+const inp=document.getElementById('inp');
+const btn=document.getElementById('btn');
+let ctx={last_recipe_ids:[],last_selected_recipe_id:null};
+function add(html,isUser,cls){
+  const m=document.createElement('div');
+  m.className='m '+(isUser?'u':'bot')+(cls?' '+cls:'');
+  const b=document.createElement('div');
+  b.className='b';
+  b.innerHTML=html;
+  m.appendChild(b);
+  msgs.appendChild(m);
+  msgs.scrollTop=msgs.scrollHeight;
+  return m;
+}
+async function send(){
+  const txt=inp.value.trim();
+  if(!txt)return;
+  add(txt,true);
+  inp.value='';
+  const t=add('Pensando\u2026',false,'typing');
+  try{
+    const r=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({mensaje:txt,contexto:ctx})
+    });
+    const d=await r.json();
+    t.remove();
+    if(d.contexto)ctx=d.contexto;
+    add(d.respuesta);
+  }catch(e){
+    t.remove();
+    add('Error al procesar tu mensaje. Intenta de nuevo.');
+  }
+}
+inp.addEventListener('keypress',e=>{if(e.key==='Enter')send()});
+btn.addEventListener('click',send);
+</script>
+</body>
+</html>"""
 
 
 def normalizar_texto(texto):
     texto = texto.lower()
-    texto = "".join(
-        c for c in unicodedata.normalize("NFD", texto) if unicodedata.category(c) != "Mn"
-    )
+    texto = "".join(c for c in unicodedata.normalize("NFD", texto) if unicodedata.category(c) != "Mn")
     texto = re.sub(r"[^a-z0-9\s]", " ", texto)
     texto = re.sub(r"\s+", " ", texto).strip()
     return texto
@@ -76,32 +157,14 @@ def normalizar_texto(texto):
 
 def tokens_relevantes(texto):
     stopwords = {
-        "de",
-        "del",
-        "la",
-        "el",
-        "los",
-        "las",
-        "con",
-        "sin",
-        "para",
-        "por",
-        "un",
-        "una",
-        "y",
-        "o",
-        "que",
-        "en",
-        "esa",
-        "ese",
-        "esta",
-        "este",
+        "de", "del", "la", "el", "los", "las", "con", "sin", "para",
+        "por", "un", "una", "y", "o", "que", "en", "esa", "ese", "esta", "este",
     }
     return [t for t in normalizar_texto(texto).split() if len(t) > 2 and t not in stopwords]
 
 
 def construir_lista_html(items, limit=3):
-    return "".join(f"- {item}<br>" for item in items[:limit])
+    return "".join(f"\u2014 {item}<br>" for item in items[:limit])
 
 
 def load_recipes_from_drive():
@@ -134,12 +197,10 @@ recipes_by_id = {receta["id"]: receta for receta in recipes_db.get("recetas", []
 def buscar_recetas(terminos):
     if isinstance(terminos, str):
         terminos = tokens_relevantes(terminos)
-
     resultados = []
     for receta in recipes_db.get("recetas", []):
         contenido = normalizar_texto(" ".join([receta["nombre"]] + receta["ingredientes"]))
         score = 0
-
         for termino in terminos:
             termino_normalizado = normalizar_texto(termino)
             if not termino_normalizado:
@@ -150,10 +211,8 @@ def buscar_recetas(terminos):
                 for token in termino_normalizado.split():
                     if token in contenido:
                         score += 1
-
         if score > 0:
             resultados.append((score, receta))
-
     resultados.sort(key=lambda item: (-item[0], item[1].get("calorias_aprox", 0)))
     return [receta for _, receta in resultados[:10]]
 
@@ -161,11 +220,9 @@ def buscar_recetas(terminos):
 def buscar_alimentos_similares(termino):
     termino_normalizado = normalizar_texto(termino)
     resultados = []
-
     for alimento in calories_db.get("alimentos", []):
         nombre_normalizado = normalizar_texto(alimento["nombre"])
         score = 0
-
         if termino_normalizado == nombre_normalizado:
             score = 100
         elif termino_normalizado and termino_normalizado in nombre_normalizado:
@@ -174,10 +231,8 @@ def buscar_alimentos_similares(termino):
             interseccion = set(tokens_relevantes(termino)) & set(tokens_relevantes(alimento["nombre"]))
             if interseccion:
                 score = len(interseccion) * 20
-
         if score > 0:
             resultados.append((score, alimento))
-
     resultados.sort(key=lambda item: (-item[0], item[1]["nombre"]))
     return [alimento for _, alimento in resultados[:5]]
 
@@ -191,78 +246,88 @@ def calcular_calorias_estimadas(alimento_info, cantidad):
     valor = cantidad.get("valor")
     unidad = cantidad.get("unidad")
     if not valor or not unidad:
-        return None
-
+        return None, None
     calorias_base = alimento_info["calorias"]
     unidad_base = normalizar_texto(alimento_info["unidad"])
-    unidad = normalizar_texto(unidad)
+    unidad_norm = normalizar_texto(unidad)
+    factor = None
+    if "100" in unidad_base:
+        if unidad_norm in {"g", "gramo", "gramos"}:
+            factor = valor / 100
+        elif unidad_norm == "kg":
+            factor = valor * 10
+    if factor is None:
+        return None, None
+    calorias = round(calorias_base * factor, 1)
+    macros = None
+    if all(k in alimento_info for k in ("proteina", "carbohidratos", "grasas")):
+        macros = {
+            "proteina": round(alimento_info["proteina"] * factor, 1),
+            "carbohidratos": round(alimento_info["carbohidratos"] * factor, 1),
+            "grasas": round(alimento_info["grasas"] * factor, 1),
+        }
+        if "fibra" in alimento_info:
+            macros["fibra"] = round(alimento_info["fibra"] * factor, 1)
+    return calorias, macros
 
-    if "100g" in unidad_base:
-        if unidad in {"g", "gramo", "gramos"}:
-            return round((calorias_base * valor) / 100, 1)
-        if unidad == "kg":
-            return round(calorias_base * valor * 10, 1)
 
-    return None
+def formatear_macros(alimento_info, factor=1.0):
+    if not all(k in alimento_info for k in ("proteina", "carbohidratos", "grasas")):
+        return ""
+    p = round(alimento_info["proteina"] * factor, 1)
+    c = round(alimento_info["carbohidratos"] * factor, 1)
+    g = round(alimento_info["grasas"] * factor, 1)
+    f = round(alimento_info.get("fibra", 0) * factor, 1)
+    linea = f"Prote\u00edna {p}g \u00b7 Carbohidratos {c}g \u00b7 Grasas {g}g"
+    if f:
+        linea += f" \u00b7 Fibra {f}g"
+    return f"<br><small style='color:#6b7280'>{linea}</small>"
 
 
 def formatear_detalle_receta(receta):
-    ingredientes = "".join(f"- {ing}<br>" for ing in receta["ingredientes"][:8])
+    ingredientes = "".join(f"\u2014 {ing}<br>" for ing in receta["ingredientes"][:8])
     pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:5], 1))
     return (
         f"<strong>{receta['nombre']}</strong><br><br>"
-        f"Es una opcion de unas <strong>{receta['calorias_aprox']} kcal</strong> aproximadamente.<br><br>"
+        f"Aproximadamente <strong>{receta['calorias_aprox']} kcal</strong>.<br><br>"
         f"<strong>Ingredientes:</strong><br>{ingredientes}<br>"
-        f"<strong>Preparacion:</strong><br>{pasos}"
+        f"<strong>Preparaci\u00f3n:</strong><br>{pasos}"
     )
 
 
 def formatear_ingredientes_receta(receta):
-    ingredientes = "".join(f"- {ing}<br>" for ing in receta["ingredientes"][:10])
+    ingredientes = "".join(f"\u2014 {ing}<br>" for ing in receta["ingredientes"][:10])
     return f"<strong>Ingredientes de {receta['nombre']}:</strong><br><br>{ingredientes}"
 
 
 def formatear_preparacion_receta(receta):
     pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:8], 1))
-    return f"<strong>Asi se prepara {receta['nombre']}:</strong><br><br>{pasos}"
+    return f"<strong>C\u00f3mo se prepara {receta['nombre']}:</strong><br><br>{pasos}"
 
 
 def explicar_capacidades():
-    return """Hola. Soy <strong>NutriGPT</strong>.
-
-Puedo ayudarte con:
-
-<strong>Recetas</strong><br>
-- \"Que puedo cocinar con pollo y espinacas\"<br>
-- \"Dame una cena alta en proteina\"<br><br>
-
-<strong>Calorias</strong><br>
-- \"Cuantas calorias tiene el arroz\"<br>
-- \"Cuantas calorias tienen 250 g de salmon\"<br><br>
-
-<strong>Nutricion practica</strong><br>
-- \"La avena es buena para desayunar?\"<br>
-- \"Que me conviene para perder grasa sin pasar hambre?\"<br><br>
-
-Despues de darte recetas, puedes seguir con \"la 2\", \"dame ingredientes\" o \"como se hace\"."""
+    return (
+        "Hola, soy <strong>NutriGPT</strong>.<br><br>"
+        "Puedo ayudarte con:<br><br>"
+        "<strong>Recetas</strong><br>"
+        "\u2014 \u201cQu\u00e9 puedo cocinar con pollo y espinacas\u201d<br>"
+        "\u2014 \u201cDame una cena alta en prote\u00edna\u201d<br><br>"
+        "<strong>Calor\u00edas y macros</strong><br>"
+        "\u2014 \u201cCu\u00e1ntas calor\u00edas tiene el arroz\u201d<br>"
+        "\u2014 \u201cCu\u00e1ntas calor\u00edas tienen 250 g de salm\u00f3n\u201d<br><br>"
+        "<strong>Nutrici\u00f3n pr\u00e1ctica</strong><br>"
+        "\u2014 \u201cLa avena es buena para desayunar?\u201d<br>"
+        "\u2014 \u201cQu\u00e9 me conviene para perder grasa sin pasar hambre?\u201d<br><br>"
+        "Despu\u00e9s de darte recetas puedes seguir con <em>la 2</em>, "
+        "<em>dame ingredientes</em> o <em>c\u00f3mo se hace</em>."
+    )
 
 
 def es_pregunta_sobre_receta(texto_normalizado):
     pistas = [
-        "la receta",
-        "esa receta",
-        "ese plato",
-        "esa opcion",
-        "la opcion",
-        "ingredientes",
-        "como se hace",
-        "preparacion",
-        "pasos",
-        "primera",
-        "segunda",
-        "tercera",
-        "cuarta",
-        "quinta",
+        "la receta", "esa receta", "ese plato", "esa opcion", "la opcion",
+        "ingredientes", "como se hace", "preparacion", "pasos",
+        "primera", "segunda", "tercera", "cuarta", "quinta",
     ]
     if re.search(r"\b[1-5]\b", texto_normalizado):
         return True
@@ -275,7 +340,6 @@ def extraer_indice_receta(texto_normalizado, total):
         valor = int(match.group(1))
         if 1 <= valor <= total:
             return valor - 1
-
     for palabra, indice in ORDINALES.items():
         if palabra in texto_normalizado:
             if indice == -1:
@@ -291,7 +355,6 @@ def buscar_receta_por_nombre(texto, recetas_contexto):
         nombre = normalizar_texto(receta["nombre"])
         if nombre and (nombre in texto_normalizado or texto_normalizado in nombre):
             return receta
-
         tokens_nombre = set(tokens_relevantes(receta["nombre"]))
         tokens_texto = set(tokens_relevantes(texto))
         if tokens_nombre and len(tokens_nombre & tokens_texto) >= max(1, min(2, len(tokens_nombre))):
@@ -301,30 +364,26 @@ def buscar_receta_por_nombre(texto, recetas_contexto):
 
 def obtener_recetas_contexto(contexto):
     recipe_ids = contexto.get("last_recipe_ids", []) if contexto else []
-    return [recipes_by_id[recipe_id] for recipe_id in recipe_ids if recipe_id in recipes_by_id]
+    return [recipes_by_id[rid] for rid in recipe_ids if rid in recipes_by_id]
 
 
 def resolver_receta_referenciada(mensaje, contexto):
     recetas_contexto = obtener_recetas_contexto(contexto)
     if not recetas_contexto:
         return None
-
     texto_normalizado = normalizar_texto(mensaje)
     receta_por_nombre = buscar_receta_por_nombre(mensaje, recetas_contexto)
     if receta_por_nombre:
         return receta_por_nombre
-
     indice = extraer_indice_receta(texto_normalizado, len(recetas_contexto))
     if indice is not None:
         return recetas_contexto[indice]
-
     recipe_id = contexto.get("last_selected_recipe_id") if contexto else None
     if recipe_id in recipes_by_id and (
         re.search(r"\b(esa|ese|receta|ingredientes|pasos|preparacion)\b", texto_normalizado)
         or "como se hace" in texto_normalizado
     ):
         return recipes_by_id[recipe_id]
-
     return None
 
 
@@ -348,8 +407,7 @@ def buscar_temas_nutricion(texto):
     for topic in nutrition_knowledge.get("topics", []):
         score = 0
         for keyword in topic.get("keywords", []):
-            keyword_normalizado = normalizar_texto(keyword)
-            if keyword_normalizado and keyword_normalizado in texto_normalizado:
+            if normalizar_texto(keyword) in texto_normalizado:
                 score += 2
         if score > 0:
             resultados.append((score, topic))
@@ -358,12 +416,10 @@ def buscar_temas_nutricion(texto):
 
 
 def buscar_perfil_alimento(texto, alimento=""):
-    candidatos = [texto, alimento]
-    candidatos_normalizados = [normalizar_texto(c) for c in candidatos if c]
-
+    candidatos_normalizados = [normalizar_texto(c) for c in [texto, alimento] if c]
     for profile in nutrition_knowledge.get("food_profiles", []):
         aliases = [normalizar_texto(profile["name"])] + [
-            normalizar_texto(alias) for alias in profile.get("aliases", [])
+            normalizar_texto(a) for a in profile.get("aliases", [])
         ]
         for candidato in candidatos_normalizados:
             for alias in aliases:
@@ -374,20 +430,7 @@ def buscar_perfil_alimento(texto, alimento=""):
 
 def detectar_riesgo_medico(texto):
     texto_normalizado = normalizar_texto(texto)
-    return any(normalizar_texto(keyword) in texto_normalizado for keyword in MEDICAL_RISK_KEYWORDS)
-
-
-def pide_macros_exactos(texto):
-    texto_normalizado = normalizar_texto(texto)
-    pistas = [
-        "cuanta proteina",
-        "cuantas proteinas",
-        "gramos de proteina",
-        "cuanta fibra",
-        "cuantos carbohidratos",
-        "macros",
-    ]
-    return any(pista in texto_normalizado for pista in pistas)
+    return any(normalizar_texto(kw) in texto_normalizado for kw in MEDICAL_RISK_KEYWORDS)
 
 
 def responder_nutricion(mensaje, analisis):
@@ -397,19 +440,17 @@ def responder_nutricion(mensaje, analisis):
     partes = []
 
     if perfil:
-        partes.append(f"Si te refieres a <strong>{perfil['name']}</strong>, diria que {perfil['summary']}")
+        partes.append(f"<strong>{perfil['name']}</strong> \u2014 {perfil['summary']}")
         alimento_info = buscar_alimento(perfil["name"])
         if alimento_info:
+            macro_str = formatear_macros(alimento_info)
             partes.append(
-                f"<br><br>A nivel energetico, suele rondar las <strong>{alimento_info['calorias']} kcal</strong> por {alimento_info['unidad']}."
-            )
-        if pide_macros_exactos(mensaje):
-            partes.append(
-                "<br><br>No tengo el dato exacto de gramos de proteina o fibra en esta base, pero si una orientacion practica bastante util."
+                f"<br><br>Aporta unas <strong>{alimento_info['calorias']} kcal</strong> "
+                f"por {alimento_info['unidad']}.{macro_str}"
             )
         if perfil.get("highlights"):
             partes.append(
-                "<br><strong>Lo mas util en la practica:</strong><br>"
+                "<br><br><strong>Lo m\u00e1s \u00fatil en la pr\u00e1ctica:</strong><br>"
                 + construir_lista_html(perfil["highlights"], limit=3)
             )
         if perfil.get("watchouts"):
@@ -420,27 +461,30 @@ def responder_nutricion(mensaje, analisis):
         if not perfil:
             partes.append(tema_principal["summary"])
         partes.append(
-            "<br><br><strong>En la practica, te puede ayudar:</strong><br>"
+            "<br><br><strong>En la pr\u00e1ctica:</strong><br>"
             + construir_lista_html(tema_principal["tips"], limit=3)
         )
 
     if not perfil and not temas:
         partes.append(
-            "Si quieres comer mejor sin complicarte demasiado, la base suele ser bastante simple: una fuente de proteina, "
-            "fruta o verdura a diario, alimentos poco procesados y cantidades que puedas sostener en el tiempo."
+            "Si quieres comer mejor sin complicarte, la base es bastante simple: "
+            "prote\u00edna en cada comida, fruta o verdura a diario y alimentos poco procesados "
+            "en cantidades que puedas mantener."
         )
         partes.append(
-            "<br><br>Una forma muy util de pensarlo es montar cada comida con tres piezas: proteina, vegetal o fruta y un carbohidrato ajustado a tu actividad."
+            "<br><br>Montando cada comida con tres piezas \u2014 prote\u00edna, vegetal y "
+            "carbohidrato ajustado a tu actividad \u2014 casi siempre es suficiente para mejorar."
         )
 
     if detectar_riesgo_medico(texto_normalizado):
         partes.append(
-            "<br>Si hay una condicion medica, embarazo, medicacion o un problema digestivo importante, conviene personalizarlo con un profesional."
+            "<br><br>Si hay una condici\u00f3n m\u00e9dica, embarazo o medicaci\u00f3n, "
+            "lo ideal es personalizarlo con un profesional."
         )
 
     partes.append(
-        "<br><br>Si quieres, te lo adapto a un objetivo concreto: <em>perder grasa</em>, <em>ganar musculo</em>, "
-        "<em>desayuno</em>, <em>cena</em> o <em>comida pre/post entreno</em>."
+        "<br><br><em>\u00bfQuieres que lo adapte a un objetivo concreto? "
+        "Perder grasa, ganar m\u00fasculo, desayuno, cena o pre/post entreno.</em>"
     )
     return "".join(partes)
 
@@ -474,34 +518,34 @@ def generar_respuesta(mensaje, contexto=None):
 
         if recetas:
             recetas_top = recetas[:5]
-            contexto["last_recipe_ids"] = [receta["id"] for receta in recetas_top]
+            contexto["last_recipe_ids"] = [r["id"] for r in recetas_top]
             contexto["last_selected_recipe_id"] = recetas_top[0]["id"]
 
             if len(recetas_top) == 1 or "detalle" in texto_normalizado or "ingredientes" in texto_normalizado:
-                return {
-                    "respuesta": formatear_detalle_receta(recetas_top[0]),
-                    "contexto": contexto,
-                }
+                return {"respuesta": formatear_detalle_receta(recetas_top[0]), "contexto": contexto}
 
-            partes = ["Estas son las opciones que mejor encajan con lo que me has pedido:<br><br>"]
+            partes = ["Aqu\u00ed tienes opciones que encajan con lo que buscas:<br><br>"]
             for i, receta in enumerate(recetas_top, 1):
                 contenido = normalizar_texto(" ".join([receta["nombre"]] + receta["ingredientes"]))
                 coincidencias = [t for t in terminos if normalizar_texto(t) in contenido]
-                motivo = f" Me encaja por: {', '.join(coincidencias[:3])}." if coincidencias else ""
+                motivo = (
+                    f" <span style='color:#6b7280;font-size:12px'>{', '.join(coincidencias[:3])}</span>"
+                    if coincidencias else ""
+                )
                 partes.append(
-                    f"<strong>{i}. {receta['nombre']}</strong> ({receta['calorias_aprox']} kcal).{motivo}<br>"
+                    f"<strong>{i}. {receta['nombre']}</strong> \u2014 {receta['calorias_aprox']} kcal{motivo}<br>"
                 )
             partes.append(
-                "<br>Ahora puedes seguir con <em>la 2</em>, <em>la primera</em>, <em>dame los ingredientes de la 3</em> "
-                "o <em>como se hace la receta 1</em>."
+                "<br><em>Pide detalles con: la 2, dame ingredientes de la 3, "
+                "c\u00f3mo se hace la primera\u2026</em>"
             )
             return {"respuesta": "".join(partes), "contexto": contexto}
 
         termino_busqueda = ", ".join(terminos) if terminos else "tu consulta"
         return {
             "respuesta": (
-                f"No he encontrado recetas claras con <strong>{termino_busqueda}</strong>.<br><br>"
-                "Si quieres, dime uno o dos ingredientes principales o el objetivo de la comida, por ejemplo "
+                f"No encontr\u00e9 recetas con <strong>{termino_busqueda}</strong>.<br><br>"
+                "Prueba con uno o dos ingredientes principales, como:<br>"
                 "<em>cena ligera con pollo</em> o <em>desayuno con avena</em>."
             ),
             "contexto": contexto,
@@ -511,7 +555,6 @@ def generar_respuesta(mensaje, contexto=None):
         candidatos = []
         if alimento:
             candidatos.extend(buscar_alimentos_similares(alimento))
-
         for palabra in palabras_clave:
             for candidato in buscar_alimentos_similares(palabra):
                 if candidato not in candidatos:
@@ -519,50 +562,59 @@ def generar_respuesta(mensaje, contexto=None):
 
         if candidatos:
             principal = candidatos[0]
-            partes = [
-                f"<strong>{principal['nombre']}</strong><br><br>",
-                f"Suele rondar las <strong>{principal['calorias']} kcal</strong> por {principal['unidad']}.<br>",
-            ]
+            partes = [f"<strong>{principal['nombre']}</strong><br><br>"]
+            partes.append(f"<strong>{principal['calorias']} kcal</strong> por {principal['unidad']}.")
 
-            calorias_estimadas = calcular_calorias_estimadas(principal, cantidad)
+            calorias_estimadas, macros_estimados = calcular_calorias_estimadas(principal, cantidad)
             if calorias_estimadas is not None:
                 partes.append(
-                    f"Para la cantidad que indicas ({cantidad['valor']} {cantidad['unidad']}), el estimado seria "
-                    f"<strong>{calorias_estimadas} kcal</strong>.<br>"
+                    f"<br>Para {cantidad['valor']} {cantidad['unidad']}: "
+                    f"<strong>{calorias_estimadas} kcal</strong>."
                 )
+                if macros_estimados:
+                    linea = (
+                        f"Prote\u00edna {macros_estimados['proteina']}g \u00b7 "
+                        f"Carbohidratos {macros_estimados['carbohidratos']}g \u00b7 "
+                        f"Grasas {macros_estimados['grasas']}g"
+                    )
+                    if "fibra" in macros_estimados:
+                        linea += f" \u00b7 Fibra {macros_estimados['fibra']}g"
+                    partes.append(f"<br><small style='color:#6b7280'>{linea}</small>")
+            else:
+                partes.append(formatear_macros(principal))
 
             if len(candidatos) > 1:
                 partes.append(
-                    "<br>Tambien podria encajar con: "
-                    + ", ".join(item["nombre"] for item in candidatos[1:4])
-                    + "."
+                    "<br><br>Tambi\u00e9n podr\u00eda ser: "
+                    + ", ".join(item["nombre"] for item in candidatos[1:4]) + "."
                 )
 
-            partes.append("<br><br>Si quieres, tambien puedo explicarte si este alimento encaja mejor para saciedad, deporte o una comida mas ligera.")
+            partes.append(
+                "<br><br><em>\u00bfQuieres saber si encaja en tu objetivo? "
+                "Perder grasa, ganar m\u00fasculo o rendimiento deportivo.</em>"
+            )
             return {"respuesta": "".join(partes), "contexto": contexto}
 
         return {
             "respuesta": (
-                "No encuentro ese alimento en mi base de datos.<br><br>"
-                "Prueba con un nombre mas concreto, por ejemplo: <em>pechuga de pollo</em>, "
-                "<em>arroz blanco</em>, <em>salmon</em> o <em>manzana</em>."
+                "No encuentro ese alimento.<br><br>"
+                "Prueba con un nombre m\u00e1s concreto, como: "
+                "<em>pechuga de pollo</em>, <em>arroz blanco</em>, "
+                "<em>salm\u00f3n</em> o <em>manzana</em>."
             ),
             "contexto": contexto,
         }
 
     if intencion == "nutricion" or buscar_temas_nutricion(mensaje) or buscar_perfil_alimento(mensaje, alimento):
-        return {
-            "respuesta": responder_nutricion(mensaje, analisis),
-            "contexto": contexto,
-        }
+        return {"respuesta": responder_nutricion(mensaje, analisis), "contexto": contexto}
 
     return {
         "respuesta": (
-            "No he terminado de entender lo que buscas.<br><br>"
-            "Puedo ayudarte con recetas, calorias o nutricion practica. Por ejemplo:<br>"
-            "- <em>Que puedo cocinar con pollo y espinacas</em><br>"
-            "- <em>Cuantas calorias tiene el arroz</em><br>"
-            "- <em>La avena es buena para desayunar?</em>"
+            "No termin\u00e9 de entender lo que buscas.<br><br>"
+            "Puedo ayudarte con recetas, calor\u00edas o nutrici\u00f3n pr\u00e1ctica:<br>"
+            "\u2014 <em>Qu\u00e9 puedo cocinar con pollo y espinacas</em><br>"
+            "\u2014 <em>Cu\u00e1ntas calor\u00edas tiene el arroz</em><br>"
+            "\u2014 <em>La avena es buena para desayunar?</em>"
         ),
         "contexto": contexto,
     }
@@ -570,221 +622,7 @@ def generar_respuesta(mensaje, contexto=None):
 
 @app.get("/", response_class=HTMLResponse)
 async def get_home():
-    return """
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>NutriGPT - Asistente de Nutricion</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <style>
-            :root {
-                --bg: #f6f1e8;
-                --panel: #fffaf2;
-                --line: #d7c9b0;
-                --text: #2f2419;
-                --muted: #6b5a46;
-                --accent: #b85c38;
-                --accent-2: #355c4b;
-            }
-            * { box-sizing: border-box; }
-            body {
-                margin: 0;
-                font-family: Georgia, "Times New Roman", serif;
-                background:
-                    radial-gradient(circle at top left, rgba(184, 92, 56, 0.12), transparent 30%),
-                    radial-gradient(circle at bottom right, rgba(53, 92, 75, 0.14), transparent 35%),
-                    var(--bg);
-                color: var(--text);
-            }
-            .layout {
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 24px;
-            }
-            .chat-shell {
-                width: min(980px, 100%);
-                height: min(90vh, 860px);
-                display: grid;
-                grid-template-rows: auto 1fr auto;
-                background: rgba(255, 250, 242, 0.92);
-                border: 1px solid var(--line);
-                border-radius: 28px;
-                overflow: hidden;
-                box-shadow: 0 30px 80px rgba(47, 36, 25, 0.14);
-                backdrop-filter: blur(12px);
-            }
-            .header {
-                padding: 28px 28px 18px;
-                border-bottom: 1px solid var(--line);
-                background: linear-gradient(135deg, rgba(184, 92, 56, 0.08), rgba(53, 92, 75, 0.1));
-            }
-            .header h1 {
-                margin: 0 0 8px;
-                font-size: clamp(30px, 5vw, 42px);
-                line-height: 1;
-            }
-            .header p {
-                margin: 0;
-                color: var(--muted);
-                font-size: 15px;
-            }
-            .messages {
-                padding: 24px;
-                overflow-y: auto;
-            }
-            .message {
-                display: flex;
-                margin-bottom: 16px;
-            }
-            .message.user { justify-content: flex-end; }
-            .bubble {
-                max-width: min(760px, 82%);
-                padding: 14px 16px;
-                border-radius: 20px;
-                line-height: 1.5;
-                font-size: 16px;
-                border: 1px solid var(--line);
-                background: var(--panel);
-            }
-            .user .bubble {
-                background: linear-gradient(135deg, var(--accent), #cf7a4f);
-                color: white;
-                border-color: transparent;
-            }
-            .composer {
-                padding: 18px;
-                border-top: 1px solid var(--line);
-                background: rgba(255,255,255,0.55);
-            }
-            .row {
-                display: flex;
-                gap: 12px;
-            }
-            input {
-                flex: 1;
-                border: 1px solid var(--line);
-                border-radius: 18px;
-                padding: 14px 16px;
-                font-size: 16px;
-                background: #fffdf8;
-                color: var(--text);
-                outline: none;
-            }
-            input:focus {
-                border-color: var(--accent);
-                box-shadow: 0 0 0 3px rgba(184, 92, 56, 0.12);
-            }
-            button {
-                border: none;
-                border-radius: 18px;
-                padding: 14px 20px;
-                font-size: 15px;
-                font-weight: 700;
-                cursor: pointer;
-                color: white;
-                background: linear-gradient(135deg, var(--accent-2), #4b7f68);
-            }
-            .typing {
-                opacity: 0.75;
-                font-style: italic;
-                color: var(--muted);
-            }
-            @media (max-width: 720px) {
-                .layout { padding: 0; }
-                .chat-shell {
-                    height: 100vh;
-                    border-radius: 0;
-                }
-                .bubble { max-width: 90%; }
-                .row { flex-direction: column; }
-                button { width: 100%; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="layout">
-            <div class="chat-shell">
-                <div class="header">
-                    <h1>NutriGPT</h1>
-                    <p>Recetas, nutricion practica y respuestas mas naturales.</p>
-                </div>
-                <div class="messages" id="messages">
-                    <div class="message">
-                        <div class="bubble">
-                            Soy <strong>NutriGPT</strong>.<br><br>
-                            Puedo ayudarte con recetas, calorias y dudas de nutricion.<br>
-                            Prueba algo como:<br>
-                            - <em>Que puedo cocinar con pollo y arroz</em><br>
-                            - <em>La avena es buena para desayunar?</em><br>
-                            - <em>Que me conviene para perder grasa sin pasar hambre?</em>
-                        </div>
-                    </div>
-                </div>
-                <div class="composer">
-                    <div class="row">
-                        <input id="message-input" type="text" placeholder="Escribe tu pregunta..." autocomplete="off">
-                        <button id="send-btn">Enviar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-            const messagesDiv = document.getElementById("messages");
-            const input = document.getElementById("message-input");
-            const button = document.getElementById("send-btn");
-            let chatContext = { last_recipe_ids: [], last_selected_recipe_id: null };
-
-            function addMessage(text, isUser = false, extraClass = "") {
-                const message = document.createElement("div");
-                message.className = `message ${isUser ? "user" : ""} ${extraClass}`.trim();
-                const bubble = document.createElement("div");
-                bubble.className = "bubble";
-                bubble.innerHTML = text;
-                message.appendChild(bubble);
-                messagesDiv.appendChild(message);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                return message;
-            }
-
-            async function sendMessage() {
-                const message = input.value.trim();
-                if (!message) return;
-
-                addMessage(message, true);
-                input.value = "";
-
-                const typing = addMessage("NutriGPT esta pensando...", false, "typing");
-
-                try {
-                    const response = await fetch("/api/chat", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ mensaje: message, contexto: chatContext })
-                    });
-                    const data = await response.json();
-                    typing.remove();
-                    if (data.contexto) {
-                        chatContext = data.contexto;
-                    }
-                    addMessage(data.respuesta, false);
-                } catch (error) {
-                    typing.remove();
-                    addMessage("No pude procesar tu mensaje. Intentalo de nuevo.", false);
-                }
-            }
-
-            input.addEventListener("keypress", (event) => {
-                if (event.key === "Enter") sendMessage();
-            });
-            button.addEventListener("click", sendMessage);
-        </script>
-    </body>
-    </html>
-    """
+    return HTML_PAGE
 
 
 @app.post("/api/chat")
@@ -817,7 +655,6 @@ async def get_stats():
 
 if __name__ == "__main__":
     import uvicorn
-
     raw_port = os.environ.get("PORT", "8000")
     clean_port = "".join(filter(str.isdigit, str(raw_port)))
     port = int(clean_port) if clean_port else 8000
