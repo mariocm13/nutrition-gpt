@@ -515,5 +515,8 @@ async def get_stats():
 if __name__ == "__main__":
     import uvicorn
     # Usar el puerto de la variable de entorno PORT (necesario para Render) o 8000 por defecto
-    port = int(os.environ.get("PORT", 8000))
+    raw_port = os.environ.get("PORT", "8000")
+    # Limpiar el puerto de cualquier carácter no numérico (como el punto que causó el error)
+    clean_port = "".join(filter(str.isdigit, str(raw_port)))
+    port = int(clean_port) if clean_port else 8000
     uvicorn.run(app, host="0.0.0.0", port=port)
