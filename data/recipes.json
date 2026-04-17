@@ -31,6 +31,28 @@
         "Decora con las nueces por encima."
       ],
       "calorias_aprox": 350
+    },
+    {
+      "nombre": "Burritos de pollo y salsa de frijoles negros",
+      "ingredientes": [
+        "1 lata (15 oz) de frijoles negros",
+        "2 cebollines picados",
+        "1 cucharada de jugo de limón",
+        "1/4 cucharadita de comino",
+        "4 pechugas de pollo",
+        "Ají en polvo, pimienta y sal",
+        "1 taza de queso rallado",
+        "4 tortillas de harina"
+      ],
+      "instrucciones": [
+        "Calienta el horno a 350°F.",
+        "Mezcla frijoles, cebollines, limón y comino.",
+        "Sazona el pollo con ají, pimienta y sal, y cocínalo en sartén 5 min por lado.",
+        "Corta el pollo en tiras.",
+        "Rellena las tortillas con queso, pollo y la mezcla de frijoles.",
+        "Enrolla los burritos en papel aluminio y hornea 15 min."
+      ],
+      "calorias_aprox": 260
     }
   ]
 }

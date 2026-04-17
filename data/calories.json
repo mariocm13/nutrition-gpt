@@ -3,10 +3,22 @@
     {"nombre": "Manzana", "calorias": 52, "unidad": "100g"},
     {"nombre": "Pechuga de Pollo", "calorias": 165, "unidad": "100g"},
     {"nombre": "Arroz Blanco", "calorias": 130, "unidad": "100g"},
-    {"nombre": "Huevo", "calorias": 155, "unit": "100g"},
+    {"nombre": "Huevo", "calorias": 155, "unidad": "100g"},
     {"nombre": "Aguacate", "calorias": 160, "unidad": "100g"},
     {"nombre": "Avena", "calorias": 389, "unidad": "100g"},
     {"nombre": "Plátano", "calorias": 89, "unidad": "100g"},
-    {"nombre": "Salmón", "calorias": 208, "unidad": "100g"}
+    {"nombre": "Salmón", "calorias": 208, "unidad": "100g"},
+    {"nombre": "Pizza de queso", "calorias": 271, "unidad": "100g"},
+    {"nombre": "Pizza pepperoni", "calorias": 280, "unidad": "100g"},
+    {"nombre": "Abulón", "calorias": 105, "unidad": "100g"},
+    {"nombre": "Acerola", "calorias": 32, "unidad": "100g"},
+    {"nombre": "Harina de bellotas", "calorias": 501, "unidad": "100g"},
+    {"nombre": "Alubias Adzuki (cocinadas)", "calorias": 128, "unidad": "100g"},
+    {"nombre": "Semillas de alfalfa", "calorias": 23, "unidad": "100g"},
+    {"nombre": "Espinacas", "calorias": 23, "unidad": "100g"},
+    {"nombre": "Tomate", "calorias": 18, "unidad": "100g"},
+    {"nombre": "Almendras", "calorias": 579, "unidad": "100g"},
+    {"nombre": "Nueces", "calorias": 654, "unidad": "100g"},
+    {"nombre": "Lentejas (cocidas)", "calorias": 116, "unidad": "100g"}
   ]
 }
