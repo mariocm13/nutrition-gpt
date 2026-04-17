@@ -1,0 +1,236 @@
+{
+  "topics": [
+    {
+      "id": "proteina",
+      "keywords": ["proteina", "proteinas", "masa muscular", "ganar musculo", "musculo", "recuperacion", "saciedad"],
+      "summary": "Si buscas una alimentacion mas saciante o enfocada en mantener o ganar masa muscular, suele ayudar bastante incluir una fuente clara de proteina en cada comida.",
+      "tips": [
+        "Huevos, pollo, pescado, yogur griego, queso fresco, tofu y legumbres suelen ser opciones muy utiles.",
+        "Repartir la proteina a lo largo del dia suele funcionar mejor que dejarla concentrada en una sola comida.",
+        "Combinar proteina con verduras, fruta o una racion razonable de carbohidrato suele dar comidas mas completas y faciles de sostener."
+      ]
+    },
+    {
+      "id": "fibra",
+      "keywords": ["fibra", "saciedad", "estrenimiento", "digestivo", "legumbres", "integral", "transito"],
+      "summary": "La fibra suele ayudar bastante con la saciedad, el transito intestinal y el control del apetito a lo largo del dia.",
+      "tips": [
+        "Subir la fibra poco a poco suele sentar mejor que hacerlo de golpe.",
+        "Fruta, verdura, legumbres, avena y frutos secos son de las bases mas utiles.",
+        "Cuando aumentas la fibra, tambien conviene cuidar la hidratacion."
+      ]
+    },
+    {
+      "id": "perder_peso",
+      "keywords": ["perder peso", "perder grasa", "adelgazar", "definicion", "bajar grasa", "deficit", "hambre"],
+      "summary": "Para perder grasa suele ayudar mas una rutina sostenible que una dieta extrema: proteina suficiente, verduras, buena saciedad y porciones razonables.",
+      "tips": [
+        "Prioriza comidas que llenen: proteina, verduras, legumbres, fruta y alimentos poco ultraprocesados.",
+        "No hace falta quitar todos los hidratos; suele ser mas util ajustar cantidades segun hambre, actividad y adherencia.",
+        "Vigila bebidas caloricas, picoteo automatico y salsas muy densas, porque muchas veces es donde mas se dispara la ingesta sin darte cuenta."
+      ]
+    },
+    {
+      "id": "energia",
+      "keywords": ["energia", "hidratos", "carbohidratos", "entrenar", "rendimiento", "pre entreno", "post entreno", "cansancio"],
+      "summary": "Los carbohidratos bien escogidos suelen venir muy bien para rendir mejor y recuperar energia, sobre todo si entrenas o llevas dias muy activos.",
+      "tips": [
+        "Avena, arroz, patata, fruta y legumbres suelen ser opciones practicas.",
+        "Antes de entrenar suele sentar mejor algo facil de digerir que una comida muy grasa o muy pesada.",
+        "Despues de entrenar, combinar carbohidrato y proteina suele ser una muy buena idea."
+      ]
+    },
+    {
+      "id": "grasas_saludables",
+      "keywords": ["grasas saludables", "grasa saludable", "omega 3", "aguacate", "frutos secos", "aceite de oliva", "semillas"],
+      "summary": "Las grasas saludables no son el problema por si mismas; de hecho, ayudan con la saciedad y forman parte de una alimentacion equilibrada.",
+      "tips": [
+        "Aceite de oliva, frutos secos, semillas, aguacate y pescado azul suelen ser buenas referencias.",
+        "Como son alimentos densos en energia, la cantidad tambien importa si estas ajustando calorias.",
+        "Suelen encajar mejor cuando desplazan opciones muy ultraprocesadas."
+      ]
+    },
+    {
+      "id": "hidratacion",
+      "keywords": ["hidratacion", "hidratar", "agua", "liquidos", "sed", "deshidratacion"],
+      "summary": "La hidratacion influye mas de lo que parece en energia, rendimiento y apetito.",
+      "tips": [
+        "No hace falta obsesionarse con un numero exacto: la sed y el color de la orina suelen orientar bastante.",
+        "Si haces deporte o hace mucho calor, normalmente necesitas algo mas.",
+        "Agua, cafe e infusiones sin exceso de azucar pueden contar dentro del total diario."
+      ]
+    },
+    {
+      "id": "desayuno",
+      "keywords": ["desayuno saludable", "desayuno", "manana", "por la manana"],
+      "summary": "Un buen desayuno no tiene por que ser grande, pero suele funcionar mejor si combina algo de proteina, fibra y energia sostenida.",
+      "tips": [
+        "Avena con yogur, fruta y frutos secos es una combinacion muy util.",
+        "Si prefieres salado, huevos con pan integral y tomate encajan muy bien.",
+        "Si no tienes hambre por la manana, no pasa nada por hacer algo mas ligero."
+      ]
+    },
+    {
+      "id": "cena",
+      "keywords": ["cena ligera", "cena", "cenar", "noche", "cena saludable"],
+      "summary": "Por la noche suele sentar bien una cena simple: proteina, verdura y una cantidad moderada de carbohidrato si lo necesitas.",
+      "tips": [
+        "Pescado, tortilla, pollo, tofu o legumbres pueden funcionar muy bien.",
+        "Si llegas con mucha hambre, incluir algo de patata, arroz o pan puede evitar picoteos despues.",
+        "Las cenas muy pesadas o muy grasas a veces empeoran digestion y descanso."
+      ]
+    },
+    {
+      "id": "saciedad",
+      "keywords": ["hambre", "saciedad", "me lleno poco", "ansiedad", "picoteo", "antojos"],
+      "summary": "Si te cuesta llegar saciado, normalmente ayuda mas cambiar la composicion de las comidas que simplemente intentar comer menos a la fuerza.",
+      "tips": [
+        "Subir proteina y fibra suele ser de las palancas mas efectivas.",
+        "Comer demasiado rapido a veces hace que la saciedad llegue tarde.",
+        "Tener comidas mas estructuradas suele reducir bastante el picoteo automatico."
+      ]
+    },
+    {
+      "id": "procesados",
+      "keywords": ["ultraprocesados", "procesados", "azucar", "dulces", "snacks"],
+      "summary": "No hace falta comer perfecto, pero cuanto mas se apoye tu dia a dia en alimentos poco procesados, mas facil suele ser controlar hambre, energia y calidad nutricional.",
+      "tips": [
+        "No hace falta prohibir nada; suele funcionar mejor mejorar la base de tus comidas principales.",
+        "Cambios pequenos pero repetibles suelen dar mas resultado que medidas extremas.",
+        "Tener opciones sencillas en casa reduce mucho las decisiones impulsivas."
+      ]
+    },
+    {
+      "id": "pre_post_entreno",
+      "keywords": ["pre entreno", "post entreno", "antes de entrenar", "despues de entrenar", "recuperacion"],
+      "summary": "Alrededor del entrenamiento suele ser util priorizar digestiones comodas, energia disponible y una recuperacion sencilla.",
+      "tips": [
+        "Antes de entrenar suele ir bien una combinacion simple de carbohidrato y algo ligero de proteina.",
+        "Despues de entrenar, meter proteina y algo de carbohidrato suele ayudar bastante a recuperar.",
+        "No hace falta complicarlo mucho si el resto del dia esta bien planteado."
+      ]
+    }
+  ],
+  "food_profiles": [
+    {
+      "name": "Avena",
+      "aliases": ["avena"],
+      "summary": "La avena suele ser una muy buena base para desayunos o meriendas porque aporta carbohidrato complejo y fibra, asi que normalmente sacia bastante.",
+      "highlights": [
+        "Suele encajar bien si buscas energia sostenida y menos hambre a media manana.",
+        "Combina muy bien con yogur, leche, fruta o frutos secos."
+      ],
+      "watchouts": "Si tu objetivo es perder grasa, vigila toppings muy caloricos como mucha crema de frutos secos, azucar o granola."
+    },
+    {
+      "name": "Platano",
+      "aliases": ["platano", "banana"],
+      "summary": "El platano suele ir muy bien cuando quieres una fruta practica, saciante y facil de tomar antes o despues de moverte.",
+      "highlights": [
+        "Es una opcion util si necesitas algo rapido y facil de digerir.",
+        "Suele combinar bien con yogur, avena o crema de cacahuete en poca cantidad."
+      ],
+      "watchouts": "No hace falta evitarlo por ser dulce; normalmente importa mas el conjunto del dia que una fruta concreta."
+    },
+    {
+      "name": "Huevo",
+      "aliases": ["huevo", "huevos"],
+      "summary": "El huevo es una fuente muy practica de proteina y suele ayudar bastante con la saciedad.",
+      "highlights": [
+        "Sirve para desayunos, cenas rapidas o comidas simples con verduras.",
+        "A nivel practico, suele ser de las opciones mas faciles para mejorar la calidad de una comida."
+      ],
+      "watchouts": "Lo que suele cambiar mucho el perfil final no es el huevo, sino con que lo acompanias y como lo cocinas."
+    },
+    {
+      "name": "Salmon",
+      "aliases": ["salmon"],
+      "summary": "El salmon suele ser una opcion muy interesante porque combina proteina con grasa saludable, especialmente omega 3.",
+      "highlights": [
+        "Suele encajar muy bien en comidas principales y cenas saciantes.",
+        "Puede ser una buena alternativa cuando quieres subir calidad nutricional sin complicarte demasiado."
+      ],
+      "watchouts": "Como es mas energetico que pescados muy magros, conviene ajustar la cantidad al objetivo que tengas."
+    },
+    {
+      "name": "Aguacate",
+      "aliases": ["aguacate", "palta"],
+      "summary": "El aguacate es un alimento interesante por su grasa saludable y porque suele mejorar bastante la saciedad de ensaladas, tostadas o bowls.",
+      "highlights": [
+        "Una pequena racion ya suele aportar textura y saciedad.",
+        "Combina especialmente bien con huevos, pollo, pescado y verduras."
+      ],
+      "watchouts": "Es saludable, pero tambien bastante energetico, asi que la cantidad importa si estas ajustando calorias."
+    },
+    {
+      "name": "Arroz Blanco",
+      "aliases": ["arroz", "arroz blanco"],
+      "summary": "El arroz blanco es una fuente simple de carbohidrato y puede ser muy util si buscas energia facil de digerir.",
+      "highlights": [
+        "Suele funcionar muy bien alrededor del entrenamiento o en comidas faciles de tolerar.",
+        "No tiene por que ser peor que otras opciones si el plato esta bien montado."
+      ],
+      "watchouts": "Suele ser mejor acompanarlo de proteina, verdura o legumbre para que la comida sea mas completa y saciante."
+    },
+    {
+      "name": "Pechuga de Pollo",
+      "aliases": ["pollo", "pechuga de pollo"],
+      "summary": "La pechuga de pollo es una de las formas mas faciles de subir proteina sin disparar demasiado las calorias.",
+      "highlights": [
+        "Suele encajar muy bien en platos para perder grasa o para ganar masa muscular.",
+        "Con verduras, arroz, patata o legumbres da comidas muy completas."
+      ],
+      "watchouts": "Para que no quede seca ni aburrida, ayuda bastante trabajar especias, salsas ligeras y buenas guarniciones."
+    },
+    {
+      "name": "Lentejas",
+      "aliases": ["lentejas", "lenteja"],
+      "summary": "Las lentejas son de las mejores bases para una comida completa porque aportan carbohidrato, fibra y algo de proteina vegetal a la vez.",
+      "highlights": [
+        "Suelen saciar mucho y funcionan muy bien en comidas de diario.",
+        "Son especialmente utiles si quieres comer mas legumbre sin complicarte."
+      ],
+      "watchouts": "Si no estas acostumbrado a las legumbres, subir la cantidad poco a poco suele sentar mejor."
+    },
+    {
+      "name": "Manzana",
+      "aliases": ["manzana"],
+      "summary": "La manzana es una fruta muy facil de encajar en el dia a dia y suele venir bien para picar algo entre horas con mas criterio.",
+      "highlights": [
+        "Va muy bien sola o combinada con yogur o frutos secos.",
+        "Suele ser mejor opcion que recurrir a bolleria o snacks muy procesados."
+      ],
+      "watchouts": "Si buscas mas saciedad, suele ayudar combinarla con algo de proteina o grasa saludable."
+    },
+    {
+      "name": "Yogur Griego",
+      "aliases": ["yogur griego", "yogur", "yogurt griego", "yogurt"],
+      "summary": "El yogur griego suele ser una opcion muy practica cuando quieres algo rapido, saciante y con bastante proteina para desayunos o meriendas.",
+      "highlights": [
+        "Combina muy bien con fruta, avena o frutos secos.",
+        "Puede ayudarte a mejorar mucho una merienda sin complicarte."
+      ],
+      "watchouts": "Conviene mirar si es azucarado o natural, porque cambia bastante el resultado final."
+    },
+    {
+      "name": "Patata",
+      "aliases": ["patata", "papa"],
+      "summary": "La patata es un carbohidrato muy util y bastante mas saciante de lo que mucha gente piensa cuando se cocina de forma simple.",
+      "highlights": [
+        "Suele funcionar muy bien en comidas completas con proteina y verdura.",
+        "Puede encajar incluso en etapas de perdida de grasa si las cantidades estan bien medidas."
+      ],
+      "watchouts": "Lo que mas cambia el plato no suele ser la patata, sino las frituras o salsas muy grasas."
+    },
+    {
+      "name": "Frutos Secos",
+      "aliases": ["frutos secos", "nueces", "almendras", "anacardos"],
+      "summary": "Los frutos secos aportan grasa saludable, algo de proteina y bastante saciedad en porciones pequenas.",
+      "highlights": [
+        "Son muy utiles para completar desayunos, yogures o meriendas.",
+        "Una cantidad pequena suele ser suficiente para notar el efecto."
+      ],
+      "watchouts": "Aunque sean una buena opcion, es facil pasarse de cantidad sin darte cuenta porque concentran bastante energia."
+    }
+  ]
+}
