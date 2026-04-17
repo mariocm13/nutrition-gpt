@@ -25,6 +25,7 @@ nlp = NLPProcessor()
 DRIVE_FILE_ID = "1pMn-MyxfEaag0rzZbwYSzSciYnRDOodw"
 CALORIES_DATA_PATH = "data/calories.json"
 RECIPES_DATA_PATH = "data/recipes_large.json"
+NUTRITION_KNOWLEDGE_PATH = "data/nutrition_knowledge.json"
 
 ORDINALES = {
     "primera": 1,
@@ -39,6 +40,21 @@ ORDINALES = {
     "quinto": 5,
     "ultima": -1,
     "ultimo": -1,
+}
+
+MEDICAL_RISK_KEYWORDS = {
+    "diabetes",
+    "embarazo",
+    "embarazada",
+    "renal",
+    "rinon",
+    "hipertension",
+    "alergia",
+    "medicacion",
+    "trigliceridos",
+    "colesterol",
+    "trastorno alimentario",
+    "anemia",
 }
 
 
@@ -78,6 +94,10 @@ def tokens_relevantes(texto):
     return [t for t in normalizar_texto(texto).split() if len(t) > 2 and t not in stopwords]
 
 
+def construir_lista_html(items, limit=3):
+    return "".join(f"- {item}<br>" for item in items[:limit])
+
+
 def load_recipes_from_drive():
     url = f"https://docs.google.com/uc?export=download&id={DRIVE_FILE_ID}"
     try:
@@ -92,15 +112,16 @@ def load_recipes_from_drive():
     return {"recetas": []}
 
 
-def load_calories():
-    if os.path.exists(CALORIES_DATA_PATH):
-        with open(CALORIES_DATA_PATH, "r", encoding="utf-8") as file:
+def load_json_file(path, empty_value):
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as file:
             return json.load(file)
-    return {"alimentos": []}
+    return empty_value
 
 
 recipes_db = load_recipes_from_drive()
-calories_db = load_calories()
+calories_db = load_json_file(CALORIES_DATA_PATH, {"alimentos": []})
+nutrition_knowledge = load_json_file(NUTRITION_KNOWLEDGE_PATH, {"topics": [], "food_profiles": []})
 recipes_by_id = {receta["id"]: receta for receta in recipes_db.get("recetas", [])}
 
 
@@ -184,9 +205,9 @@ def formatear_detalle_receta(receta):
     pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:5], 1))
     return (
         f"<strong>{receta['nombre']}</strong><br><br>"
-        f"<strong>Calorias aproximadas:</strong> {receta['calorias_aprox']} kcal<br><br>"
+        f"Es una opcion de unas <strong>{receta['calorias_aprox']} kcal</strong> aproximadamente.<br><br>"
         f"<strong>Ingredientes:</strong><br>{ingredientes}<br>"
-        f"<strong>Pasos principales:</strong><br>{pasos}"
+        f"<strong>Preparacion:</strong><br>{pasos}"
     )
 
 
@@ -197,7 +218,7 @@ def formatear_ingredientes_receta(receta):
 
 def formatear_preparacion_receta(receta):
     pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:8], 1))
-    return f"<strong>Preparacion de {receta['nombre']}:</strong><br><br>{pasos}"
+    return f"<strong>Asi se prepara {receta['nombre']}:</strong><br><br>{pasos}"
 
 
 def explicar_capacidades():
@@ -209,12 +230,15 @@ Puedo ayudarte con:
 - \"Que puedo cocinar con pollo y espinacas\"<br>
 - \"Dame una cena alta en proteina\"<br><br>
 
-<strong>Calorias e informacion nutricional basica</strong><br>
+<strong>Calorias</strong><br>
 - \"Cuantas calorias tiene el arroz\"<br>
 - \"Cuantas calorias tienen 250 g de salmon\"<br><br>
 
-<strong>Seguimiento de recetas</strong><br>
-Despues de darte opciones, puedes decirme \"la 2\", \"la primera\", \"dame ingredientes\" o \"como se hace\"."""
+<strong>Nutricion practica</strong><br>
+- \"La avena es buena para desayunar?\"<br>
+- \"Que me conviene para perder grasa sin pasar hambre?\"<br><br>
+
+Despues de darte recetas, puedes seguir con \"la 2\", \"dame ingredientes\" o \"como se hace\"."""
 
 
 def es_pregunta_sobre_receta(texto_normalizado):
@@ -312,9 +336,112 @@ def responder_detalle_receta(receta, mensaje):
     if "calorias" in texto_normalizado or "kcal" in texto_normalizado:
         return (
             f"<strong>{receta['nombre']}</strong><br><br>"
-            f"Tiene aproximadamente <strong>{receta['calorias_aprox']} kcal</strong>."
+            f"Esta receta ronda las <strong>{receta['calorias_aprox']} kcal</strong>."
         )
     return formatear_detalle_receta(receta)
+
+
+def buscar_temas_nutricion(texto):
+    texto_normalizado = normalizar_texto(texto)
+    resultados = []
+    for topic in nutrition_knowledge.get("topics", []):
+        score = 0
+        for keyword in topic.get("keywords", []):
+            keyword_normalizado = normalizar_texto(keyword)
+            if keyword_normalizado and keyword_normalizado in texto_normalizado:
+                score += 2
+        if score > 0:
+            resultados.append((score, topic))
+    resultados.sort(key=lambda item: -item[0])
+    return [topic for _, topic in resultados[:3]]
+
+
+def buscar_perfil_alimento(texto, alimento=""):
+    candidatos = [texto, alimento]
+    candidatos_normalizados = [normalizar_texto(c) for c in candidatos if c]
+
+    for profile in nutrition_knowledge.get("food_profiles", []):
+        aliases = [normalizar_texto(profile["name"])] + [
+            normalizar_texto(alias) for alias in profile.get("aliases", [])
+        ]
+        for candidato in candidatos_normalizados:
+            for alias in aliases:
+                if alias and (alias in candidato or candidato in alias):
+                    return profile
+    return None
+
+
+def detectar_riesgo_medico(texto):
+    texto_normalizado = normalizar_texto(texto)
+    return any(normalizar_texto(keyword) in texto_normalizado for keyword in MEDICAL_RISK_KEYWORDS)
+
+
+def pide_macros_exactos(texto):
+    texto_normalizado = normalizar_texto(texto)
+    pistas = [
+        "cuanta proteina",
+        "cuantas proteinas",
+        "gramos de proteina",
+        "cuanta fibra",
+        "cuantos carbohidratos",
+        "macros",
+    ]
+    return any(pista in texto_normalizado for pista in pistas)
+
+
+def responder_nutricion(mensaje, analisis):
+    texto_normalizado = normalizar_texto(mensaje)
+    perfil = buscar_perfil_alimento(mensaje, analisis.get("alimento", ""))
+    temas = buscar_temas_nutricion(mensaje)
+    partes = []
+
+    if perfil:
+        partes.append(f"Si te refieres a <strong>{perfil['name']}</strong>, diria que {perfil['summary']}")
+        alimento_info = buscar_alimento(perfil["name"])
+        if alimento_info:
+            partes.append(
+                f"<br><br>A nivel energetico, suele rondar las <strong>{alimento_info['calorias']} kcal</strong> por {alimento_info['unidad']}."
+            )
+        if pide_macros_exactos(mensaje):
+            partes.append(
+                "<br><br>No tengo el dato exacto de gramos de proteina o fibra en esta base, pero si una orientacion practica bastante util."
+            )
+        if perfil.get("highlights"):
+            partes.append(
+                "<br><strong>Lo mas util en la practica:</strong><br>"
+                + construir_lista_html(perfil["highlights"], limit=3)
+            )
+        if perfil.get("watchouts"):
+            partes.append(f"<br><strong>Ten en cuenta:</strong> {perfil['watchouts']}")
+
+    if temas:
+        tema_principal = temas[0]
+        if not perfil:
+            partes.append(tema_principal["summary"])
+        partes.append(
+            "<br><br><strong>En la practica, te puede ayudar:</strong><br>"
+            + construir_lista_html(tema_principal["tips"], limit=3)
+        )
+
+    if not perfil and not temas:
+        partes.append(
+            "Si quieres comer mejor sin complicarte demasiado, la base suele ser bastante simple: una fuente de proteina, "
+            "fruta o verdura a diario, alimentos poco procesados y cantidades que puedas sostener en el tiempo."
+        )
+        partes.append(
+            "Una forma muy util de pensarlo es montar cada comida con tres piezas: proteina, vegetal o fruta y un carbohidrato ajustado a tu actividad."
+        )
+
+    if detectar_riesgo_medico(texto_normalizado):
+        partes.append(
+            "<br>Si hay una condicion medica, embarazo, medicacion o un problema digestivo importante, conviene personalizarlo con un profesional."
+        )
+
+    partes.append(
+        "<br><br>Si quieres, te lo adapto a un objetivo concreto: <em>perder grasa</em>, <em>ganar musculo</em>, "
+        "<em>desayuno</em>, <em>cena</em> o <em>comida pre/post entreno</em>."
+    )
+    return "".join(partes)
 
 
 def generar_respuesta(mensaje, contexto=None):
@@ -353,26 +480,26 @@ def generar_respuesta(mensaje, contexto=None):
                     "contexto": contexto,
                 }
 
-            partes = [f"Encontre {len(recetas)} receta(s) que encajan con tu consulta:<br><br>"]
+            partes = ["Estas son las opciones que mejor encajan con lo que me has pedido:<br><br>"]
             for i, receta in enumerate(recetas_top, 1):
                 contenido = normalizar_texto(" ".join([receta["nombre"]] + receta["ingredientes"]))
                 coincidencias = [t for t in terminos if normalizar_texto(t) in contenido]
-                motivo = f" Coincide con: {', '.join(coincidencias[:3])}." if coincidencias else ""
+                motivo = f" Me encaja por: {', '.join(coincidencias[:3])}." if coincidencias else ""
                 partes.append(
                     f"<strong>{i}. {receta['nombre']}</strong> ({receta['calorias_aprox']} kcal).{motivo}<br>"
                 )
             partes.append(
-                "<br>Ahora puedes decirme cosas como <em>la 2</em>, <em>la primera</em>, "
-                "<em>dame los ingredientes de la 3</em> o <em>como se hace la receta 1</em>."
+                "<br>Ahora puedes seguir con <em>la 2</em>, <em>la primera</em>, <em>dame los ingredientes de la 3</em> "
+                "o <em>como se hace la receta 1</em>."
             )
             return {"respuesta": "".join(partes), "contexto": contexto}
 
         termino_busqueda = ", ".join(terminos) if terminos else "tu consulta"
         return {
             "respuesta": (
-                f"No encontre recetas claras con <strong>{termino_busqueda}</strong>.<br><br>"
-                "Prueba con 1 o 2 ingredientes principales, por ejemplo: <em>pollo y arroz</em>, "
-                "<em>salmon</em> o <em>desayuno con avena</em>."
+                f"No he encontrado recetas claras con <strong>{termino_busqueda}</strong>.<br><br>"
+                "Si quieres, dime uno o dos ingredientes principales o el objetivo de la comida, por ejemplo "
+                "<em>cena ligera con pollo</em> o <em>desayuno con avena</em>."
             ),
             "contexto": contexto,
         }
@@ -391,41 +518,48 @@ def generar_respuesta(mensaje, contexto=None):
             principal = candidatos[0]
             partes = [
                 f"<strong>{principal['nombre']}</strong><br><br>",
-                f"<strong>{principal['calorias']} kcal</strong> por {principal['unidad']}.<br>",
+                f"Suele rondar las <strong>{principal['calorias']} kcal</strong> por {principal['unidad']}.<br>",
             ]
 
             calorias_estimadas = calcular_calorias_estimadas(principal, cantidad)
             if calorias_estimadas is not None:
                 partes.append(
-                    f"Para la cantidad indicada ({cantidad['valor']} {cantidad['unidad']}), el estimado es "
+                    f"Para la cantidad que indicas ({cantidad['valor']} {cantidad['unidad']}), el estimado seria "
                     f"<strong>{calorias_estimadas} kcal</strong>.<br>"
                 )
 
             if len(candidatos) > 1:
                 partes.append(
-                    "<br>Tambien podria referirte a: "
+                    "<br>Tambien podria encajar con: "
                     + ", ".join(item["nombre"] for item in candidatos[1:4])
                     + "."
                 )
 
-            partes.append("<br><br>Si quieres, tambien puedo sugerirte recetas con este alimento.")
+            partes.append("<br><br>Si quieres, tambien puedo explicarte si este alimento encaja mejor para saciedad, deporte o una comida mas ligera.")
             return {"respuesta": "".join(partes), "contexto": contexto}
 
         return {
             "respuesta": (
-                "No encontre ese alimento en mi base de datos.<br><br>"
+                "No encuentro ese alimento en mi base de datos.<br><br>"
                 "Prueba con un nombre mas concreto, por ejemplo: <em>pechuga de pollo</em>, "
                 "<em>arroz blanco</em>, <em>salmon</em> o <em>manzana</em>."
             ),
             "contexto": contexto,
         }
 
+    if intencion == "nutricion" or buscar_temas_nutricion(mensaje) or buscar_perfil_alimento(mensaje, alimento):
+        return {
+            "respuesta": responder_nutricion(mensaje, analisis),
+            "contexto": contexto,
+        }
+
     return {
         "respuesta": (
-            "No he entendido del todo tu consulta.<br><br>"
-            "Puedo ayudarte con recetas y calorias. Prueba algo como:<br>"
+            "No he terminado de entender lo que buscas.<br><br>"
+            "Puedo ayudarte con recetas, calorias o nutricion practica. Por ejemplo:<br>"
             "- <em>Que puedo cocinar con pollo y espinacas</em><br>"
-            "- <em>Cuantas calorias tienen 200 g de arroz</em>"
+            "- <em>Cuantas calorias tiene el arroz</em><br>"
+            "- <em>La avena es buena para desayunar?</em>"
         ),
         "contexto": contexto,
     }
@@ -454,7 +588,7 @@ async def get_home():
             * { box-sizing: border-box; }
             body {
                 margin: 0;
-                font-family: Georgia, \"Times New Roman\", serif;
+                font-family: Georgia, "Times New Roman", serif;
                 background:
                     radial-gradient(circle at top left, rgba(184, 92, 56, 0.12), transparent 30%),
                     radial-gradient(circle at bottom right, rgba(53, 92, 75, 0.14), transparent 35%),
@@ -573,17 +707,17 @@ async def get_home():
             <div class="chat-shell">
                 <div class="header">
                     <h1>NutriGPT</h1>
-                    <p>Ahora recuerda las recetas que te acaba de sugerir.</p>
+                    <p>Recetas, nutricion practica y respuestas mas naturales.</p>
                 </div>
                 <div class="messages" id="messages">
                     <div class="message">
                         <div class="bubble">
                             Soy <strong>NutriGPT</strong>.<br><br>
-                            Puedo ayudarte con recetas y calorias.<br>
+                            Puedo ayudarte con recetas, calorias y dudas de nutricion.<br>
                             Prueba algo como:<br>
                             - <em>Que puedo cocinar con pollo y arroz</em><br>
-                            - <em>Luego dime la 2</em><br>
-                            - <em>O preguntame como se hace la primera</em>
+                            - <em>La avena es buena para desayunar?</em><br>
+                            - <em>Que me conviene para perder grasa sin pasar hambre?</em>
                         </div>
                     </div>
                 </div>
