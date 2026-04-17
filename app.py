@@ -314,12 +314,7 @@ def resolver_receta_referenciada(mensaje, contexto):
 
     recipe_id = contexto.get("last_selected_recipe_id") if contexto else None
     if recipe_id in recipes_by_id and (
-        "esa" in texto_normalizado
-        or "ese" in texto_normalizado
-        or "receta" in texto_normalizado
-        or "ingredientes" in texto_normalizado
-        or "pasos" in texto_normalizado
-        or "preparacion" in texto_normalizado
+        re.search(r"\b(esa|ese|receta|ingredientes|pasos|preparacion)\b", texto_normalizado)
         or "como se hace" in texto_normalizado
     ):
         return recipes_by_id[recipe_id]
@@ -429,7 +424,7 @@ def responder_nutricion(mensaje, analisis):
             "fruta o verdura a diario, alimentos poco procesados y cantidades que puedas sostener en el tiempo."
         )
         partes.append(
-            "Una forma muy util de pensarlo es montar cada comida con tres piezas: proteina, vegetal o fruta y un carbohidrato ajustado a tu actividad."
+            "<br><br>Una forma muy util de pensarlo es montar cada comida con tres piezas: proteina, vegetal o fruta y un carbohidrato ajustado a tu actividad."
         )
 
     if detectar_riesgo_medico(texto_normalizado):
@@ -454,13 +449,15 @@ def generar_respuesta(mensaje, contexto=None):
     cantidad = analisis["cantidad"]
     texto_normalizado = normalizar_texto(mensaje)
 
-    receta_referenciada = resolver_receta_referenciada(mensaje, contexto)
-    if receta_referenciada and (es_pregunta_sobre_receta(texto_normalizado) or intencion == "general"):
-        contexto["last_selected_recipe_id"] = receta_referenciada["id"]
-        return {
-            "respuesta": responder_detalle_receta(receta_referenciada, mensaje),
-            "contexto": contexto,
-        }
+    receta_referenciada = None
+    if intencion in {"general", "recetas"} or es_pregunta_sobre_receta(texto_normalizado):
+        receta_referenciada = resolver_receta_referenciada(mensaje, contexto)
+        if receta_referenciada and (es_pregunta_sobre_receta(texto_normalizado) or intencion == "general"):
+            contexto["last_selected_recipe_id"] = receta_referenciada["id"]
+            return {
+                "respuesta": responder_detalle_receta(receta_referenciada, mensaje),
+                "contexto": contexto,
+            }
 
     if intencion == "ayuda":
         return {"respuesta": explicar_capacidades(), "contexto": contexto}
