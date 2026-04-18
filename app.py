@@ -242,6 +242,10 @@ small{font-size:12px}
       <button class="filter-btn" data-cat="arroz">Arroz</button>
       <button class="filter-btn" data-cat="legumbres">Legumbres</button>
       <button class="filter-btn" data-cat="pasta">Pasta</button>
+      <button class="filter-btn" data-cat="desayuno">Desayuno</button>
+      <button class="filter-btn" data-cat="sopa">Sopas</button>
+      <button class="filter-btn" data-cat="ensalada">Ensaladas</button>
+      <button class="filter-btn" data-cat="postre">Postres</button>
     </div>
     <div class="gallery-grid" id="gg">
       <div class="empty">Cargando recetas\u2026</div>
@@ -1006,6 +1010,7 @@ function getEmoji(r){
 }
 function matchesCat(r,cat){
   if(cat==='all')return true;
+  if(r.categoria)return r.categoria===cat;
   var t=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
   if(cat==='pollo')return /\bpollo\b/.test(t);
   if(cat==='pescado')return /\bpescado\b|salmon|at[uú]n|merluza|dorada|bacalao|marisco|gamba|calamar|lubina|rape/.test(t);
@@ -1014,12 +1019,16 @@ function matchesCat(r,cat){
   if(cat==='arroz')return /\barroz\b/.test(t);
   if(cat==='legumbres')return /\bgarbanzo|\blenteja|\balubia|\bjud[ií]a/.test(t);
   if(cat==='pasta')return /\bpasta\b|\bquinoa\b/.test(t);
+  if(cat==='desayuno')return /desayuno|avena|tostada|pancake|smoothie/.test(t);
+  if(cat==='sopa')return /\bsopa\b|\bcaldo\b|\bcrema\b|minestrone/.test(t);
+  if(cat==='ensalada')return /\bensalada\b/.test(t);
+  if(cat==='postre')return /\bpostre\b|flan|mousse|tarta|natilla|crema catalana/.test(t);
   return false;
 }
 function loadGallery(){
   galleryLoaded=true;
   fetch('/api/recipes').then(function(r){return r.json();}).then(function(d){
-    allRecipes=(d.recetas||[]).slice(0,100);
+    allRecipes=(d.recetas||[]);
     allRecipes.forEach(function(r){recipesMap[String(r.id)]=r;});
     renderGallery();
   }).catch(function(){gg.innerHTML='<div class="empty">Error cargando recetas.</div>';});
@@ -1030,7 +1039,7 @@ function renderGallery(){
     return matchesCat(r,activeFilter)&&(!searchTerm||txt.indexOf(searchTerm)>=0);
   });
   if(!filtered.length){gg.innerHTML='<div class="empty">Sin resultados.</div>';return;}
-  gg.innerHTML=filtered.slice(0,40).map(function(r){
+  gg.innerHTML=filtered.map(function(r){
     var tags=(r.ingredientes||[]).slice(0,2).map(function(i){return '<span class="tag">'+i.split(' ')[0]+'</span>';}).join('');
     var id=String(r.id);
     return '<div class="card" onclick="window._om(\''+id+'\')">'+
@@ -1057,7 +1066,7 @@ function openModal(id){
     '<img class="modal-img" src="'+getPhoto(r)+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
     '<div class="modal-ph">'+getEmoji(r)+'</div>'+
     '<div class="modal-body"><div class="modal-head"><div>'+
-    '<div class="modal-name">'+r.nombre+'</div><div class="modal-kcal">'+r.calorias_aprox+' kcal aprox.</div></div>'+
+    '<div class="modal-name">'+r.nombre+'</div><div class="modal-kcal">'+r.calorias_aprox+' kcal'+(r.tiempo?' &nbsp;·&nbsp; ⏱ '+r.tiempo:'')+(r.dificultad?' &nbsp;·&nbsp; '+r.dificultad:'')+'</div></div>'+
     '<button class="x-btn" onclick="window._cm()">x</button></div>'+
     '<div class="modal-sec"><h3>Ingredientes</h3><div class="modal-ing">'+ings+'</div></div>'+
     '<div class="modal-sec"><h3>Preparacion</h3>'+steps+'</div></div></div></div>';
