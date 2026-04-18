@@ -1,78 +1,104 @@
-# Asistente de Nutrición GPT
+# NutriGPT
 
-Este es un asistente de nutrición accesible vía web, diseñado para proporcionar recetas saludables y contar calorías de diversos alimentos. Puedes acceder a través de un navegador web sin necesidad de instalación adicional.
+Asistente de nutrición web con chat inteligente, galería de recetas con fotos y base de datos nutricional completa.
+
+**Demo en vivo:** [https://nutrigpt.onrender.com](https://nutrigpt.onrender.com)
+
+---
 
 ## Características
 
-- **Recetario Interactivo**: Una colección de recetas saludables con ingredientes e instrucciones detalladas.
-- **Contador de Calorías**: Búsqueda de información nutricional de alimentos comunes por cada 100g.
-- **Interfaz Web Moderna**: Aplicación web responsiva y fácil de usar.
-- **API RESTful**: Endpoints para integración con otras aplicaciones.
+### Chat inteligente
+- Pregunta por recetas con los ingredientes que tengas
+- Consulta calorías y macros de cualquier alimento
+- Consejos de nutrición práctica adaptados a tus objetivos
+- Memoria de contexto: pide detalles de una receta sin repetir el nombre
 
-## Requisitos
+### Galería de recetas
+- Más de 100 recetas con fotos y filtros por categoría
+- Filtros: Todas, Desayuno, Almuerzo, Cena, Snack, Pollo, Pescado, Vegetariano
+- Buscador en tiempo real
+- Modal con foto, ingredientes y pasos de preparación numerados
 
-- Python 3.8 o superior
-- pip (gestor de paquetes de Python)
+### Base de datos nutricional
+- 157 alimentos con calorías, proteína, carbohidratos, grasas y fibra
+- Cálculo automático por cantidad (ej. "250g de salmón")
+- Categorías: frutas, verduras, carnes, pescados, lácteos, legumbres, cereales, frutos secos, bebidas, condimentos y snacks
 
-## Instalación
+### Diseño
+- Interfaz minimalista con modo oscuro
+- Animaciones suaves y transiciones
+- Responsive — funciona en móvil y escritorio
 
-1. Clona el repositorio:
-   ```bash
-   git clone https://github.com/mariocm13/nutrition-gpt.git
-   cd nutrition-gpt
-   ```
+---
 
-2. Instala las dependencias:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Stack
 
-## Uso
+| Capa | Tecnología |
+|------|-----------|
+| Backend | Python 3.8+, FastAPI |
+| Frontend | HTML/CSS/JS vanilla (sin frameworks) |
+| NLP | Procesador propio en `nlp_processor.py` |
+| Datos | JSON local + Google Drive (recetas) |
+| Despliegue | Render |
 
-### Opción 1: Acceso en Línea (Recomendado)
+---
 
-Tu NutriGPT está desplegado en línea y es accesible desde cualquier lugar:
-
-**URL Pública**: [https://nutrigpt.onrender.com](https://nutrigpt.onrender.com)
-
-Simplemente abre el enlace en tu navegador desde cualquier dispositivo.
-
-### Opción 2: Actualización y Despliegue Automático
-
-He incluido un script para facilitar las actualizaciones. Solo tienes que ejecutar:
-
-```bash
-./deploy.sh "Descripción de tus cambios"
-```
-
-Este script validará tu código y lo subirá a GitHub, lo que activará automáticamente el despliegue en Render.
-
-### Opción 3: Ejecutar Localmente
-
-Si quieres ejecutar la aplicación en tu ordenador:
+## Instalación local
 
 ```bash
+git clone https://github.com/mariocm13/nutrition-gpt.git
+cd nutrition-gpt
+pip install -r requirements.txt
 python app.py
 ```
 
-Luego abre tu navegador y ve a: **http://localhost:8000**
+Abre **http://localhost:8000** en tu navegador.
 
-### Opción 3: Ejecutar la Versión CLI (Línea de Comandos)
+---
 
-```bash
-python main.py
+## API
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/` | Interfaz web |
+| `POST` | `/api/chat` | Chat con contexto |
+| `GET` | `/api/recipes` | Todas las recetas |
+| `GET` | `/api/calories?food=<nombre>` | Buscar alimento |
+| `GET` | `/api/stats` | Total de recetas y alimentos |
+
+### Ejemplo `/api/chat`
+
+```json
+POST /api/chat
+{
+  "mensaje": "cuántas calorías tiene el salmón",
+  "contexto": {}
+}
 ```
 
-## Estructura del Proyecto
+---
 
-- `app.py`: Aplicación web con FastAPI
-- `main.py`: Versión CLI del asistente
-- `data/`: Archivos JSON con información de recetas y calorías
-- `requirements.txt`: Dependencias del proyecto
+## Estructura
 
-## API Endpoints
+```
+nutrition-gpt/
+├── app.py                 # Servidor FastAPI + HTML embebido
+├── nlp_processor.py       # Procesamiento del lenguaje natural
+├── main.py                # Versión CLI
+├── data/
+│   ├── calories.json      # 157 alimentos con macros
+│   ├── recipes_large.json # Base de datos de recetas
+│   └── nutrition_knowledge.json
+└── requirements.txt
+```
 
-- `GET /` - Página principal de la aplicación web
-- `GET /api/calories?food=<nombre>` - Buscar calorías de un alimento
-- `GET /api/recipes` - Obtener todas las recetas
-- `GET /api/recipes/<index>` - Obtener una receta específica
+---
+
+## Despliegue
+
+El proyecto se despliega automáticamente en Render al hacer push a `main`.
+
+```bash
+./deploy.sh "descripción del cambio"
+```
