@@ -43,6 +43,13 @@ HTML_PAGE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NutriGPT</title>
+<meta name="theme-color" content="#3a9d6e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NutriGPT">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
@@ -1132,6 +1139,10 @@ calcGo.addEventListener('click',function(){
   calcResult.style.display='block';
   calcResult.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(function(){});
+}
 })();"""
 
 
@@ -1172,6 +1183,88 @@ async def get_stats():
         "total_recetas": len(recipes_db.get("recetas", [])),
         "total_alimentos": len(calories_db.get("alimentos", [])),
     }
+
+
+MANIFEST = {
+    "name": "NutriGPT",
+    "short_name": "NutriGPT",
+    "description": "Asistente de nutrición con recetas, calorías y calculadora de macros",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#e0e5ec",
+    "theme_color": "#3a9d6e",
+    "orientation": "portrait-primary",
+    "icons": [
+        {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+        {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+    ],
+    "categories": ["health", "food"],
+}
+
+SW_CODE = r"""
+const CACHE='nutrigpt-v1';
+const PRECACHE=['/','/app.js'];
+self.addEventListener('install',e=>{
+  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/','/app.js'])).then(()=>self.skipWaiting()));
+});
+self.addEventListener('activate',e=>{
+  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+});
+self.addEventListener('fetch',e=>{
+  const url=new URL(e.request.url);
+  if(e.request.method!=='GET')return;
+  if(url.pathname.startsWith('/api/')){
+    e.respondWith(fetch(e.request).catch(()=>new Response('{"error":"offline"}',{headers:{'Content-Type':'application/json'}})));
+    return;
+  }
+  e.respondWith(caches.match(e.request).then(cached=>{
+    const net=fetch(e.request).then(res=>{
+      const clone=res.clone();
+      caches.open(CACHE).then(c=>c.put(e.request,clone));
+      return res;
+    });
+    return cached||net;
+  }));
+});
+"""
+
+# SVG icon rendered as PNG placeholder (simple green circle with leaf)
+ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 {s} {s}">
+<rect width="{s}" height="{s}" rx="{r}" fill="#3a9d6e"/>
+<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="{fs}" font-family="system-ui">🥗</text>
+</svg>"""
+
+
+@app.get("/manifest.json")
+async def get_manifest():
+    from fastapi.responses import JSONResponse
+    return JSONResponse(content=MANIFEST, headers={"Cache-Control": "public, max-age=86400"})
+
+
+@app.get("/sw.js")
+async def get_sw():
+    from fastapi.responses import Response
+    return Response(
+        content=SW_CODE,
+        media_type="text/javascript; charset=utf-8",
+        headers={"Cache-Control": "no-cache, no-store"},
+    )
+
+
+@app.get("/icon-192.png")
+async def get_icon_192():
+    from fastapi.responses import Response
+    svg = ICON_SVG.format(s=192, r=40, fs=120)
+    return Response(content=svg.encode(), media_type="image/svg+xml",
+                    headers={"Cache-Control": "public, max-age=604800"})
+
+
+@app.get("/icon-512.png")
+async def get_icon_512():
+    from fastapi.responses import Response
+    svg = ICON_SVG.format(s=512, r=100, fs=320)
+    return Response(content=svg.encode(), media_type="image/svg+xml",
+                    headers={"Cache-Control": "public, max-age=604800"})
 
 
 if __name__ == "__main__":
