@@ -120,7 +120,7 @@ html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,
 .card{border-radius:20px;overflow:hidden;cursor:pointer;box-shadow:var(--sh);transition:box-shadow .2s,transform .2s,background .3s;animation:fadeUp .25s ease both;background:var(--bg)}
 .card:hover{transform:translateY(-3px);box-shadow:8px 8px 18px var(--nm-d),-8px -8px 18px var(--nm-l)}
 .card:active{transform:scale(.98);box-shadow:var(--sh-press)}
-.card-img{width:100%;height:120px;object-fit:cover;display:block}
+.card-img{width:100%;height:160px;object-fit:cover;display:block}
 .card-ph{width:100%;height:120px;display:none;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,var(--accent-light),var(--bg))}
 .card-body{padding:11px 13px 13px}
 .card-name{font-size:12px;font-weight:700;line-height:1.35;margin-bottom:5px;color:var(--text)}
@@ -155,10 +155,12 @@ small{font-size:12px}
   #btn{padding:13px 16px;font-size:12px}
   .gallery-top{padding:6px 14px 0}
   .filters{padding:12px 14px}
-  .gallery-grid{padding:2px 14px 18px;gap:12px}
+  .gallery-grid{padding:2px 14px 18px;gap:12px;grid-template-columns:1fr}
+  .card-img{height:200px}
+  .card-ph{height:200px}
+  .card-name{font-size:14px}
   .modal-body{padding:18px 18px 28px}
 }
-@media(max-width:380px){.gallery-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
