@@ -206,167 +206,12 @@ small{font-size:12px}
   </div>
 </div>
 <div id="modal" style="display:none"></div>
-<script>
-(function(){
-var dmBtn=document.getElementById('dm');
-var dmIcon=document.getElementById('dm-icon');
-var msgs=document.getElementById('msgs');
-var inp=document.getElementById('inp');
-var btn=document.getElementById('btn');
-var gg=document.getElementById('gg');
-var gsearch=document.getElementById('gsearch');
+<script src="/app.js"></script>
 
-var SUN='<path d="M12 4.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 4.5zm0 13.5a.75.75 0 01.75.75v.75a.75.75 0 01-1.5 0v-.75A.75.75 0 0112 18zm7.5-6.75a.75.75 0 010 1.5h-.75a.75.75 0 010-1.5h.75zm-15 0a.75.75 0 010 1.5H3.75a.75.75 0 010-1.5H4.5zm12.86-5.61a.75.75 0 010 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 011.06 0zm-10.6 10.6a.75.75 0 010 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 011.06 0zm10.6 0a.75.75 0 011.06 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 010-1.06zM5.86 6.14a.75.75 0 011.06 0l.53.53A.75.75 0 016.39 7.73l-.53-.53a.75.75 0 010-1.06zM12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z"/>';
-var MOON='<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
-
-function setDark(on){
-  document.documentElement.classList.toggle('dark',on);
-  dmIcon.innerHTML=on?SUN:MOON;
-  localStorage.setItem('nutrigpt-dark',on?'1':'0');
-}
-var saved=localStorage.getItem('nutrigpt-dark');
-var prefersDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
-setDark(saved!==null?saved==='1':prefersDark);
-dmBtn.addEventListener('click',function(){setDark(!document.documentElement.classList.contains('dark'));});
-
-document.querySelectorAll('.tab').forEach(function(tab){
-  tab.addEventListener('click',function(){
-    var id=tab.dataset.tab;
-    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t===tab);});
-    document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+id);});
-    if(id==='recetas'&&!galleryLoaded)loadGallery();
-  });
-});
-
-var ctx={last_recipe_ids:[],last_selected_recipe_id:null};
-var galleryLoaded=false,allRecipes=[],recipesMap={},activeFilter='all',searchTerm='';
-
-function addMsg(html,isUser,cls){
-  var m=document.createElement('div');
-  m.className='m '+(isUser?'u':'bot')+(cls?' '+cls:'');
-  var b=document.createElement('div');b.className='b';b.innerHTML=html;
-  m.appendChild(b);msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;return m;
-}
-function send(){
-  var txt=inp.value.trim();if(!txt)return;
-  addMsg(txt,true);inp.value='';
-  var t=addMsg('Pensando\u2026',false,'typing');
-  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensaje:txt,contexto:ctx})})
-    .then(function(r){return r.json();})
-    .then(function(d){t.remove();if(d.contexto)ctx=d.contexto;addMsg(d.respuesta);})
-    .catch(function(){t.remove();addMsg('Error al procesar tu mensaje. Intenta de nuevo.');});
-}
-inp.addEventListener('keypress',function(e){if(e.key==='Enter')send();});
-btn.addEventListener('click',send);
-
-var PHOTOS={
-  salmon:'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=220&fit=crop&auto=format',
-  avena:'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=400&h=220&fit=crop&auto=format',
-  batido:'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400&h=220&fit=crop&auto=format',
-  tostada:'https://images.unsplash.com/photo-1484723091739-30990d4d5b21?w=400&h=220&fit=crop&auto=format',
-  ensalada:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=220&fit=crop&auto=format',
-  pasta:'https://images.unsplash.com/photo-1551183053-bf91798d454e?w=400&h=220&fit=crop&auto=format',
-  sopa:'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=220&fit=crop&auto=format',
-  pollo:'https://images.unsplash.com/photo-1598103442097-8b74394b95c1?w=400&h=220&fit=crop&auto=format',
-  pescado:'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=220&fit=crop&auto=format',
-  huevo:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&h=220&fit=crop&auto=format',
-  carne:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=220&fit=crop&auto=format',
-  arroz:'https://images.unsplash.com/photo-1516684732162-798a0062be99?w=400&h=220&fit=crop&auto=format',
-  verdura:'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=220&fit=crop&auto=format',
-  fruta:'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=220&fit=crop&auto=format',
-  default:'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&h=220&fit=crop&auto=format'
-};
-var EMOJIS={salmon:'&#x1F41F;',avena:'&#x1F33E;',batido:'&#x1F964;',tostada:'&#x1F35E;',ensalada:'&#x1F957;',pasta:'&#x1F35D;',sopa:'&#x1F35C;',pollo:'&#x1F357;',pescado:'&#x1F420;',huevo:'&#x1F373;',carne:'&#x1F969;',arroz:'&#x1F35A;',verdura:'&#x1F966;',fruta:'&#x1F34E;',default:'&#x1F37D;'};
-
-function photoKey(r){
-  var t=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-  var ks=['salmon','avena','batido','tostada','ensalada','pasta','sopa','pollo','pescado','huevo','carne','arroz','verdura','fruta'];
-  for(var i=0;i<ks.length;i++){if(t.indexOf(ks[i])>=0)return ks[i];}
-  return 'default';
-}
-function getcat(r){
-  var t=((r.nombre||'')+' '+(r.categoria||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-  if(/desayuno|avena|tostada|yogur|granola|muesli/.test(t))return 'desayuno';
-  if(/snack|merienda|barrita|batido|smoothie/.test(t))return 'snack';
-  if(/sopa|crema de|pure|caldo/.test(t))return 'cena';
-  if(/pollo/.test(t))return 'pollo';
-  if(/salmon|atun|merluza|dorada|bacalao|pescado/.test(t))return 'pescado';
-  if(!/pollo|carne|jamon|bacon|cerdo|ternera|pavo|res|buey|cordero/.test(t))return 'vegetariano';
-  return 'almuerzo';
-}
-
-function loadGallery(){
-  galleryLoaded=true;
-  fetch('/api/recipes')
-    .then(function(r){return r.json();})
-    .then(function(d){
-      allRecipes=(d.recetas||[]).slice(0,100);
-      allRecipes.forEach(function(r){recipesMap[String(r.id)]=r;});
-      renderGallery();
-    })
-    .catch(function(){gg.innerHTML='<div class="empty">Error cargando recetas.</div>';});
-}
-
-function renderGallery(){
-  var filtered=allRecipes.filter(function(r){
-    var okCat=activeFilter==='all'||getcat(r)===activeFilter;
-    var txt=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-    return okCat&&(!searchTerm||txt.indexOf(searchTerm)>=0);
-  });
-  if(!filtered.length){gg.innerHTML='<div class="empty">Sin resultados.</div>';return;}
-  gg.innerHTML=filtered.slice(0,40).map(function(r){
-    var k=photoKey(r);
-    var tags=(r.ingredientes||[]).slice(0,2).map(function(i){return '<span class="tag">'+i.split(' ')[0]+'</span>';}).join('');
-    var id=String(r.id);
-    return '<div class="card" onclick="window._om(\''+id+'\')">'+
-      '<img class="card-img" src="'+PHOTOS[k]+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
-      '<div class="card-ph">'+EMOJIS[k]+'</div>'+
-      '<div class="card-body"><div class="card-name">'+r.nombre+'</div>'+
-      '<div class="card-cal">'+r.calorias_aprox+' kcal</div>'+
-      '<div class="card-tags">'+tags+'</div></div></div>';
-  }).join('');
-}
-
-document.querySelectorAll('.filter-btn').forEach(function(b){
-  b.addEventListener('click',function(){
-    document.querySelectorAll('.filter-btn').forEach(function(x){x.classList.remove('active');});
-    b.classList.add('active');activeFilter=b.dataset.cat;renderGallery();
-  });
-});
-gsearch.addEventListener('input',function(e){searchTerm=e.target.value.toLowerCase().trim();renderGallery();});
-
-function openModal(id){
-  var r=recipesMap[id];if(!r)return;
-  var k=photoKey(r);
-  var ings=(r.ingredientes||[]).map(function(i){return '\u2014 '+i;}).join('<br>');
-  var steps=(r.instrucciones||[]).map(function(s,i){
-    return '<div class="modal-step"><div class="sn">'+(i+1)+'</div><div>'+s+'</div></div>';
-  }).join('');
-  var el=document.getElementById('modal');
-  el.innerHTML='<div class="modal-wrap" onclick="if(event.target===this)window._cm()">'+
-    '<div class="modal">'+
-    '<img class="modal-img" src="'+PHOTOS[k]+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
-    '<div class="modal-ph">'+EMOJIS[k]+'</div>'+
-    '<div class="modal-body"><div class="modal-head"><div>'+
-    '<div class="modal-name">'+r.nombre+'</div>'+
-    '<div class="modal-kcal">'+r.calorias_aprox+' kcal aprox.</div></div>'+
-    '<button class="x-btn" onclick="window._cm()">\u00d7</button></div>'+
-    '<div class="modal-sec"><h3>Ingredientes</h3><div class="modal-ing">'+ings+'</div></div>'+
-    '<div class="modal-sec"><h3>Preparaci\u00f3n</h3>'+steps+'</div>'+
-    '</div></div></div>';
-  el.style.display='block';
-  document.body.style.overflow='hidden';
-}
-function closeModal(){
-  document.getElementById('modal').style.display='none';
-  document.body.style.overflow='';
-}
-window._om=openModal;
-window._cm=closeModal;
-})();
-</script>
 </body>
 </html>"""
+
+# (script moved to /app.js endpoint below)
 
 
 def normalizar_texto(texto):
@@ -842,9 +687,133 @@ def generar_respuesta(mensaje, contexto=None):
     }
 
 
+JS_CODE = r"""(function(){
+var dmBtn=document.getElementById('dm');
+var dmIcon=document.getElementById('dm-icon');
+var msgs=document.getElementById('msgs');
+var inp=document.getElementById('inp');
+var btn=document.getElementById('btn');
+var gg=document.getElementById('gg');
+var gsearch=document.getElementById('gsearch');
+var SUN='<path d="M12 4.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 4.5zm0 13.5a.75.75 0 01.75.75v.75a.75.75 0 01-1.5 0v-.75A.75.75 0 0112 18zm7.5-6.75a.75.75 0 010 1.5h-.75a.75.75 0 010-1.5h.75zm-15 0a.75.75 0 010 1.5H3.75a.75.75 0 010-1.5H4.5zm12.86-5.61a.75.75 0 010 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 011.06 0zm-10.6 10.6a.75.75 0 010 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 011.06 0zm10.6 0a.75.75 0 011.06 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 010-1.06zM5.86 6.14a.75.75 0 011.06 0l.53.53A.75.75 0 016.39 7.73l-.53-.53a.75.75 0 010-1.06zM12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z"/>';
+var MOON='<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+function setDark(on){
+  document.documentElement.classList.toggle('dark',on);
+  dmIcon.innerHTML=on?SUN:MOON;
+  try{localStorage.setItem('nutrigpt-dark',on?'1':'0');}catch(e){}
+}
+var saved=null;try{saved=localStorage.getItem('nutrigpt-dark');}catch(e){}
+var prefersDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+setDark(saved!==null?saved==='1':prefersDark);
+dmBtn.addEventListener('click',function(){setDark(!document.documentElement.classList.contains('dark'));});
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    var id=tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t===tab);});
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+id);});
+    if(id==='recetas'&&!galleryLoaded)loadGallery();
+  });
+});
+var ctx={last_recipe_ids:[],last_selected_recipe_id:null};
+var galleryLoaded=false,allRecipes=[],recipesMap={},activeFilter='all',searchTerm='';
+function addMsg(html,isUser,cls){
+  var m=document.createElement('div');
+  m.className='m '+(isUser?'u':'bot')+(cls?' '+cls:'');
+  var b=document.createElement('div');b.className='b';b.innerHTML=html;
+  m.appendChild(b);msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;return m;
+}
+function send(){
+  var txt=inp.value.trim();if(!txt)return;
+  addMsg(txt,true);inp.value='';
+  var t=addMsg('Pensando...',false,'typing');
+  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensaje:txt,contexto:ctx})})
+    .then(function(r){return r.json();})
+    .then(function(d){t.remove();if(d.contexto)ctx=d.contexto;addMsg(d.respuesta);})
+    .catch(function(){t.remove();addMsg('Error de conexion. Intenta de nuevo.');});
+}
+inp.addEventListener('keypress',function(e){if(e.key==='Enter')send();});
+btn.addEventListener('click',send);
+var PHOTOS={salmon:'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=220&fit=crop&auto=format',avena:'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=400&h=220&fit=crop&auto=format',batido:'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400&h=220&fit=crop&auto=format',tostada:'https://images.unsplash.com/photo-1484723091739-30990d4d5b21?w=400&h=220&fit=crop&auto=format',ensalada:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=220&fit=crop&auto=format',pasta:'https://images.unsplash.com/photo-1551183053-bf91798d454e?w=400&h=220&fit=crop&auto=format',sopa:'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=220&fit=crop&auto=format',pollo:'https://images.unsplash.com/photo-1598103442097-8b74394b95c1?w=400&h=220&fit=crop&auto=format',pescado:'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=220&fit=crop&auto=format',huevo:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&h=220&fit=crop&auto=format',carne:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=220&fit=crop&auto=format',arroz:'https://images.unsplash.com/photo-1516684732162-798a0062be99?w=400&h=220&fit=crop&auto=format',verdura:'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=220&fit=crop&auto=format',fruta:'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=220&fit=crop&auto=format',default:'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&h=220&fit=crop&auto=format'};
+var EMOJIS={salmon:'&#x1F41F;',avena:'&#x1F33E;',batido:'&#x1F964;',tostada:'&#x1F35E;',ensalada:'&#x1F957;',pasta:'&#x1F35D;',sopa:'&#x1F35C;',pollo:'&#x1F357;',pescado:'&#x1F420;',huevo:'&#x1F373;',carne:'&#x1F969;',arroz:'&#x1F35A;',verdura:'&#x1F966;',fruta:'&#x1F34E;',default:'&#x1F37D;'};
+function photoKey(r){
+  var t=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
+  var ks=['salmon','avena','batido','tostada','ensalada','pasta','sopa','pollo','pescado','huevo','carne','arroz','verdura','fruta'];
+  for(var i=0;i<ks.length;i++){if(t.indexOf(ks[i])>=0)return ks[i];}return 'default';
+}
+function getcat(r){
+  var t=((r.nombre||'')+' '+(r.categoria||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
+  if(/desayuno|avena|tostada|yogur|granola|muesli/.test(t))return 'desayuno';
+  if(/snack|merienda|barrita|batido|smoothie/.test(t))return 'snack';
+  if(/sopa|crema de|pure|caldo/.test(t))return 'cena';
+  if(/pollo/.test(t))return 'pollo';
+  if(/salmon|atun|merluza|dorada|bacalao|pescado/.test(t))return 'pescado';
+  if(!/pollo|carne|jamon|bacon|cerdo|ternera|pavo|res|buey|cordero/.test(t))return 'vegetariano';
+  return 'almuerzo';
+}
+function loadGallery(){
+  galleryLoaded=true;
+  fetch('/api/recipes').then(function(r){return r.json();}).then(function(d){
+    allRecipes=(d.recetas||[]).slice(0,100);
+    allRecipes.forEach(function(r){recipesMap[String(r.id)]=r;});
+    renderGallery();
+  }).catch(function(){gg.innerHTML='<div class="empty">Error cargando recetas.</div>';});
+}
+function renderGallery(){
+  var filtered=allRecipes.filter(function(r){
+    var okCat=activeFilter==='all'||getcat(r)===activeFilter;
+    var txt=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
+    return okCat&&(!searchTerm||txt.indexOf(searchTerm)>=0);
+  });
+  if(!filtered.length){gg.innerHTML='<div class="empty">Sin resultados.</div>';return;}
+  gg.innerHTML=filtered.slice(0,40).map(function(r){
+    var k=photoKey(r);
+    var tags=(r.ingredientes||[]).slice(0,2).map(function(i){return '<span class="tag">'+i.split(' ')[0]+'</span>';}).join('');
+    var id=String(r.id);
+    return '<div class="card" onclick="window._om(\''+id+'\')">'+
+      '<img class="card-img" src="'+PHOTOS[k]+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
+      '<div class="card-ph">'+EMOJIS[k]+'</div>'+
+      '<div class="card-body"><div class="card-name">'+r.nombre+'</div>'+
+      '<div class="card-cal">'+r.calorias_aprox+' kcal</div>'+
+      '<div class="card-tags">'+tags+'</div></div></div>';
+  }).join('');
+}
+document.querySelectorAll('.filter-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.filter-btn').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');activeFilter=b.dataset.cat;renderGallery();
+  });
+});
+gsearch.addEventListener('input',function(e){searchTerm=e.target.value.toLowerCase().trim();renderGallery();});
+function openModal(id){
+  var r=recipesMap[id];if(!r)return;
+  var k=photoKey(r);
+  var ings=(r.ingredientes||[]).map(function(i){return '- '+i;}).join('<br>');
+  var steps=(r.instrucciones||[]).map(function(s,i){return '<div class="modal-step"><div class="sn">'+(i+1)+'</div><div>'+s+'</div></div>';}).join('');
+  var el=document.getElementById('modal');
+  el.innerHTML='<div class="modal-wrap" onclick="if(event.target===this)window._cm()"><div class="modal">'+
+    '<img class="modal-img" src="'+PHOTOS[k]+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
+    '<div class="modal-ph">'+EMOJIS[k]+'</div>'+
+    '<div class="modal-body"><div class="modal-head"><div>'+
+    '<div class="modal-name">'+r.nombre+'</div><div class="modal-kcal">'+r.calorias_aprox+' kcal aprox.</div></div>'+
+    '<button class="x-btn" onclick="window._cm()">x</button></div>'+
+    '<div class="modal-sec"><h3>Ingredientes</h3><div class="modal-ing">'+ings+'</div></div>'+
+    '<div class="modal-sec"><h3>Preparacion</h3>'+steps+'</div></div></div></div>';
+  el.style.display='block';document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modal').style.display='none';document.body.style.overflow='';}
+window._om=openModal;window._cm=closeModal;
+})();"""
+
+
 @app.get("/", response_class=HTMLResponse)
 async def get_home():
     return HTML_PAGE
+
+
+@app.get("/app.js")
+async def get_js():
+    from fastapi.responses import Response
+    return Response(content=JS_CODE, media_type="text/javascript; charset=utf-8")
 
 
 @app.post("/api/chat")
