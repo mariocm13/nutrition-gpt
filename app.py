@@ -147,6 +147,36 @@ html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(70px);opacity:0}to{transform:translateY(0);opacity:1}}
 small{font-size:12px}
+.calc-wrap{flex:1;overflow-y:auto;padding:18px 22px 30px;-webkit-overflow-scrolling:touch}
+.calc-card{background:var(--bg);border-radius:22px;padding:22px;box-shadow:var(--sh);margin-bottom:18px}
+.calc-title{font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text)}
+.calc-row{margin-bottom:16px}
+.calc-row.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0}
+.calc-row.two .calc-group{margin-bottom:16px}
+.calc-group{margin-bottom:16px}
+.calc-label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.calc-inp{width:100%;padding:12px 14px;border:none;border-radius:12px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);-webkit-appearance:none;user-select:auto;-webkit-user-select:auto}
+.calc-inp:focus{box-shadow:var(--sh-in),0 0 0 2px var(--accent)}
+.calc-sel{width:100%;padding:12px 14px;border:none;border-radius:12px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);-webkit-appearance:none;cursor:pointer}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg-btn{flex:1;padding:10px 8px;border:none;border-radius:12px;font-size:13px;font-weight:600;font-family:inherit;background:var(--bg);color:var(--muted);cursor:pointer;box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s;white-space:nowrap;touch-action:manipulation}
+.seg-btn.active{box-shadow:var(--sh-press);color:var(--accent)}
+.calc-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:4px 4px 10px rgba(58,157,110,.4),-2px -2px 6px rgba(255,255,255,.35);transition:box-shadow .15s,transform .1s;touch-action:manipulation;margin-top:4px}
+.calc-btn:active{transform:scale(.98);box-shadow:inset 2px 2px 5px rgba(0,0,0,.18)}
+.calc-result{background:var(--bg);border-radius:22px;padding:22px;box-shadow:var(--sh)}
+.res-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:22px}
+.res-box{background:var(--bg);border-radius:16px;padding:14px 10px;text-align:center;box-shadow:var(--sh-sm)}
+.res-box.accent{box-shadow:4px 4px 12px rgba(58,157,110,.35),-4px -4px 12px rgba(255,255,255,.5)}
+.res-val{font-size:22px;font-weight:700;color:var(--accent);line-height:1}
+.res-lbl{font-size:11px;font-weight:700;color:var(--text);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.res-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.macro-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.macro-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.macro-box{background:var(--bg);border-radius:16px;padding:14px 10px;text-align:center;box-shadow:var(--sh-sm)}
+.macro-val{font-size:18px;font-weight:700;color:var(--text)}
+.macro-lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.macro-g{font-size:10px;color:var(--accent);font-weight:700;margin-top:2px}
+.res-note{font-size:12px;color:var(--muted);line-height:1.6;padding:12px 14px;background:var(--bg);border-radius:12px;box-shadow:var(--sh-in)}
 @media(max-width:600px){
   .header{padding:14px 16px 10px}
   .tabs{padding:0 16px 12px;gap:8px}
@@ -180,6 +210,7 @@ small{font-size:12px}
   <nav class="tabs">
     <button class="tab active" data-tab="chat">Chat</button>
     <button class="tab" data-tab="recetas">Recetas</button>
+    <button class="tab" data-tab="calc">Calculadora</button>
   </nav>
   <div id="panel-chat" class="panel active">
     <div class="msgs" id="msgs">
@@ -214,6 +245,95 @@ small{font-size:12px}
     </div>
     <div class="gallery-grid" id="gg">
       <div class="empty">Cargando recetas\u2026</div>
+    </div>
+  </div>
+  <div id="panel-calc" class="panel">
+    <div class="calc-wrap">
+      <div class="calc-card">
+        <div class="calc-title">Calculadora de macros</div>
+        <div class="calc-row">
+          <div class="calc-group">
+            <label class="calc-label">Sexo</label>
+            <div class="seg" id="sexo-seg">
+              <button class="seg-btn active" data-val="h">Hombre</button>
+              <button class="seg-btn" data-val="m">Mujer</button>
+            </div>
+          </div>
+        </div>
+        <div class="calc-row two">
+          <div class="calc-group">
+            <label class="calc-label">Edad (a\u00f1os)</label>
+            <input class="calc-inp" type="number" id="c-edad" min="10" max="100" placeholder="25">
+          </div>
+          <div class="calc-group">
+            <label class="calc-label">Peso (kg)</label>
+            <input class="calc-inp" type="number" id="c-peso" min="30" max="300" placeholder="70">
+          </div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-group">
+            <label class="calc-label">Altura (cm)</label>
+            <input class="calc-inp" type="number" id="c-altura" min="100" max="250" placeholder="170">
+          </div>
+        </div>
+        <div class="calc-group">
+          <label class="calc-label">Actividad f\u00edsica</label>
+          <select class="calc-sel" id="c-act">
+            <option value="1.2">Sedentario (sin ejercicio)</option>
+            <option value="1.375">Poco activo (1\u20133 d\u00edas/semana)</option>
+            <option value="1.55" selected>Moderado (3\u20135 d\u00edas/semana)</option>
+            <option value="1.725">Activo (6\u20137 d\u00edas/semana)</option>
+            <option value="1.9">Muy activo (2 sesiones/d\u00eda)</option>
+          </select>
+        </div>
+        <div class="calc-group">
+          <label class="calc-label">Objetivo</label>
+          <div class="seg" id="goal-seg">
+            <button class="seg-btn active" data-val="cut">Perder grasa</button>
+            <button class="seg-btn" data-val="mant">Mantener</button>
+            <button class="seg-btn" data-val="bulk">Ganar m\u00fasculo</button>
+          </div>
+        </div>
+        <button class="calc-btn" id="calc-go">Calcular</button>
+      </div>
+      <div class="calc-result" id="calc-result" style="display:none">
+        <div class="res-row">
+          <div class="res-box">
+            <div class="res-val" id="r-bmr"></div>
+            <div class="res-lbl">BMR</div>
+            <div class="res-sub">metabolismo basal</div>
+          </div>
+          <div class="res-box accent">
+            <div class="res-val" id="r-tdee"></div>
+            <div class="res-lbl">TDEE</div>
+            <div class="res-sub">gasto total diario</div>
+          </div>
+          <div class="res-box">
+            <div class="res-val" id="r-obj"></div>
+            <div class="res-lbl">Objetivo</div>
+            <div class="res-sub" id="r-obj-lbl"></div>
+          </div>
+        </div>
+        <div class="macro-title">Macros diarios recomendados</div>
+        <div class="macro-row">
+          <div class="macro-box">
+            <div class="macro-val" id="r-prot"></div>
+            <div class="macro-lbl">Prote\u00edna</div>
+            <div class="macro-g" id="r-prot-g"></div>
+          </div>
+          <div class="macro-box">
+            <div class="macro-val" id="r-carb"></div>
+            <div class="macro-lbl">Carbohidratos</div>
+            <div class="macro-g" id="r-carb-g"></div>
+          </div>
+          <div class="macro-box">
+            <div class="macro-val" id="r-fat"></div>
+            <div class="macro-lbl">Grasas</div>
+            <div class="macro-g" id="r-fat-g"></div>
+          </div>
+        </div>
+        <div class="res-note" id="r-note"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -945,6 +1065,64 @@ function openModal(id){
 }
 function closeModal(){document.getElementById('modal').style.display='none';document.body.style.overflow='';}
 window._om=openModal;window._cm=closeModal;
+
+var sexoSeg=document.getElementById('sexo-seg');
+var goalSeg=document.getElementById('goal-seg');
+var calcGo=document.getElementById('calc-go');
+var calcResult=document.getElementById('calc-result');
+var sexoVal='h';
+var goalVal='cut';
+function setupSeg(seg,cb){
+  seg.querySelectorAll('.seg-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      seg.querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');cb(b.dataset.val);
+    });
+  });
+}
+setupSeg(sexoSeg,function(v){sexoVal=v;});
+setupSeg(goalSeg,function(v){goalVal=v;});
+calcGo.addEventListener('click',function(){
+  var edad=parseFloat(document.getElementById('c-edad').value);
+  var peso=parseFloat(document.getElementById('c-peso').value);
+  var altura=parseFloat(document.getElementById('c-altura').value);
+  var act=parseFloat(document.getElementById('c-act').value);
+  if(!edad||!peso||!altura||isNaN(edad)||isNaN(peso)||isNaN(altura)){
+    calcGo.textContent='Rellena todos los campos';
+    setTimeout(function(){calcGo.textContent='Calcular';},2000);return;
+  }
+  var bmr=sexoVal==='h'
+    ?(10*peso+6.25*altura-5*edad+5)
+    :(10*peso+6.25*altura-5*edad-161);
+  bmr=Math.round(bmr);
+  var tdee=Math.round(bmr*act);
+  var objCal,objLabel,protFactor,fatFactor;
+  if(goalVal==='cut'){objCal=Math.max(tdee-500,1200);objLabel='D\u00e9ficit \u2212500 kcal';protFactor=2.2;fatFactor=0.9;}
+  else if(goalVal==='bulk'){objCal=tdee+300;objLabel='Super\u00e1vit +300 kcal';protFactor=2.0;fatFactor=1.0;}
+  else{objCal=tdee;objLabel='Mantenimiento';protFactor=1.8;fatFactor=0.9;}
+  var protG=Math.round(protFactor*peso);
+  var fatG=Math.round(fatFactor*peso);
+  var carbG=Math.round(Math.max(objCal-protG*4-fatG*9,0)/4);
+  var pct=function(g,cal){return Math.round(g*cal/objCal*100);};
+  document.getElementById('r-bmr').textContent=bmr+' kcal';
+  document.getElementById('r-tdee').textContent=tdee+' kcal';
+  document.getElementById('r-obj').textContent=objCal+' kcal';
+  document.getElementById('r-obj-lbl').textContent=objLabel;
+  document.getElementById('r-prot').textContent=pct(protG,4)+'%';
+  document.getElementById('r-prot-g').textContent=protG+'g / d\u00eda';
+  document.getElementById('r-carb').textContent=pct(carbG,4)+'%';
+  document.getElementById('r-carb-g').textContent=carbG+'g / d\u00eda';
+  document.getElementById('r-fat').textContent=pct(fatG,9)+'%';
+  document.getElementById('r-fat-g').textContent=fatG+'g / d\u00eda';
+  var notes={
+    cut:'Con d\u00e9ficit de 500 kcal perder\u00e1s ~0,5 kg/semana. Prioriza prote\u00edna alta y entreno de fuerza para preservar m\u00fasculo.',
+    bulk:'Super\u00e1vit controlado de 300 kcal para ganar m\u00fasculo con m\u00ednima grasa. Combina con progresivo entreno de fuerza.',
+    mant:'Revisa tu peso cada 2 semanas y ajusta \u00b1100 kcal seg\u00fan evoluci\u00f3n real.'
+  };
+  document.getElementById('r-note').textContent=notes[goalVal];
+  calcResult.style.display='block';
+  calcResult.scrollIntoView({behavior:'smooth',block:'nearest'});
+});
 })();"""
 
 
