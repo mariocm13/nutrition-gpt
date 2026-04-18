@@ -71,9 +71,9 @@ html.dark{
   --accent:#4ade80;
   --accent-light:#0d2318;
 }
-html,body{height:100%;background:var(--bg);overscroll-behavior:none}
-body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;line-height:1.5;transition:background .3s,color .3s}
-.app{max-width:680px;min-height:100vh;min-height:100dvh;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);transition:background .3s}
+html,body{height:100%;overflow:hidden;background:var(--bg);overscroll-behavior:none}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;line-height:1.5;transition:background .3s,color .3s;display:flex;flex-direction:column}
+.app{max-width:680px;width:100%;flex:1;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);transition:background .3s;overflow:hidden}
 .header{padding:18px 22px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0}
 .icon{width:44px;height:44px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:4px 4px 10px rgba(58,157,110,.4),-2px -2px 6px rgba(255,255,255,.5)}
 html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222,128,.15)}
@@ -87,7 +87,7 @@ html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222
 .tabs{display:flex;gap:12px;padding:0 22px 16px;flex-shrink:0}
 .tab{flex:1;padding:11px;font-size:13px;font-weight:600;color:var(--muted);background:var(--bg);border:none;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s,background .3s}
 .tab.active{box-shadow:var(--sh-press);color:var(--accent)}
-.panel{display:none;flex:1;flex-direction:column;min-height:0}
+.panel{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
 .panel.active{display:flex}
 .msgs{flex:1;overflow-y:auto;padding:8px 22px 14px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--nm-d) transparent;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .msgs::-webkit-scrollbar{width:4px}
@@ -99,7 +99,7 @@ html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222
 .m.u .b{background:var(--accent);color:#fff;box-shadow:4px 4px 10px rgba(58,157,110,.35),-2px -2px 6px rgba(255,255,255,.4);border-radius:18px 6px 18px 18px}
 html.dark .m.u .b{box-shadow:4px 4px 10px rgba(74,222,128,.25),-2px -2px 5px rgba(42,47,66,.8)}
 .typing .b{color:var(--muted);font-style:italic}
-.composer{padding:14px 22px 22px;display:flex;gap:10px;flex-shrink:0}
+.composer{padding:14px 22px 22px;display:flex;gap:10px;flex-shrink:0;background:var(--bg)}
 #inp{flex:1;padding:13px 16px;border:none;border-radius:14px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);transition:box-shadow .2s,background .3s,color .3s;user-select:auto;-webkit-user-select:auto}
 #inp:focus{box-shadow:var(--sh-in),0 0 0 2px var(--accent)}
 #inp::placeholder{color:var(--muted)}
