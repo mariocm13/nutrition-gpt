@@ -13,6 +13,8 @@ class NLPProcessor:
             "desayuno", "almuerzo", "comida", "cena", "merienda",
             "idea", "ideas", "menu", "menus", "ingredientes",
             "cocinamos", "preparo", "hago", "puedo comer",
+            "sugerencia", "sugerencias", "opciones", "combinar",
+            "aprovechar", "usar", "gastar", "sobra", "sobras",
         }
 
         self.palabras_calorias = {
@@ -101,6 +103,12 @@ class NLPProcessor:
         if re.search(r"\b(tengo|con|usar|aprovechar|cocinar)\b", texto_limpio):
             puntos_recetas += 2
 
+        if re.search(r"\b(que|qu[eé])\s+(hago|puedo|podria|haria|cocino|preparo|como)\b", texto_limpio):
+            puntos_recetas += 4
+
+        if re.search(r"\b(ideas?|sugerencias?|opciones?)\s+(para|con|de)\b", texto_limpio):
+            puntos_recetas += 4
+
         if re.search(r"\b(\d+)\s*(g|gramos|kg|ml|unidad|unidades)\b", texto_limpio):
             puntos_calorias += 2
 
@@ -140,7 +148,7 @@ class NLPProcessor:
             return []
         candidatos: List[str] = []
 
-        for match in re.finditer(r"(?:con|de|tengo|usar|aprovechar|usando)\s+([a-z0-9,\s]+)", texto_limpio):
+        for match in re.finditer(r"(?:con|de|tengo|usar|aprovechar|usando|gastar|sobra(?:n)?)\s+([a-z0-9,\s]+)", texto_limpio):
             fragmento = match.group(1)
             fragmento = re.split(
                 r"\b(para|que|porque|pero|aunque|cuantas|calorias|como|sin)\b",

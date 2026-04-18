@@ -273,27 +273,83 @@ nutrition_knowledge = load_json_file(NUTRITION_KNOWLEDGE_PATH, {"topics": [], "f
 recipes_by_id = {receta["id"]: receta for receta in recipes_db.get("recetas", [])}
 
 
-def buscar_recetas(terminos):
+def buscar_recetas(terminos, strict=False):
     if isinstance(terminos, str):
         terminos = tokens_relevantes(terminos)
     resultados = []
     for receta in recipes_db.get("recetas", []):
         contenido = normalizar_texto(" ".join([receta["nombre"]] + receta["ingredientes"]))
         score = 0
+        tiene_match_directo = False
         for termino in terminos:
             termino_normalizado = normalizar_texto(termino)
             if not termino_normalizado:
                 continue
             if termino_normalizado in contenido:
                 score += 3
+                tiene_match_directo = True
             else:
                 for token in termino_normalizado.split():
-                    if token in contenido:
+                    if len(token) > 3 and token in contenido:
                         score += 1
-        if score > 0:
+        if score > 0 and (not strict or tiene_match_directo):
             resultados.append((score, receta))
     resultados.sort(key=lambda item: (-item[0], item[1].get("calorias_aprox", 0)))
     return [receta for _, receta in resultados[:10]]
+
+
+USOS_INGREDIENTE = {
+    "melon": ["Ensalada de frutas con menta", "Batido de melón y yogur", "Gazpacho de melón", "Macedonias frescas"],
+    "sandia": ["Zumo de sandía con limón", "Granizado de sandía", "Ensalada de verano con feta y sandía", "Batido rosa refrescante"],
+    "fresa": ["Batido de fresas con leche", "Yogur con fresas y granola", "Ensalada con fresas y espinacas"],
+    "platano": ["Batido proteico de plátano", "Tostadas con plátano y mantequilla de cacahuete", "Porridge con plátano"],
+    "manzana": ["Zumo natural de manzana", "Ensalada de frutas", "Manzana al horno con canela"],
+    "naranja": ["Zumo de naranja natural", "Smoothie cítrico", "Ensalada de naranja con hinojo"],
+    "limon": ["Agua con limón", "Vinagreta de limón para ensaladas", "Limonada casera"],
+    "aguacate": ["Guacamole casero", "Tostada de aguacate con huevo", "Ensalada verde con aguacate"],
+    "tomate": ["Gazpacho andaluz", "Ensalada de tomate y mozzarella", "Salsa casera de tomate"],
+    "pepino": ["Ensalada fresca de pepino", "Gazpacho", "Agua detox con pepino y limón"],
+    "espinaca": ["Batido verde con espinacas", "Salteado de espinacas con ajo", "Ensalada de espinacas"],
+    "zanahoria": ["Zumo de zanahoria y naranja", "Crudités con hummus", "Crema de zanahoria"],
+    "brocoli": ["Brócoli al vapor con limón", "Crema de brócoli", "Salteado de brócoli con ajo"],
+    "pollo": ["Pollo a la plancha con verduras", "Pechuga al horno con especias", "Caldo de pollo casero"],
+    "salmon": ["Salmón a la plancha con limón", "Salmón al horno con miel", "Tartar de salmón"],
+    "atun": ["Ensalada de atún con huevo", "Pasta con atún y tomate", "Tataki de atún"],
+    "huevo": ["Tortilla española", "Huevos revueltos con verduras", "Huevos al plato"],
+    "arroz": ["Arroz con verduras salteadas", "Arroz caldoso", "Risotto de setas"],
+    "pasta": ["Pasta con tomate casero", "Pasta con atún", "Pasta salteada con verduras"],
+    "avena": ["Porridge con fruta", "Overnight oats", "Tortitas de avena y plátano"],
+    "yogur": ["Smoothie bowl", "Yogur con frutas y semillas", "Tzatziki"],
+    "queso": ["Tostada con queso y tomate", "Ensalada caprese", "Quesadillas de verduras"],
+    "lentejas": ["Lentejas estofadas", "Ensalada de lentejas", "Sopa de lentejas"],
+    "garbanzos": ["Hummus casero", "Ensalada de garbanzos", "Potaje de garbanzos"],
+}
+
+
+def crear_sugerencia_ingredientes(ingredientes):
+    sugerencias = []
+    for ing in ingredientes:
+        ing_norm = normalizar_texto(ing)
+        for key, ideas in USOS_INGREDIENTE.items():
+            if key in ing_norm or ing_norm in key:
+                sugerencias.extend(ideas)
+                break
+    sugerencias_unicas = list(dict.fromkeys(sugerencias))[:6]
+    ingredientes_str = " y ".join(f"<strong>{i}</strong>" for i in ingredientes[:3])
+    if sugerencias_unicas:
+        lista = "".join(f"\u2014 {s}<br>" for s in sugerencias_unicas)
+        return (
+            f"No tengo recetas guardadas con {ingredientes_str}, "
+            f"pero con esos ingredientes puedes preparar:<br><br>{lista}<br>"
+            "\u00bfQuieres detalles de alguna de estas ideas? "
+            "Tambi\u00e9n puedes explorar la pesta\u00f1a de <em>Recetas</em>."
+        )
+    return (
+        f"No encontr\u00e9 recetas con {ingredientes_str}.<br><br>"
+        "Los ingredientes con m\u00e1s recetas en mi base de datos son: "
+        "<em>pollo, arroz, salm\u00f3n, avena, huevo y legumbres</em>. "
+        "Prueba combinando alguno de ellos."
+    )
 
 
 def buscar_alimentos_similares(termino):
@@ -593,7 +649,8 @@ def generar_respuesta(mensaje, contexto=None):
 
     if intencion == "recetas":
         terminos = ingredientes if ingredientes else palabras_clave
-        recetas = buscar_recetas(terminos)
+        strict = bool(ingredientes)
+        recetas = buscar_recetas(terminos, strict=strict)
 
         if recetas:
             recetas_top = recetas[:5]
@@ -620,10 +677,12 @@ def generar_respuesta(mensaje, contexto=None):
             )
             return {"respuesta": "".join(partes), "contexto": contexto}
 
+        if ingredientes:
+            return {"respuesta": crear_sugerencia_ingredientes(ingredientes), "contexto": contexto}
         termino_busqueda = ", ".join(terminos) if terminos else "tu consulta"
         return {
             "respuesta": (
-                f"No encontr\u00e9 recetas con <strong>{termino_busqueda}</strong>.<br><br>"
+                f"No encontr\u00e9 recetas para <strong>{termino_busqueda}</strong>.<br><br>"
                 "Prueba con uno o dos ingredientes principales, como:<br>"
                 "<em>cena ligera con pollo</em> o <em>desayuno con avena</em>."
             ),
