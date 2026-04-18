@@ -120,8 +120,8 @@ html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,
 .card{border-radius:20px;overflow:hidden;cursor:pointer;box-shadow:var(--sh);transition:box-shadow .2s,transform .2s,background .3s;animation:fadeUp .25s ease both;background:var(--bg)}
 .card:hover{transform:translateY(-3px);box-shadow:8px 8px 18px var(--nm-d),-8px -8px 18px var(--nm-l)}
 .card:active{transform:scale(.98);box-shadow:var(--sh-press)}
-.card-img{width:100%;height:160px;object-fit:cover;display:block}
-.card-ph{width:100%;height:120px;display:none;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,var(--accent-light),var(--bg))}
+.card-img{width:100%;height:220px;object-fit:cover;display:block}
+.card-ph{width:100%;height:220px;display:none;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,var(--accent-light),var(--bg))}
 .card-body{padding:11px 13px 13px}
 .card-name{font-size:12px;font-weight:700;line-height:1.35;margin-bottom:5px;color:var(--text)}
 .card-cal{font-size:11px;color:var(--accent);font-weight:700;margin-bottom:7px}
@@ -806,12 +806,85 @@ function send(){
 }
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
 btn.addEventListener('click',send);
-var PHOTOS={salmon:'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=220&fit=crop&auto=format',avena:'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=400&h=220&fit=crop&auto=format',batido:'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400&h=220&fit=crop&auto=format',tostada:'https://images.unsplash.com/photo-1484723091739-30990d4d5b21?w=400&h=220&fit=crop&auto=format',ensalada:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=220&fit=crop&auto=format',pasta:'https://images.unsplash.com/photo-1551183053-bf91798d454e?w=400&h=220&fit=crop&auto=format',sopa:'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=220&fit=crop&auto=format',pollo:'https://images.unsplash.com/photo-1598103442097-8b74394b95c1?w=400&h=220&fit=crop&auto=format',pescado:'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=220&fit=crop&auto=format',huevo:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&h=220&fit=crop&auto=format',carne:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=220&fit=crop&auto=format',arroz:'https://images.unsplash.com/photo-1516684732162-798a0062be99?w=400&h=220&fit=crop&auto=format',verdura:'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=220&fit=crop&auto=format',fruta:'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=220&fit=crop&auto=format',default:'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&h=220&fit=crop&auto=format'};
-var EMOJIS={salmon:'&#x1F41F;',avena:'&#x1F33E;',batido:'&#x1F964;',tostada:'&#x1F35E;',ensalada:'&#x1F957;',pasta:'&#x1F35D;',sopa:'&#x1F35C;',pollo:'&#x1F357;',pescado:'&#x1F420;',huevo:'&#x1F373;',carne:'&#x1F969;',arroz:'&#x1F35A;',verdura:'&#x1F966;',fruta:'&#x1F34E;',default:'&#x1F37D;'};
+var Q='?w=500&h=280&fit=crop&auto=format';
+var PHOTOS={
+  salmon:'https://images.unsplash.com/photo-1467003909585-2f8a72700288'+Q,
+  avena:'https://images.unsplash.com/photo-1517673132405-a56a62b18caf'+Q,
+  batido:'https://images.unsplash.com/photo-1553530666-ba11a7da3888'+Q,
+  tostada:'https://images.unsplash.com/photo-1484723091739-30990d4d5b21'+Q,
+  ensalada:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd'+Q,
+  pasta:'https://images.unsplash.com/photo-1551183053-bf91798d454e'+Q,
+  sopa:'https://images.unsplash.com/photo-1547592166-23ac45744acd'+Q,
+  pollo:'https://images.unsplash.com/photo-1598103442097-8b74394b95c1'+Q,
+  pescado:'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2'+Q,
+  huevo:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543'+Q,
+  carne:'https://images.unsplash.com/photo-1544025162-d76694265947'+Q,
+  arroz:'https://images.unsplash.com/photo-1516684732162-798a0062be99'+Q,
+  verdura:'https://images.unsplash.com/photo-1540420773420-3366772f4999'+Q,
+  fruta:'https://images.unsplash.com/photo-1619566636858-adf3ef46400b'+Q,
+  legumbre:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'+Q,
+  yogur:'https://images.unsplash.com/photo-1488477181946-6428a0291777'+Q,
+  queso:'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d'+Q,
+  seta:'https://images.unsplash.com/photo-1504674900247-0877df9cc836'+Q,
+  curry:'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38'+Q,
+  wok:'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd'+Q,
+  sandwich:'https://images.unsplash.com/photo-1528735602780-2552fd46c7af'+Q,
+  tortilla:'https://images.unsplash.com/photo-1565958011703-44f9829ba187'+Q,
+  quinoa:'https://images.unsplash.com/photo-1512058564366-18510be2db19'+Q,
+  gazpacho:'https://images.unsplash.com/photo-1476124369491-e7addf5db371'+Q
+};
+var DEFAULT_POOL=[
+  'https://images.unsplash.com/photo-1498837167922-ddd27525d352'+Q,
+  'https://images.unsplash.com/photo-1490645935967-10de6ba17061'+Q,
+  'https://images.unsplash.com/photo-1473093295043-cdd812d0e601'+Q,
+  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0'+Q,
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836'+Q,
+  'https://images.unsplash.com/photo-1529042410759-befb1204b468'+Q,
+  'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327'+Q,
+  'https://images.unsplash.com/photo-1540189549336-e6e99d7aa571'+Q,
+  'https://images.unsplash.com/photo-1565299585323-38d6b0865b47'+Q,
+  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445'+Q,
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'+Q,
+  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd'+Q,
+  'https://images.unsplash.com/photo-1547592180-85f173990554'+Q,
+  'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327'+Q,
+  'https://images.unsplash.com/photo-1506354666786-959d6d497f1a'+Q,
+  'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd'+Q
+];
+var EMOJIS={salmon:'&#x1F41F;',avena:'&#x1F33E;',batido:'&#x1F964;',tostada:'&#x1F35E;',ensalada:'&#x1F957;',pasta:'&#x1F35D;',sopa:'&#x1F35C;',pollo:'&#x1F357;',pescado:'&#x1F420;',huevo:'&#x1F373;',carne:'&#x1F969;',arroz:'&#x1F35A;',verdura:'&#x1F966;',fruta:'&#x1F34E;',legumbre:'&#x1FAD8;',yogur:'&#x1F962;',queso:'&#x1F9C0;',seta:'&#x1F344;',curry:'&#x1F35B;',wok:'&#x1FAD5;',sandwich:'&#x1F96A;',tortilla:'&#x1F373;',quinoa:'&#x1F33E;',gazpacho:'&#x1F35C;'};
 function photoKey(r){
   var t=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-  var ks=['salmon','avena','batido','tostada','ensalada','pasta','sopa','pollo','pescado','huevo','carne','arroz','verdura','fruta'];
-  for(var i=0;i<ks.length;i++){if(t.indexOf(ks[i])>=0)return ks[i];}return 'default';
+  var checks=[
+    ['salmon'],['avena','porridge','overnight'],['batido','smoothie','shake'],
+    ['tostada','pan tostado'],['ensalada'],['pasta','espagueti','macarron','fideo'],
+    ['sopa','crema de','caldo','pure'],['pollo','pechuga','contramuslo'],
+    ['atun','merluza','dorada','bacalao','salmon','pescado'],
+    ['huevo','tortilla de huevo','revuelto'],
+    ['carne','ternera','cerdo','cordero','buey','jamon','bacon','pavo'],
+    ['arroz','risotto'],['brocoli','coliflor','espinaca','zanahoria','pimiento','calabacin','verdura'],
+    ['fruta','fresa','arandano','melon','sandia','pera','manzana','platano','mango','kiwi','piña'],
+    ['lenteja','garbanzo','alubia','judias','legumbre'],
+    ['yogur','kefir'],['queso'],['seta','champiñon','boletus'],
+    ['curry','tikka','masala'],['wok','salteado','oriental','chino'],
+    ['sandwich','bocadillo','wrap','burrito'],['tortilla'],
+    ['quinoa'],['gazpacho','salmorejo']
+  ];
+  var keys=['salmon','avena','batido','tostada','ensalada','pasta','sopa','pollo','pescado','huevo','carne','arroz','verdura','fruta','legumbre','yogur','queso','seta','curry','wok','sandwich','tortilla','quinoa','gazpacho'];
+  for(var i=0;i<checks.length;i++){
+    for(var j=0;j<checks[i].length;j++){
+      if(t.indexOf(checks[i][j])>=0)return keys[i];
+    }
+  }
+  return null;
+}
+function getPhoto(r){
+  var k=photoKey(r);
+  if(k)return PHOTOS[k];
+  return DEFAULT_POOL[Math.abs(r.id||0)%DEFAULT_POOL.length];
+}
+function getEmoji(r){
+  var k=photoKey(r);
+  return k?EMOJIS[k]:'&#x1F37D;';
 }
 function getcat(r){
   var t=((r.nombre||'')+' '+(r.categoria||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
@@ -839,12 +912,11 @@ function renderGallery(){
   });
   if(!filtered.length){gg.innerHTML='<div class="empty">Sin resultados.</div>';return;}
   gg.innerHTML=filtered.slice(0,40).map(function(r){
-    var k=photoKey(r);
     var tags=(r.ingredientes||[]).slice(0,2).map(function(i){return '<span class="tag">'+i.split(' ')[0]+'</span>';}).join('');
     var id=String(r.id);
     return '<div class="card" onclick="window._om(\''+id+'\')">'+
-      '<img class="card-img" src="'+PHOTOS[k]+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
-      '<div class="card-ph">'+EMOJIS[k]+'</div>'+
+      '<img class="card-img" src="'+getPhoto(r)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
+      '<div class="card-ph">'+getEmoji(r)+'</div>'+
       '<div class="card-body"><div class="card-name">'+r.nombre+'</div>'+
       '<div class="card-cal">'+r.calorias_aprox+' kcal</div>'+
       '<div class="card-tags">'+tags+'</div></div></div>';
@@ -859,13 +931,12 @@ document.querySelectorAll('.filter-btn').forEach(function(b){
 gsearch.addEventListener('input',function(e){searchTerm=e.target.value.toLowerCase().trim();renderGallery();});
 function openModal(id){
   var r=recipesMap[id];if(!r)return;
-  var k=photoKey(r);
   var ings=(r.ingredientes||[]).map(function(i){return '- '+i;}).join('<br>');
   var steps=(r.instrucciones||[]).map(function(s,i){return '<div class="modal-step"><div class="sn">'+(i+1)+'</div><div>'+s+'</div></div>';}).join('');
   var el=document.getElementById('modal');
   el.innerHTML='<div class="modal-wrap" onclick="if(event.target===this)window._cm()"><div class="modal">'+
-    '<img class="modal-img" src="'+PHOTOS[k]+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
-    '<div class="modal-ph">'+EMOJIS[k]+'</div>'+
+    '<img class="modal-img" src="'+getPhoto(r)+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
+    '<div class="modal-ph">'+getEmoji(r)+'</div>'+
     '<div class="modal-body"><div class="modal-head"><div>'+
     '<div class="modal-name">'+r.nombre+'</div><div class="modal-kcal">'+r.calorias_aprox+' kcal aprox.</div></div>'+
     '<button class="x-btn" onclick="window._cm()">x</button></div>'+
