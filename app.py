@@ -5,7 +5,6 @@ import json
 import os
 import re
 import unicodedata
-import requests
 from nlp_processor import NLPProcessor
 
 app = FastAPI(title="NutriGPT")
@@ -21,9 +20,7 @@ app.add_middleware(
 
 nlp = NLPProcessor()
 
-DRIVE_FILE_ID = "1pMn-MyxfEaag0rzZbwYSzSciYnRDOodw"
 CALORIES_DATA_PATH = "data/calories.json"
-RECIPES_DATA_PATH = "data/recipes_large.json"
 NUTRITION_KNOWLEDGE_PATH = "data/nutrition_knowledge.json"
 
 ORDINALES = {
@@ -113,43 +110,6 @@ html.dark .m.u .b{box-shadow:4px 4px 10px rgba(74,222,128,.25),-2px -2px 5px rgb
 #btn{padding:13px 22px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:4px 4px 10px rgba(58,157,110,.4),-2px -2px 6px rgba(255,255,255,.35);transition:box-shadow .15s,transform .1s;flex-shrink:0}
 #btn:active{transform:scale(.97);box-shadow:inset 2px 2px 5px rgba(0,0,0,.18),inset -1px -1px 3px rgba(255,255,255,.1)}
 html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,128,.15)}
-.gallery-top{padding:6px 22px 0;flex-shrink:0}
-#gsearch{width:100%;padding:13px 16px;border:none;border-radius:14px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);transition:box-shadow .2s,background .3s,color .3s;display:block;user-select:auto;-webkit-user-select:auto}
-#gsearch:focus{box-shadow:var(--sh-in),0 0 0 2px var(--accent)}
-#gsearch::placeholder{color:var(--muted)}
-.filters{display:flex;gap:8px;padding:14px 22px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
-.filter-btn{padding:8px 15px;border-radius:22px;font-size:12px;font-weight:600;border:none;background:var(--bg);color:var(--muted);cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s,background .3s}
-.filter-btn.active{box-shadow:var(--sh-press);color:var(--accent)}
-.gallery-grid{flex:1;min-height:0;overflow-y:auto;padding:2px 22px 22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;align-content:start;scrollbar-width:thin;scrollbar-color:var(--nm-d) transparent;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.gallery-grid::-webkit-scrollbar{width:4px}
-.gallery-grid::-webkit-scrollbar-thumb{background:var(--nm-d);border-radius:4px}
-.card{border-radius:20px;overflow:hidden;cursor:pointer;box-shadow:var(--sh);transition:box-shadow .2s,transform .2s,background .3s;animation:fadeUp .25s ease both;background:var(--bg)}
-.card:hover{transform:translateY(-3px);box-shadow:8px 8px 18px var(--nm-d),-8px -8px 18px var(--nm-l)}
-.card:active{transform:scale(.98);box-shadow:var(--sh-press)}
-.card-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
-.card-ph{width:100%;aspect-ratio:4/3;display:none;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,var(--accent-light),var(--bg))}
-.card-body{padding:11px 13px 13px}
-.card-name{font-size:13px;font-weight:700;line-height:1.35;margin-bottom:5px;color:var(--text)}
-.card-cal{font-size:11px;color:var(--accent);font-weight:700;margin-bottom:7px}
-.card-tags{display:flex;gap:5px;flex-wrap:wrap}
-.tag{font-size:10px;padding:3px 9px;border-radius:10px;background:var(--bg);box-shadow:var(--sh-press);color:var(--accent);font-weight:600}
-.empty{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
-.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease}
-.modal{background:var(--bg);border-radius:28px 28px 0 0;max-width:960px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;animation:slideUp .28s ease;box-shadow:0 -8px 40px rgba(0,0,0,.18)}
-.modal-img{width:100%;height:190px;object-fit:cover;flex-shrink:0;display:block}
-.modal-ph{width:100%;height:190px;display:none;align-items:center;justify-content:center;font-size:64px;flex-shrink:0;background:linear-gradient(135deg,var(--accent-light),var(--bg))}
-.modal-body{padding:22px 24px 34px;overflow-y:auto;flex:1}
-.modal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
-.modal-name{font-size:19px;font-weight:700;line-height:1.3}
-.modal-kcal{font-size:13px;color:var(--accent);font-weight:700;margin-top:4px}
-.x-btn{width:36px;height:36px;border-radius:50%;border:none;background:var(--bg);cursor:pointer;color:var(--muted);font-size:19px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--sh-sm);transition:box-shadow .15s,color .15s;font-family:inherit}
-.x-btn:active{box-shadow:var(--sh-press);color:var(--accent)}
-.modal-sec{margin-top:20px}
-.modal-sec h3{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
-.modal-ing{font-size:13px;line-height:2.2}
-.modal-step{display:flex;gap:12px;margin-bottom:11px;font-size:13px;line-height:1.65}
-.sn{width:24px;height:24px;min-width:24px;border-radius:50%;background:var(--bg);box-shadow:var(--sh-sm);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(70px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -190,11 +150,6 @@ small{font-size:12px}
   .msgs{padding:8px 14px 12px}
   .composer{padding:10px 14px 18px;gap:8px}
   #btn{padding:13px 16px;font-size:12px}
-  .gallery-top{padding:6px 14px 0}
-  .filters{padding:12px 14px}
-  .gallery-grid{padding:2px 14px 18px;gap:12px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
-  .card-name{font-size:12px}
-  .modal-body{padding:18px 18px 28px}
   .foto-wrap{padding:14px}
   .foto-macros{grid-template-columns:repeat(2,1fr)}
 }
@@ -231,7 +186,7 @@ small{font-size:12px}
     </div>
     <div>
       <h1>NutriGPT</h1>
-      <p>Asistente de nutrici\u00f3n y recetas</p>
+      <p>Asistente de nutrici\u00f3n</p>
     </div>
     <div class="header-end">
       <button id="dm" title="Modo oscuro" aria-label="Alternar modo oscuro">
@@ -241,7 +196,6 @@ small{font-size:12px}
   </div>
   <nav class="tabs">
     <button class="tab active" data-tab="chat">Chat</button>
-    <button class="tab" data-tab="recetas">Recetas</button>
     <button class="tab" data-tab="calc">Calculadora</button>
     <button class="tab" data-tab="foto">📷 Foto</button>
   </nav>
@@ -260,28 +214,6 @@ small{font-size:12px}
     <div class="composer">
       <input type="text" id="inp" placeholder="Escribe tu pregunta..." autocomplete="off" enterkeyhint="send" inputmode="text">
       <button id="btn">Enviar</button>
-    </div>
-  </div>
-  <div id="panel-recetas" class="panel">
-    <div class="gallery-top">
-      <input type="text" id="gsearch" placeholder="Buscar recetas\u2026" autocomplete="off">
-    </div>
-    <div class="filters">
-      <button class="filter-btn active" data-cat="all">Todas</button>
-      <button class="filter-btn" data-cat="pollo">Pollo</button>
-      <button class="filter-btn" data-cat="pescado">Pescado</button>
-      <button class="filter-btn" data-cat="carne">Carne</button>
-      <button class="filter-btn" data-cat="vegetariano">Vegetariano</button>
-      <button class="filter-btn" data-cat="arroz">Arroz</button>
-      <button class="filter-btn" data-cat="legumbres">Legumbres</button>
-      <button class="filter-btn" data-cat="pasta">Pasta</button>
-      <button class="filter-btn" data-cat="desayuno">Desayuno</button>
-      <button class="filter-btn" data-cat="sopa">Sopas</button>
-      <button class="filter-btn" data-cat="ensalada">Ensaladas</button>
-      <button class="filter-btn" data-cat="postre">Postres</button>
-    </div>
-    <div class="gallery-grid" id="gg">
-      <div class="empty">Cargando recetas\u2026</div>
     </div>
   </div>
   <div id="panel-calc" class="panel">
@@ -373,7 +305,6 @@ small{font-size:12px}
       </div>
     </div>
   </div>
-</div>
   <div id="panel-foto" class="panel">
     <div class="foto-wrap">
       <div class="foto-card">
@@ -407,7 +338,6 @@ small{font-size:12px}
     </div>
   </div>
 </div>
-<div id="modal" style="display:none"></div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 <script src="/app.js"></script>
@@ -438,20 +368,6 @@ def construir_lista_html(items, limit=3):
     return "".join(f"\u2014 {item}<br>" for item in items[:limit])
 
 
-def load_recipes_from_drive():
-    url = f"https://docs.google.com/uc?export=download&id={DRIVE_FILE_ID}"
-    try:
-        response = requests.get(url, timeout=10)
-        if response.status_code == 200:
-            return response.json()
-    except Exception as exc:
-        print(f"Error cargando recetas desde Drive: {exc}")
-    if os.path.exists(RECIPES_DATA_PATH):
-        with open(RECIPES_DATA_PATH, "r", encoding="utf-8") as file:
-            return json.load(file)
-    return {"recetas": []}
-
-
 def load_json_file(path, empty_value):
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as file:
@@ -459,7 +375,7 @@ def load_json_file(path, empty_value):
     return empty_value
 
 
-recipes_db = load_recipes_from_drive()
+recipes_db = load_json_file("data/recipes_large.json", {"recetas": []})
 calories_db = load_json_file(CALORIES_DATA_PATH, {"alimentos": []})
 nutrition_knowledge = load_json_file(NUTRITION_KNOWLEDGE_PATH, {"topics": [], "food_profiles": []})
 recipes_by_id = {receta["id"]: receta for receta in recipes_db.get("recetas", [])}
@@ -956,8 +872,6 @@ var dmIcon=document.getElementById('dm-icon');
 var msgs=document.getElementById('msgs');
 var inp=document.getElementById('inp');
 var btn=document.getElementById('btn');
-var gg=document.getElementById('gg');
-var gsearch=document.getElementById('gsearch');
 var SUN='<path d="M12 4.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 4.5zm0 13.5a.75.75 0 01.75.75v.75a.75.75 0 01-1.5 0v-.75A.75.75 0 0112 18zm7.5-6.75a.75.75 0 010 1.5h-.75a.75.75 0 010-1.5h.75zm-15 0a.75.75 0 010 1.5H3.75a.75.75 0 010-1.5H4.5zm12.86-5.61a.75.75 0 010 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 011.06 0zm-10.6 10.6a.75.75 0 010 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 011.06 0zm10.6 0a.75.75 0 011.06 1.06l-.53.53a.75.75 0 01-1.06-1.06l.53-.53a.75.75 0 010-1.06zM5.86 6.14a.75.75 0 011.06 0l.53.53A.75.75 0 016.39 7.73l-.53-.53a.75.75 0 010-1.06zM12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z"/>';
 var MOON='<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
 function setDark(on){
@@ -974,11 +888,9 @@ document.querySelectorAll('.tab').forEach(function(tab){
     var id=tab.dataset.tab;
     document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t===tab);});
     document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+id);});
-    if(id==='recetas'&&!galleryLoaded)loadGallery();
   });
 });
 var ctx={last_recipe_ids:[],last_selected_recipe_id:null};
-var galleryLoaded=false,allRecipes=[],recipesMap={},activeFilter='all',searchTerm='';
 function addMsg(html,isUser,cls){
   var m=document.createElement('div');
   m.className='m '+(isUser?'u':'bot')+(cls?' '+cls:'');
@@ -996,152 +908,6 @@ function send(){
 }
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
 btn.addEventListener('click',send);
-var Q='?w=800&h=600&fit=crop&auto=format';
-var PHOTOS={
-  salmon:'https://images.unsplash.com/photo-1467003909585-2f8a72700288'+Q,
-  avena:'https://images.unsplash.com/photo-1517673132405-a56a62b18caf'+Q,
-  batido:'https://images.unsplash.com/photo-1553530666-ba11a7da3888'+Q,
-  tostada:'https://images.unsplash.com/photo-1484723091739-30990d4d5b21'+Q,
-  ensalada:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd'+Q,
-  pasta:'https://images.unsplash.com/photo-1551183053-bf91798d454e'+Q,
-  sopa:'https://images.unsplash.com/photo-1547592166-23ac45744acd'+Q,
-  pollo:'https://images.unsplash.com/photo-1598103442097-8b74394b95c1'+Q,
-  pescado:'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2'+Q,
-  huevo:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543'+Q,
-  carne:'https://images.unsplash.com/photo-1544025162-d76694265947'+Q,
-  arroz:'https://images.unsplash.com/photo-1516684732162-798a0062be99'+Q,
-  verdura:'https://images.unsplash.com/photo-1540420773420-3366772f4999'+Q,
-  fruta:'https://images.unsplash.com/photo-1619566636858-adf3ef46400b'+Q,
-  legumbre:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'+Q,
-  yogur:'https://images.unsplash.com/photo-1488477181946-6428a0291777'+Q,
-  queso:'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d'+Q,
-  seta:'https://images.unsplash.com/photo-1504674900247-0877df9cc836'+Q,
-  curry:'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38'+Q,
-  wok:'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd'+Q,
-  sandwich:'https://images.unsplash.com/photo-1528735602780-2552fd46c7af'+Q,
-  tortilla:'https://images.unsplash.com/photo-1565958011703-44f9829ba187'+Q,
-  quinoa:'https://images.unsplash.com/photo-1512058564366-18510be2db19'+Q,
-  gazpacho:'https://images.unsplash.com/photo-1476124369491-e7addf5db371'+Q
-};
-var DEFAULT_POOL=[
-  'https://images.unsplash.com/photo-1498837167922-ddd27525d352'+Q,
-  'https://images.unsplash.com/photo-1490645935967-10de6ba17061'+Q,
-  'https://images.unsplash.com/photo-1473093295043-cdd812d0e601'+Q,
-  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0'+Q,
-  'https://images.unsplash.com/photo-1504674900247-0877df9cc836'+Q,
-  'https://images.unsplash.com/photo-1529042410759-befb1204b468'+Q,
-  'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327'+Q,
-  'https://images.unsplash.com/photo-1540189549336-e6e99d7aa571'+Q,
-  'https://images.unsplash.com/photo-1565299585323-38d6b0865b47'+Q,
-  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445'+Q,
-  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'+Q,
-  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd'+Q,
-  'https://images.unsplash.com/photo-1547592180-85f173990554'+Q,
-  'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327'+Q,
-  'https://images.unsplash.com/photo-1506354666786-959d6d497f1a'+Q,
-  'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd'+Q
-];
-var EMOJIS={salmon:'&#x1F41F;',avena:'&#x1F33E;',batido:'&#x1F964;',tostada:'&#x1F35E;',ensalada:'&#x1F957;',pasta:'&#x1F35D;',sopa:'&#x1F35C;',pollo:'&#x1F357;',pescado:'&#x1F420;',huevo:'&#x1F373;',carne:'&#x1F969;',arroz:'&#x1F35A;',verdura:'&#x1F966;',fruta:'&#x1F34E;',legumbre:'&#x1FAD8;',yogur:'&#x1F962;',queso:'&#x1F9C0;',seta:'&#x1F344;',curry:'&#x1F35B;',wok:'&#x1FAD5;',sandwich:'&#x1F96A;',tortilla:'&#x1F373;',quinoa:'&#x1F33E;',gazpacho:'&#x1F35C;'};
-function photoKey(r){
-  var t=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-  var checks=[
-    ['salmon'],['avena','porridge','overnight'],['batido','smoothie','shake'],
-    ['tostada','pan tostado'],['ensalada'],['pasta','espagueti','macarron','fideo'],
-    ['sopa','crema de','caldo','pure'],['pollo','pechuga','contramuslo'],
-    ['atun','merluza','dorada','bacalao','salmon','pescado'],
-    ['huevo','tortilla de huevo','revuelto'],
-    ['carne','ternera','cerdo','cordero','buey','jamon','bacon','pavo'],
-    ['arroz','risotto'],['brocoli','coliflor','espinaca','zanahoria','pimiento','calabacin','verdura'],
-    ['fruta','fresa','arandano','melon','sandia','pera','manzana','platano','mango','kiwi','piña'],
-    ['lenteja','garbanzo','alubia','judias','legumbre'],
-    ['yogur','kefir'],['queso'],['seta','champiñon','boletus'],
-    ['curry','tikka','masala'],['wok','salteado','oriental','chino'],
-    ['sandwich','bocadillo','wrap','burrito'],['tortilla'],
-    ['quinoa'],['gazpacho','salmorejo']
-  ];
-  var keys=['salmon','avena','batido','tostada','ensalada','pasta','sopa','pollo','pescado','huevo','carne','arroz','verdura','fruta','legumbre','yogur','queso','seta','curry','wok','sandwich','tortilla','quinoa','gazpacho'];
-  for(var i=0;i<checks.length;i++){
-    for(var j=0;j<checks[i].length;j++){
-      if(t.indexOf(checks[i][j])>=0)return keys[i];
-    }
-  }
-  return null;
-}
-function getPhoto(r){
-  var k=photoKey(r);
-  if(k)return PHOTOS[k];
-  return DEFAULT_POOL[Math.abs(r.id||0)%DEFAULT_POOL.length];
-}
-function getEmoji(r){
-  var k=photoKey(r);
-  return k?EMOJIS[k]:'&#x1F37D;';
-}
-function matchesCat(r,cat){
-  if(cat==='all')return true;
-  if(r.categoria)return r.categoria===cat;
-  var t=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-  if(cat==='pollo')return /\bpollo\b/.test(t);
-  if(cat==='pescado')return /\bpescado\b|salmon|at[uú]n|merluza|dorada|bacalao|marisco|gamba|calamar|lubina|rape/.test(t);
-  if(cat==='carne')return /\bres\b|\bcarne\b|ternera|cerdo|cordero|pavo|buey|jam[oó]n|bacon/.test(t);
-  if(cat==='vegetariano')return !/\bpollo\b|\bpescado\b|\bres\b|\bcarne\b|salmon|at[uú]n|merluza|bacalao|ternera|cerdo|cordero|pavo|buey|jam[oó]n|bacon|marisco|gamba|calamar/.test(t);
-  if(cat==='arroz')return /\barroz\b/.test(t);
-  if(cat==='legumbres')return /\bgarbanzo|\blenteja|\balubia|\bjud[ií]a/.test(t);
-  if(cat==='pasta')return /\bpasta\b|\bquinoa\b/.test(t);
-  if(cat==='desayuno')return /desayuno|avena|tostada|pancake|smoothie/.test(t);
-  if(cat==='sopa')return /\bsopa\b|\bcaldo\b|\bcrema\b|minestrone/.test(t);
-  if(cat==='ensalada')return /\bensalada\b/.test(t);
-  if(cat==='postre')return /\bpostre\b|flan|mousse|tarta|natilla|crema catalana/.test(t);
-  return false;
-}
-function loadGallery(){
-  galleryLoaded=true;
-  fetch('/api/recipes').then(function(r){return r.json();}).then(function(d){
-    allRecipes=(d.recetas||[]);
-    allRecipes.forEach(function(r){recipesMap[String(r.id)]=r;});
-    renderGallery();
-  }).catch(function(){gg.innerHTML='<div class="empty">Error cargando recetas.</div>';});
-}
-function renderGallery(){
-  var filtered=allRecipes.filter(function(r){
-    var txt=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-    return matchesCat(r,activeFilter)&&(!searchTerm||txt.indexOf(searchTerm)>=0);
-  });
-  if(!filtered.length){gg.innerHTML='<div class="empty">Sin resultados.</div>';return;}
-  gg.innerHTML=filtered.map(function(r){
-    var tags=(r.ingredientes||[]).slice(0,2).map(function(i){return '<span class="tag">'+i.split(' ')[0]+'</span>';}).join('');
-    var id=String(r.id);
-    return '<div class="card" onclick="window._om(\''+id+'\')">'+
-      '<img class="card-img" src="'+getPhoto(r)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
-      '<div class="card-ph">'+getEmoji(r)+'</div>'+
-      '<div class="card-body"><div class="card-name">'+r.nombre+'</div>'+
-      '<div class="card-cal">'+r.calorias_aprox+' kcal</div>'+
-      '<div class="card-tags">'+tags+'</div></div></div>';
-  }).join('');
-}
-document.querySelectorAll('.filter-btn').forEach(function(b){
-  b.addEventListener('click',function(){
-    document.querySelectorAll('.filter-btn').forEach(function(x){x.classList.remove('active');});
-    b.classList.add('active');activeFilter=b.dataset.cat;renderGallery();
-  });
-});
-gsearch.addEventListener('input',function(e){searchTerm=e.target.value.toLowerCase().trim();renderGallery();});
-function openModal(id){
-  var r=recipesMap[id];if(!r)return;
-  var ings=(r.ingredientes||[]).map(function(i){return '- '+i;}).join('<br>');
-  var steps=(r.instrucciones||[]).map(function(s,i){return '<div class="modal-step"><div class="sn">'+(i+1)+'</div><div>'+s+'</div></div>';}).join('');
-  var el=document.getElementById('modal');
-  el.innerHTML='<div class="modal-wrap" onclick="if(event.target===this)window._cm()"><div class="modal">'+
-    '<img class="modal-img" src="'+getPhoto(r)+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
-    '<div class="modal-ph">'+getEmoji(r)+'</div>'+
-    '<div class="modal-body"><div class="modal-head"><div>'+
-    '<div class="modal-name">'+r.nombre+'</div><div class="modal-kcal">'+r.calorias_aprox+' kcal'+(r.tiempo?' &nbsp;·&nbsp; ⏱ '+r.tiempo:'')+(r.dificultad?' &nbsp;·&nbsp; '+r.dificultad:'')+'</div></div>'+
-    '<button class="x-btn" onclick="window._cm()">x</button></div>'+
-    '<div class="modal-sec"><h3>Ingredientes</h3><div class="modal-ing">'+ings+'</div></div>'+
-    '<div class="modal-sec"><h3>Preparacion</h3>'+steps+'</div></div></div></div>';
-  el.style.display='block';document.body.style.overflow='hidden';
-}
-function closeModal(){document.getElementById('modal').style.display='none';document.body.style.overflow='';}
-window._om=openModal;window._cm=closeModal;
 
 var sexoSeg=document.getElementById('sexo-seg');
 var goalSeg=document.getElementById('goal-seg');
@@ -1209,35 +975,105 @@ if('serviceWorker' in navigator){
 (function(){
   // MobileNet label → nombre alimento para buscar en /api/calories
   var FOOD_MAP = {
-    'banana':['platano','banana'],'apple':['manzana'],'orange':['naranja'],
-    'strawberry':['fresa','fresas'],'lemon':['limon'],'pineapple':['pina'],
-    'mango':['mango'],'watermelon':['sandia'],'grape':['uvas'],'peach':['melocoton'],
-    'pizza':['pizza'],'hamburger':['hamburguesa'],'hot dog':['salchicha'],
-    'french fries':['patatas fritas'],'ice cream':['helado'],
-    'pretzel':['pan'],'bagel':['pan'],'baguette':['pan','baguette'],
-    'croissant':['croissant'],'waffle':['tortita'],'pancake':['tortita'],
-    'burrito':['burrito'],'taco':['tacos'],
-    'broccoli':['brocoli'],'carrot':['zanahoria'],'corn':['maiz'],
-    'mushroom':['champiñon','setas'],'cucumber':['pepino'],
-    'tomato':['tomate'],'lettuce':['lechuga'],'avocado':['aguacate'],
-    'egg':['huevo','huevos'],'omelette':['tortilla'],
-    'cheese':['queso'],'butter':['mantequilla'],
-    'milk':['leche'],'yogurt':['yogur'],
-    'chicken':['pollo'],'beef':['carne ternera','ternera'],'pork':['cerdo'],
-    'salmon':['salmon'],'tuna':['atun'],'shrimp':['gamba','gambas'],
-    'lobster':['langosta'],'crab':['cangrejo'],
-    'rice':['arroz'],'pasta':['pasta'],'bread':['pan'],
+    'banana':['platano'],'apple':['manzana'],'orange':['naranja'],
+    'strawberry':['fresa'],'lemon':['limon'],'pineapple':['pina'],
+    'mango':['mango'],'watermelon':['sandia'],'grape':['uva'],
+    'peach':['melocoton'],'cherry':['cereza'],'blueberry':['arandanos'],
+    'raspberry':['frambuesas'],'blackberry':['moras'],'plum':['ciruelas'],
+    'kiwi':['kiwi'],'papaya':['papaya'],'pomegranate':['granada'],
+    'fig':['higo fresco'],'date':['datiles'],'coconut':['coco rallado'],
+    'lychee':['lichi'],'passion fruit':['maracuya'],'apricot':['albaricoque'],
+    'pear':['pera'],'melon':['melon'],
+    'broccoli':['brocoli'],'carrot':['zanahoria'],'corn':['maiz cocido'],
+    'mushroom':['champiñon'],'cucumber':['pepino'],'tomato':['tomate'],
+    'lettuce':['lechuga'],'avocado':['aguacate'],'onion':['cebolla'],
+    'garlic':['ajo'],'pepper':['pimiento rojo'],'zucchini':['calabacin'],
+    'eggplant':['berenjena'],'spinach':['espinacas'],'kale':['kale'],
+    'asparagus':['esparragos'],'artichoke':['alcachofas'],'celery':['apio'],
+    'leek':['puerro'],'cauliflower':['coliflor'],'pumpkin':['calabaza'],
+    'sweet potato':['boniato cocido'],'potato':['patata cocida'],
+    'beet':['remolachas'],'green beans':['judias verdes'],
+    'brussels sprouts':['coles de bruselas'],'arugula':['rucula'],
+    'ginger':['jengibre fresco'],
+    'egg':['huevo'],'omelette':['huevo'],'scrambled eggs':['huevo'],
+    'fried egg':['huevo'],'boiled egg':['huevo'],
+    'chicken':['pechuga de pollo'],'roast chicken':['pollo entero asado'],
+    'chicken breast':['pechuga de pollo'],'chicken thigh':['muslo de pollo'],
+    'beef':['ternera lomo'],'steak':['ternera lomo'],
+    'hamburger':['hamburguesa con pan'],'cheeseburger':['hamburguesa con pan'],
+    'burger':['hamburguesa con pan'],'ground beef':['ternera picada'],
+    'pork':['cerdo lomo'],'bacon':['bacon'],'ham':['jamon serrano'],
+    'chorizo':['chorizo'],'hot dog':['salchichas de pollo'],
+    'sausage':['salchichas de pollo'],'turkey':['pavo pechuga'],
+    'lamb':['cordero pierna'],'duck':['pato pechuga'],
+    'salmon':['salmon'],'tuna':['atun fresco'],
+    'canned tuna':['atun en agua'],'shrimp':['gambas'],
+    'lobster':['langostinos'],'crab':['cangrejo'],
+    'cod':['bacalao'],'hake':['merluza'],'sea bass':['lubina'],
+    'sea bream':['dorada'],'trout':['trucha'],
+    'sardine':['sardinas en aceite'],'anchovy':['anchoas en aceite'],
+    'squid':['calamar'],'octopus':['pulpo cocido'],
+    'mussel':['mejillones cocidos'],'tofu':['tofu'],'tempeh':['tempeh'],
+    'cheese':['queso cheddar'],'cheddar':['queso cheddar'],
+    'mozzarella':['mozzarella'],'parmesan':['parmesano'],'brie':['queso brie'],
+    'feta':['queso fresco'],'cottage cheese':['requesson'],
+    'butter':['mantequilla'],'milk':['leche entera'],
+    'skim milk':['leche desnatada'],'almond milk':['leche de almendras'],
+    'oat milk':['leche de avena'],'soy milk':['leche de soja'],
+    'yogurt':['yogur griego'],'greek yogurt':['yogur griego'],
+    'kefir':['kefir'],'cream':['nata para cocinar'],
+    'bread':['pan blanco'],'white bread':['pan blanco'],
+    'whole wheat bread':['pan integral'],'pita':['pan de pita'],
+    'rice':['arroz blanco'],'brown rice':['arroz integral'],
+    'pasta':['pasta cocida'],'whole wheat pasta':['pasta integral cocida'],
+    'couscous':['cuscus cocido'],'quinoa':['quinoa cocida'],
     'oatmeal':['avena'],'granola':['granola'],
-    'chocolate':['chocolate'],'cake':['pastel'],
-    'coffee':['cafe'],'orange juice':['zumo naranja'],
-    'beer':['cerveza'],'wine':['vino'],
-    'almond':['almendra','almendras'],'peanut':['cacahuete'],
-    'walnut':['nuez','nueces'],'olive':['aceituna'],
-    'potato':['patata','patatas'],'sweet potato':['boniato'],
-    'soup':['sopa'],'salad':['ensalada'],
-    'sushi':['sushi'],'ramen':['ramen'],
-    'lentil':['lentejas'],'chickpea':['garbanzo','garbanzos'],
-    'tofu':['tofu']
+    'polenta':['polenta cocida'],'millet':['mijo cocido'],
+    'buckwheat':['trigo sarraceno cocido'],'rice cake':['galletas de arroz'],
+    'pretzel':['pan blanco'],'bagel':['pan blanco'],'baguette':['pan blanco'],
+    'croissant':['croissant'],'waffle':['gofre'],'pancake':['crepe'],
+    'lentil':['lentejas cocidas'],'chickpea':['garbanzos cocidos'],
+    'black bean':['alubias negras cocidas'],
+    'white bean':['alubias blancas cocidas'],
+    'pinto bean':['alubias pintas cocidas'],'soybean':['soja cocida'],
+    'edamame':['edamame'],'fava bean':['habas cocidas'],
+    'pea':['guisantes cocidos'],
+    'almond':['almendras'],'walnut':['nueces'],'peanut':['cacahuetes'],
+    'pistachio':['pistachos'],'hazelnut':['avellanas'],'cashew':['anacardos'],
+    'macadamia':['nueces de macadamia'],
+    'sunflower seed':['pipas de girasol'],
+    'pumpkin seed':['pipas de calabaza'],'sesame':['sesamo'],
+    'chia seed':['semillas de chia'],'flaxseed':['semillas de lino'],
+    'peanut butter':['mantequilla de cacahuete'],
+    'almond butter':['mantequilla de almendras'],
+    'olive oil':['aceite de oliva'],'coconut oil':['aceite de coco'],
+    'sunflower oil':['aceite de girasol'],'honey':['miel'],
+    'ketchup':['ketchup'],'mayonnaise':['mayonesa'],
+    'soy sauce':['salsa de soja'],'olive':['aceituna'],
+    'hummus':['garbanzos cocidos'],'guacamole':['aguacate'],
+    'french fries':['patatas fritas'],'chips':['patatas fritas'],
+    'popcorn':['palomitas de maiz'],'granola bar':['barrita de cereales'],
+    'chocolate':['chocolate negro 70%'],'dark chocolate':['chocolate negro 70%'],
+    'pizza':['pizza de queso'],'ice cream':['helado'],
+    'cake':['pastel'],'cheesecake':['tarta de queso'],
+    'brownie':['brownie'],'donut':['donut'],'muffin':['magdalena'],
+    'cookie':['galleta'],'nachos':['nachos'],'churro':['churro'],
+    'sushi':['sushi'],'ramen':['ramen'],'pad thai':['pad thai'],
+    'fried rice':['arroz frito'],'spring roll':['rollitos primavera'],
+    'dumpling':['dumpling'],'noodles':['fideos cocidos'],
+    'curry':['curry'],'tikka masala':['curry'],
+    'kebab':['kebab'],'shawarma':['shawarma'],'falafel':['falafel'],
+    'burrito':['burrito'],'taco':['tacos'],'quesadilla':['quesadilla'],
+    'sandwich':['sandwich'],'wrap':['wrap'],
+    'soup':['sopa'],'salad':['ensalada'],'caesar salad':['ensalada'],
+    'paella':['paella'],'risotto':['risotto'],
+    'tiramisu':['tiramisu'],'french toast':['torrija'],'crepe':['crepe'],
+    'coffee':['cafe solo'],'espresso':['cafe solo'],
+    'cappuccino':['cafe con leche'],'latte':['cafe con leche'],
+    'tea':['te verde'],'orange juice':['zumo de naranja'],
+    'coconut water':['agua de coco'],'beer':['cerveza'],'wine':['vino'],
+    'smoothie':['batido'],'milkshake':['batido con leche'],
+    'protein shake':['proteina whey'],'protein powder':['proteina whey']
   };
 
   var mnModel=null,mnLoading=false;
@@ -1406,11 +1242,6 @@ async def chat(data: dict):
     return generar_respuesta(mensaje, contexto)
 
 
-@app.get("/api/recipes")
-async def get_recipes():
-    return recipes_db
-
-
 @app.get("/api/calories")
 async def get_calories(food: str):
     alimento = buscar_alimento(food)
@@ -1430,7 +1261,7 @@ async def get_stats():
 MANIFEST = {
     "name": "NutriGPT",
     "short_name": "NutriGPT",
-    "description": "Asistente de nutrición con recetas, calorías y calculadora de macros",
+    "description": "Asistente de nutrición: calorías, macros, calculadora TDEE y estimación por foto",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#e0e5ec",
