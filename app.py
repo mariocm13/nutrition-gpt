@@ -248,7 +248,7 @@ const PHOTOS={
   fruta:'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=220&fit=crop&auto=format',
   default:'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&h=220&fit=crop&auto=format'
 };
-const EMOJIS={salmon:'🐟',avena:'🌾',batido:'🥤',tostada:'🍞',ensalada:'🥗',pasta:'🍝',sopa:'🍜',pollo:'🍗',pescado:'🐠',huevo:'🍳',carne:'🥩',arroz:'🍚',verdura:'🥦',fruta:'🍎',default:'🍽️'};
+const EMOJIS={salmon:'&#x1F41F;',avena:'&#x1F33E;',batido:'&#x1F964;',tostada:'&#x1F35E;',ensalada:'&#x1F957;',pasta:'&#x1F35D;',sopa:'&#x1F35C;',pollo:'&#x1F357;',pescado:'&#x1F420;',huevo:'&#x1F373;',carne:'&#x1F969;',arroz:'&#x1F35A;',verdura:'&#x1F966;',fruta:'&#x1F34E;',default:'&#x1F37D;'};
 
 function photoKey(r){
   const t=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
