@@ -204,13 +204,13 @@ small{font-size:12px}
     </div>
     <div class="filters">
       <button class="filter-btn active" data-cat="all">Todas</button>
-      <button class="filter-btn" data-cat="desayuno">Desayuno</button>
-      <button class="filter-btn" data-cat="almuerzo">Almuerzo</button>
-      <button class="filter-btn" data-cat="cena">Cena</button>
-      <button class="filter-btn" data-cat="snack">Snack</button>
       <button class="filter-btn" data-cat="pollo">Pollo</button>
       <button class="filter-btn" data-cat="pescado">Pescado</button>
+      <button class="filter-btn" data-cat="carne">Carne</button>
       <button class="filter-btn" data-cat="vegetariano">Vegetariano</button>
+      <button class="filter-btn" data-cat="arroz">Arroz</button>
+      <button class="filter-btn" data-cat="legumbres">Legumbres</button>
+      <button class="filter-btn" data-cat="pasta">Pasta</button>
     </div>
     <div class="gallery-grid" id="gg">
       <div class="empty">Cargando recetas\u2026</div>
@@ -886,14 +886,14 @@ function getEmoji(r){
 }
 function matchesCat(r,cat){
   if(cat==='all')return true;
-  var t=((r.nombre||'')+' '+(r.categoria||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-  if(cat==='desayuno')return /desayuno|avena|tostada|yogur|granola|muesli|tortita|pancake|porridge|overnight/.test(t);
-  if(cat==='almuerzo')return /almuerzo|ensalada|pasta|arroz|legumbre|lenteja|garbanzo|quinoa|wrap|sandwich|bocadillo/.test(t)||(/carne|ternera|cerdo|cordero|pavo|res|buey|jamon|bacon/.test(t)&&!/desayuno|snack|merienda/.test(t));
-  if(cat==='cena')return /cena|sopa|crema de|pure|caldo|gazpacho|salmorejo|ligero|ligera|verdura salteada/.test(t);
-  if(cat==='snack')return /snack|merienda|barrita|batido|smoothie|bebida|zumo|tarta|bizcocho|galleta/.test(t);
-  if(cat==='pollo')return /pollo|pechuga|muslo|contramuslo/.test(t);
-  if(cat==='pescado')return /salmon|atun|merluza|dorada|bacalao|pescado|marisco|gamba|calamar|pulpo|lubina|rape/.test(t);
-  if(cat==='vegetariano')return !/pollo|pechuga|muslo|carne|ternera|cerdo|cordero|pavo|res|buey|jamon|bacon|atun|salmon|merluza|bacalao|pescado|marisco|gamba|calamar/.test(t);
+  var t=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
+  if(cat==='pollo')return /\bpollo\b/.test(t);
+  if(cat==='pescado')return /\bpescado\b|salmon|at[uú]n|merluza|dorada|bacalao|marisco|gamba|calamar|lubina|rape/.test(t);
+  if(cat==='carne')return /\bres\b|\bcarne\b|ternera|cerdo|cordero|pavo|buey|jam[oó]n|bacon/.test(t);
+  if(cat==='vegetariano')return !/\bpollo\b|\bpescado\b|\bres\b|\bcarne\b|salmon|at[uú]n|merluza|bacalao|ternera|cerdo|cordero|pavo|buey|jam[oó]n|bacon|marisco|gamba|calamar/.test(t);
+  if(cat==='arroz')return /\barroz\b/.test(t);
+  if(cat==='legumbres')return /\bgarbanzo|\blenteja|\balubia|\bjud[ií]a/.test(t);
+  if(cat==='pasta')return /\bpasta\b|\bquinoa\b/.test(t);
   return false;
 }
 function loadGallery(){
