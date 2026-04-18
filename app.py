@@ -87,7 +87,7 @@ html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222
 .tabs{display:flex;gap:12px;padding:0 22px 16px;flex-shrink:0}
 .tab{flex:1;padding:11px;font-size:13px;font-weight:600;color:var(--muted);background:var(--bg);border:none;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s,background .3s}
 .tab.active{box-shadow:var(--sh-press);color:var(--accent)}
-.panel{display:none;flex:1;flex-direction:column;min-height:0}
+.panel{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
 .panel.active{display:flex}
 .msgs{flex:1;overflow-y:auto;padding:8px 22px 14px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--nm-d) transparent;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .msgs::-webkit-scrollbar{width:4px}
