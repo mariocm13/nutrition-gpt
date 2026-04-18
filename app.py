@@ -87,7 +87,7 @@ html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222
 .tabs{display:flex;gap:12px;padding:0 22px 16px;flex-shrink:0}
 .tab{flex:1;padding:11px;font-size:13px;font-weight:600;color:var(--muted);background:var(--bg);border:none;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s,background .3s}
 .tab.active{box-shadow:var(--sh-press);color:var(--accent)}
-.panel{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
+.panel{display:none;flex:1;flex-direction:column;min-height:0}
 .panel.active{display:flex}
 .msgs{flex:1;overflow-y:auto;padding:8px 22px 14px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--nm-d) transparent;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .msgs::-webkit-scrollbar{width:4px}
@@ -114,7 +114,7 @@ html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,
 .filters::-webkit-scrollbar{display:none}
 .filter-btn{padding:8px 15px;border-radius:22px;font-size:12px;font-weight:600;border:none;background:var(--bg);color:var(--muted);cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s,background .3s}
 .filter-btn.active{box-shadow:var(--sh-press);color:var(--accent)}
-.gallery-grid{flex:1;overflow-y:auto;padding:2px 22px 22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start;scrollbar-width:thin;scrollbar-color:var(--nm-d) transparent;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.gallery-grid{flex:1;min-height:0;overflow-y:auto;padding:2px 22px 22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start;scrollbar-width:thin;scrollbar-color:var(--nm-d) transparent;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .gallery-grid::-webkit-scrollbar{width:4px}
 .gallery-grid::-webkit-scrollbar-thumb{background:var(--nm-d);border-radius:4px}
 .card{border-radius:20px;overflow:hidden;cursor:pointer;box-shadow:var(--sh);transition:box-shadow .2s,transform .2s,background .3s;animation:fadeUp .25s ease both;background:var(--bg)}
@@ -886,15 +886,17 @@ function getEmoji(r){
   var k=photoKey(r);
   return k?EMOJIS[k]:'&#x1F37D;';
 }
-function getcat(r){
+function matchesCat(r,cat){
+  if(cat==='all')return true;
   var t=((r.nombre||'')+' '+(r.categoria||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-  if(/desayuno|avena|tostada|yogur|granola|muesli/.test(t))return 'desayuno';
-  if(/snack|merienda|barrita|batido|smoothie/.test(t))return 'snack';
-  if(/sopa|crema de|pure|caldo/.test(t))return 'cena';
-  if(/pollo/.test(t))return 'pollo';
-  if(/salmon|atun|merluza|dorada|bacalao|pescado/.test(t))return 'pescado';
-  if(!/pollo|carne|jamon|bacon|cerdo|ternera|pavo|res|buey|cordero/.test(t))return 'vegetariano';
-  return 'almuerzo';
+  if(cat==='desayuno')return /desayuno|avena|tostada|yogur|granola|muesli|tortita|pancake|porridge|overnight/.test(t);
+  if(cat==='almuerzo')return /almuerzo|ensalada|pasta|arroz|legumbre|lenteja|garbanzo|quinoa|wrap|sandwich|bocadillo/.test(t)||(/carne|ternera|cerdo|cordero|pavo|res|buey|jamon|bacon/.test(t)&&!/desayuno|snack|merienda/.test(t));
+  if(cat==='cena')return /cena|sopa|crema de|pure|caldo|gazpacho|salmorejo|ligero|ligera|verdura salteada/.test(t);
+  if(cat==='snack')return /snack|merienda|barrita|batido|smoothie|bebida|zumo|tarta|bizcocho|galleta/.test(t);
+  if(cat==='pollo')return /pollo|pechuga|muslo|contramuslo/.test(t);
+  if(cat==='pescado')return /salmon|atun|merluza|dorada|bacalao|pescado|marisco|gamba|calamar|pulpo|lubina|rape/.test(t);
+  if(cat==='vegetariano')return !/pollo|pechuga|muslo|carne|ternera|cerdo|cordero|pavo|res|buey|jamon|bacon|atun|salmon|merluza|bacalao|pescado|marisco|gamba|calamar/.test(t);
+  return false;
 }
 function loadGallery(){
   galleryLoaded=true;
@@ -906,9 +908,8 @@ function loadGallery(){
 }
 function renderGallery(){
   var filtered=allRecipes.filter(function(r){
-    var okCat=activeFilter==='all'||getcat(r)===activeFilter;
     var txt=((r.nombre||'')+' '+(r.ingredientes||[]).join(' ')).toLowerCase();
-    return okCat&&(!searchTerm||txt.indexOf(searchTerm)>=0);
+    return matchesCat(r,activeFilter)&&(!searchTerm||txt.indexOf(searchTerm)>=0);
   });
   if(!filtered.length){gg.innerHTML='<div class="empty">Sin resultados.</div>';return;}
   gg.innerHTML=filtered.slice(0,40).map(function(r){
