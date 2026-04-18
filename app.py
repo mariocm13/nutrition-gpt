@@ -195,7 +195,32 @@ small{font-size:12px}
   .gallery-grid{padding:2px 14px 18px;gap:12px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
   .card-name{font-size:12px}
   .modal-body{padding:18px 18px 28px}
+  .foto-wrap{padding:14px}
+  .foto-macros{grid-template-columns:repeat(2,1fr)}
 }
+.foto-wrap{flex:1;overflow-y:auto;padding:22px;display:flex;justify-content:center;align-items:flex-start}
+.foto-card{background:var(--bg);border-radius:24px;box-shadow:var(--sh);padding:28px 24px;width:100%;max-width:480px}
+.foto-title{font-size:17px;font-weight:700;margin-bottom:20px;text-align:center}
+.foto-drop{border-radius:18px;box-shadow:var(--sh-in);padding:20px;min-height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;cursor:pointer;transition:box-shadow .2s}
+.foto-drop.drag{box-shadow:inset 0 0 0 2px var(--accent),var(--sh-in)}
+#foto-preview{width:100%;border-radius:12px;max-height:260px;object-fit:contain;display:block}
+#foto-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px}
+.foto-icon{font-size:44px}
+.foto-hint{font-size:13px;color:var(--muted);text-align:center}
+.foto-pick-btn{padding:10px 24px;background:var(--bg);border:none;border-radius:14px;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;font-family:inherit;box-shadow:var(--sh-sm);margin-top:4px}
+.foto-status{font-size:13px;color:var(--muted);text-align:center;margin:14px 0;min-height:20px}
+.foto-result{margin-top:10px}
+.foto-food-name{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px}
+.foto-kcal-big{font-size:42px;font-weight:800;color:var(--accent);text-align:center;line-height:1.1;margin-bottom:14px}
+.foto-portion-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.foto-slider{flex:1;min-width:80px;accent-color:var(--accent)}
+.foto-slider-val{font-size:13px;font-weight:600;color:var(--accent);min-width:44px;text-align:right}
+.foto-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.foto-macro-box{background:var(--bg);border-radius:14px;box-shadow:var(--sh-sm);padding:10px;text-align:center}
+.foto-macro-val{font-size:17px;font-weight:700;color:var(--text)}
+.foto-macro-lbl{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.foto-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.foto-disclaimer{font-size:10px;color:var(--muted);text-align:center;line-height:1.5}
 </style>
 </head>
 <body>
@@ -218,6 +243,7 @@ small{font-size:12px}
     <button class="tab active" data-tab="chat">Chat</button>
     <button class="tab" data-tab="recetas">Recetas</button>
     <button class="tab" data-tab="calc">Calculadora</button>
+    <button class="tab" data-tab="foto">📷 Foto</button>
   </nav>
   <div id="panel-chat" class="panel active">
     <div class="msgs" id="msgs">
@@ -348,7 +374,42 @@ small{font-size:12px}
     </div>
   </div>
 </div>
+  <div id="panel-foto" class="panel">
+    <div class="foto-wrap">
+      <div class="foto-card">
+        <div class="foto-title">Estimar calorías por foto</div>
+        <div class="foto-drop" id="foto-drop">
+          <input type="file" id="foto-inp" accept="image/*" capture="environment" style="display:none">
+          <div id="foto-preview-wrap" style="display:none">
+            <img id="foto-preview" alt="preview">
+          </div>
+          <div id="foto-placeholder">
+            <div class="foto-icon">📷</div>
+            <div class="foto-hint">Sube o haz una foto de tu comida</div>
+            <button class="foto-pick-btn" id="foto-pick">Elegir imagen</button>
+          </div>
+        </div>
+        <button class="calc-btn" id="foto-go" style="display:none">Analizar calorías</button>
+        <div id="foto-status" class="foto-status"></div>
+        <div id="foto-result" class="foto-result" style="display:none">
+          <div class="foto-food-name" id="foto-food-name"></div>
+          <div class="foto-kcal-big" id="foto-kcal-big"></div>
+          <div class="foto-portion-row">
+            <label class="calc-label">Porción (g)</label>
+            <input type="range" id="foto-slider" min="50" max="500" value="100" step="10" class="foto-slider">
+            <span class="foto-slider-val" id="foto-slider-val">100 g</span>
+          </div>
+          <div class="foto-macros" id="foto-macros"></div>
+          <div class="foto-tags" id="foto-tags"></div>
+          <div class="foto-disclaimer">Estimación orientativa basada en IA. No sustituye asesoramiento nutricional profesional.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="modal" style="display:none"></div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 <script src="/app.js"></script>
 
 </body>
@@ -1143,6 +1204,187 @@ calcGo.addEventListener('click',function(){
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').catch(function(){});
 }
+
+// ─── FOTO PANEL ───────────────────────────────────────────────
+(function(){
+  // MobileNet label → nombre alimento para buscar en /api/calories
+  var FOOD_MAP = {
+    'banana':['platano','banana'],'apple':['manzana'],'orange':['naranja'],
+    'strawberry':['fresa','fresas'],'lemon':['limon'],'pineapple':['pina'],
+    'mango':['mango'],'watermelon':['sandia'],'grape':['uvas'],'peach':['melocoton'],
+    'pizza':['pizza'],'hamburger':['hamburguesa'],'hot dog':['salchicha'],
+    'french fries':['patatas fritas'],'ice cream':['helado'],
+    'pretzel':['pan'],'bagel':['pan'],'baguette':['pan','baguette'],
+    'croissant':['croissant'],'waffle':['tortita'],'pancake':['tortita'],
+    'burrito':['burrito'],'taco':['tacos'],
+    'broccoli':['brocoli'],'carrot':['zanahoria'],'corn':['maiz'],
+    'mushroom':['champiñon','setas'],'cucumber':['pepino'],
+    'tomato':['tomate'],'lettuce':['lechuga'],'avocado':['aguacate'],
+    'egg':['huevo','huevos'],'omelette':['tortilla'],
+    'cheese':['queso'],'butter':['mantequilla'],
+    'milk':['leche'],'yogurt':['yogur'],
+    'chicken':['pollo'],'beef':['carne ternera','ternera'],'pork':['cerdo'],
+    'salmon':['salmon'],'tuna':['atun'],'shrimp':['gamba','gambas'],
+    'lobster':['langosta'],'crab':['cangrejo'],
+    'rice':['arroz'],'pasta':['pasta'],'bread':['pan'],
+    'oatmeal':['avena'],'granola':['granola'],
+    'chocolate':['chocolate'],'cake':['pastel'],
+    'coffee':['cafe'],'orange juice':['zumo naranja'],
+    'beer':['cerveza'],'wine':['vino'],
+    'almond':['almendra','almendras'],'peanut':['cacahuete'],
+    'walnut':['nuez','nueces'],'olive':['aceituna'],
+    'potato':['patata','patatas'],'sweet potato':['boniato'],
+    'soup':['sopa'],'salad':['ensalada'],
+    'sushi':['sushi'],'ramen':['ramen'],
+    'lentil':['lentejas'],'chickpea':['garbanzo','garbanzos'],
+    'tofu':['tofu']
+  };
+
+  var mnModel=null,mnLoading=false;
+  var fotoDrop=document.getElementById('foto-drop');
+  var fotoInp=document.getElementById('foto-inp');
+  var fotoPick=document.getElementById('foto-pick');
+  var fotoPreview=document.getElementById('foto-preview');
+  var fotoPreviewWrap=document.getElementById('foto-preview-wrap');
+  var fotoPlaceholder=document.getElementById('foto-placeholder');
+  var fotoGo=document.getElementById('foto-go');
+  var fotoStatus=document.getElementById('foto-status');
+  var fotoResult=document.getElementById('foto-result');
+  var fotoFoodName=document.getElementById('foto-food-name');
+  var fotoKcalBig=document.getElementById('foto-kcal-big');
+  var fotoSlider=document.getElementById('foto-slider');
+  var fotoSliderVal=document.getElementById('foto-slider-val');
+  var fotoMacros=document.getElementById('foto-macros');
+  var fotoTags=document.getElementById('foto-tags');
+
+  var currentAlimento=null;
+
+  function setStatus(msg){fotoStatus.textContent=msg;}
+
+  function showPreview(file){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      fotoPreview.src=e.target.result;
+      fotoPreviewWrap.style.display='block';
+      fotoPlaceholder.style.display='none';
+      fotoGo.style.display='block';
+      fotoResult.style.display='none';
+      setStatus('');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  fotoDrop.addEventListener('click',function(e){
+    if(e.target===fotoPick||e.target.closest('#foto-pick'))return;
+    if(fotoPreviewWrap.style.display!=='none')fotoInp.click();
+  });
+  fotoPick.addEventListener('click',function(e){e.stopPropagation();fotoInp.click();});
+  fotoInp.addEventListener('change',function(){if(this.files[0])showPreview(this.files[0]);});
+  fotoDrop.addEventListener('dragover',function(e){e.preventDefault();fotoDrop.classList.add('drag');});
+  fotoDrop.addEventListener('dragleave',function(){fotoDrop.classList.remove('drag');});
+  fotoDrop.addEventListener('drop',function(e){
+    e.preventDefault();fotoDrop.classList.remove('drag');
+    var f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))showPreview(f);
+  });
+
+  function preloadModel(){
+    if(mnModel||mnLoading)return;
+    if(typeof mobilenet==='undefined')return;
+    mnLoading=true;
+    mobilenet.load().then(function(m){mnModel=m;mnLoading=false;}).catch(function(){mnLoading=false;});
+  }
+  // Pre-cargar cuando el usuario cambia al tab de foto
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click',function(){if(t.dataset.tab==='foto')preloadModel();});
+  });
+
+  function findFoodKey(predictions){
+    for(var i=0;i<predictions.length;i++){
+      var lbl=predictions[i].className.toLowerCase();
+      for(var key in FOOD_MAP){
+        if(lbl.indexOf(key)>=0)return{key:key,label:lbl,prob:predictions[i].probability};
+      }
+    }
+    return null;
+  }
+
+  function renderResult(alimento, gramos){
+    var factor=gramos/100;
+    var kcal=Math.round((alimento.calorias||0)*factor);
+    fotoKcalBig.textContent=kcal+' kcal';
+    var macros=[
+      {v:Math.round((alimento.proteina||0)*factor),l:'Proteína'},
+      {v:Math.round((alimento.carbohidratos||0)*factor),l:'Carbos'},
+      {v:Math.round((alimento.grasa||0)*factor),l:'Grasas'},
+    ];
+    fotoMacros.innerHTML=macros.map(function(m){
+      return '<div class="foto-macro-box"><div class="foto-macro-val">'+m.v+'g</div><div class="foto-macro-lbl">'+m.l+'</div></div>';
+    }).join('');
+    var tags=[];
+    if(alimento.fibra)tags.push('Fibra '+alimento.fibra+'g');
+    if(alimento.categoria)tags.push(alimento.categoria);
+    fotoTags.innerHTML=tags.map(function(t){return '<span class="tag">'+t+'</span>';}).join('');
+  }
+
+  fotoSlider.addEventListener('input',function(){
+    fotoSliderVal.textContent=this.value+' g';
+    if(currentAlimento)renderResult(currentAlimento,parseInt(this.value));
+  });
+
+  fotoGo.addEventListener('click',function(){
+    if(!fotoPreview.src||fotoPreview.src==='about:blank')return;
+    fotoResult.style.display='none';
+    setStatus('Cargando modelo de IA\u2026');
+    fotoGo.disabled=true;
+
+    function doAnalysis(){
+      setStatus('Analizando imagen\u2026');
+      mnModel.classify(fotoPreview,5).then(function(preds){
+        var match=findFoodKey(preds);
+        if(!match){
+          setStatus('No reconozco el alimento. Intenta con otra foto.');
+          fotoGo.disabled=false;return;
+        }
+        var candidates=FOOD_MAP[match.key];
+        var pct=Math.round(match.prob*100);
+        // buscar primer candidato que devuelva resultado en /api/calories
+        function tryNext(i){
+          if(i>=candidates.length){
+            setStatus('Alimento detectado ('+match.label+') pero sin datos nutricionales. Prueba otra foto.');
+            fotoGo.disabled=false;return;
+          }
+          fetch('/api/calories?food='+encodeURIComponent(candidates[i])).then(function(r){return r.json();}).then(function(d){
+            if(d.found){
+              currentAlimento=d;
+              var gramos=parseInt(fotoSlider.value);
+              fotoFoodName.textContent=d.nombre+' \u2014 confianza '+pct+'%';
+              renderResult(d,gramos);
+              fotoResult.style.display='block';
+              setStatus('');
+            } else {
+              tryNext(i+1);
+            }
+          }).catch(function(){tryNext(i+1);});
+        }
+        tryNext(0);
+        fotoGo.disabled=false;
+      }).catch(function(){
+        setStatus('Error al analizar la imagen. Intenta de nuevo.');
+        fotoGo.disabled=false;
+      });
+    }
+
+    if(mnModel){doAnalysis();return;}
+    if(typeof mobilenet==='undefined'){
+      setStatus('El modelo aún se está cargando\u2026 espera un momento.');
+      fotoGo.disabled=false;return;
+    }
+    mobilenet.load().then(function(m){mnModel=m;doAnalysis();}).catch(function(){
+      setStatus('No se pudo cargar el modelo. Comprueba tu conexión.');
+      fotoGo.disabled=false;
+    });
+  });
+})();
 })();"""
 
 
