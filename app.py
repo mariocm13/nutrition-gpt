@@ -72,7 +72,7 @@ html.dark{
 }
 html,body{height:100%;background:var(--bg)}
 body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;line-height:1.5;transition:background .3s,color .3s}
-.app{max-width:680px;min-height:100vh;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);transition:background .3s}
+.app{max-width:680px;min-height:100vh;min-height:100dvh;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);transition:background .3s}
 .header{padding:18px 22px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0}
 .icon{width:44px;height:44px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:4px 4px 10px rgba(58,157,110,.4),-2px -2px 6px rgba(255,255,255,.5)}
 html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222,128,.15)}
@@ -99,14 +99,14 @@ html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222
 html.dark .m.u .b{box-shadow:4px 4px 10px rgba(74,222,128,.25),-2px -2px 5px rgba(42,47,66,.8)}
 .typing .b{color:var(--muted);font-style:italic}
 .composer{padding:14px 22px 22px;display:flex;gap:10px;flex-shrink:0}
-#inp{flex:1;padding:13px 16px;border:none;border-radius:14px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);transition:box-shadow .2s,background .3s,color .3s}
+#inp{flex:1;padding:13px 16px;border:none;border-radius:14px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);transition:box-shadow .2s,background .3s,color .3s}
 #inp:focus{box-shadow:var(--sh-in),0 0 0 2px var(--accent)}
 #inp::placeholder{color:var(--muted)}
 #btn{padding:13px 22px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:4px 4px 10px rgba(58,157,110,.4),-2px -2px 6px rgba(255,255,255,.35);transition:box-shadow .15s,transform .1s;flex-shrink:0}
 #btn:active{transform:scale(.97);box-shadow:inset 2px 2px 5px rgba(0,0,0,.18),inset -1px -1px 3px rgba(255,255,255,.1)}
 html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,128,.15)}
 .gallery-top{padding:6px 22px 0;flex-shrink:0}
-#gsearch{width:100%;padding:13px 16px;border:none;border-radius:14px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);transition:box-shadow .2s,background .3s,color .3s;display:block}
+#gsearch{width:100%;padding:13px 16px;border:none;border-radius:14px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);transition:box-shadow .2s,background .3s,color .3s;display:block}
 #gsearch:focus{box-shadow:var(--sh-in),0 0 0 2px var(--accent)}
 #gsearch::placeholder{color:var(--muted)}
 .filters{display:flex;gap:8px;padding:14px 22px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
@@ -146,6 +146,17 @@ html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(70px);opacity:0}to{transform:translateY(0);opacity:1}}
 small{font-size:12px}
+@media(max-width:480px){
+  .header{padding:14px 16px 10px}
+  .tabs{padding:0 16px 12px;gap:8px}
+  .msgs{padding:8px 14px 12px}
+  .composer{padding:10px 14px 18px;gap:8px}
+  #btn{padding:13px 16px;font-size:12px}
+  .gallery-top{padding:6px 14px 0}
+  .filters{padding:12px 14px}
+  .gallery-grid{padding:2px 14px 18px;gap:12px}
+  .modal-body{padding:18px 18px 28px}
+}
 @media(max-width:380px){.gallery-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -182,7 +193,7 @@ small{font-size:12px}
       </div>
     </div>
     <div class="composer">
-      <input type="text" id="inp" placeholder="Escribe tu pregunta..." autocomplete="off">
+      <input type="text" id="inp" placeholder="Escribe tu pregunta..." autocomplete="off" enterkeyhint="send" inputmode="text">
       <button id="btn">Enviar</button>
     </div>
   </div>
@@ -731,7 +742,7 @@ function send(){
     .then(function(d){t.remove();if(d.contexto)ctx=d.contexto;addMsg(d.respuesta);})
     .catch(function(){t.remove();addMsg('Error de conexion. Intenta de nuevo.');});
 }
-inp.addEventListener('keypress',function(e){if(e.key==='Enter')send();});
+inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
 btn.addEventListener('click',send);
 var PHOTOS={salmon:'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=220&fit=crop&auto=format',avena:'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=400&h=220&fit=crop&auto=format',batido:'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400&h=220&fit=crop&auto=format',tostada:'https://images.unsplash.com/photo-1484723091739-30990d4d5b21?w=400&h=220&fit=crop&auto=format',ensalada:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=220&fit=crop&auto=format',pasta:'https://images.unsplash.com/photo-1551183053-bf91798d454e?w=400&h=220&fit=crop&auto=format',sopa:'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=220&fit=crop&auto=format',pollo:'https://images.unsplash.com/photo-1598103442097-8b74394b95c1?w=400&h=220&fit=crop&auto=format',pescado:'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=220&fit=crop&auto=format',huevo:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&h=220&fit=crop&auto=format',carne:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=220&fit=crop&auto=format',arroz:'https://images.unsplash.com/photo-1516684732162-798a0062be99?w=400&h=220&fit=crop&auto=format',verdura:'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=220&fit=crop&auto=format',fruta:'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=220&fit=crop&auto=format',default:'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&h=220&fit=crop&auto=format'};
 var EMOJIS={salmon:'&#x1F41F;',avena:'&#x1F33E;',batido:'&#x1F964;',tostada:'&#x1F35E;',ensalada:'&#x1F957;',pasta:'&#x1F35D;',sopa:'&#x1F35C;',pollo:'&#x1F357;',pescado:'&#x1F420;',huevo:'&#x1F373;',carne:'&#x1F969;',arroz:'&#x1F35A;',verdura:'&#x1F966;',fruta:'&#x1F34E;',default:'&#x1F37D;'};
