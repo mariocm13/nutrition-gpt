@@ -424,7 +424,7 @@ def buscar_alimento(termino):
 
 
 
-GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyCvHB8cuZtEU9RpZK-WDOsxQ88v0KCViD0")
+GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 
 SYSTEM_PROMPT = (
     "Eres NutriGPT, un asistente de nutrición experto en cocina española e internacional. "
