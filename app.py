@@ -1562,14 +1562,15 @@ if('serviceWorker' in navigator){
   }
 
   var xPipeline=null,xPromise=null,xFailed=false;
+  var FOOD_LABELS=Object.keys(F101).map(function(k){return k.replace(/_/g,' ');});
   function getXPipeline(){
     if(xFailed)return Promise.reject(new Error('unavailable'));
     if(xPipeline)return Promise.resolve(xPipeline);
     if(xPromise)return xPromise;
     xPromise=import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2')
       .then(function(mod){
-        setStatus('Descargando modelo IA\u2026 (primera vez)');
-        return mod.pipeline('image-classification','Xenova/vit-base-patch16-224',{quantized:true});
+        setStatus('Descargando modelo IA\u2026 (~80MB, solo la primera vez)');
+        return mod.pipeline('zero-shot-image-classification','Xenova/clip-vit-base-patch32',{quantized:true});
       })
       .then(function(p){xPipeline=p;xPromise=null;return p;})
       .catch(function(e){xFailed=true;xPromise=null;throw e;});
@@ -1578,14 +1579,14 @@ if('serviceWorker' in navigator){
   function analyzeXenova(imgEl){
     setStatus('Cargando modelo IA\u2026');
     return getXPipeline().then(function(classifier){
-      setStatus('Reconociendo alimento\u2026');
+      setStatus('Analizando imagen\u2026');
       var c=document.createElement('canvas');
       var s=Math.min(1,512/Math.max(imgEl.naturalWidth,imgEl.naturalHeight,1));
       c.width=Math.round(imgEl.naturalWidth*s);c.height=Math.round(imgEl.naturalHeight*s);
       c.getContext('2d').drawImage(imgEl,0,0,c.width,c.height);
-      return classifier(c.toDataURL('image/jpeg',0.92),{topk:10});
+      return classifier(c.toDataURL('image/jpeg',0.92),FOOD_LABELS);
     }).then(function(results){
-      return results.map(function(r){return{label:r.label,score:r.score};});
+      return results.slice(0,10).map(function(r){return{label:r.label,score:r.score};});
     });
   }
 
