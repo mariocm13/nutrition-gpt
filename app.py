@@ -286,6 +286,15 @@ small{font-size:12px}
 .scan-res-val{font-size:16px;font-weight:700;color:var(--accent)}
 .scan-res-lbl{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-top:3px}
 .scan-add-diary{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:4px 4px 10px rgba(58,157,110,.4)}
+/* ── PREDICCIONES FOTO ── */
+.pred-options{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px}
+.pred-opt{background:var(--bg);border-radius:14px;padding:12px 14px;box-shadow:var(--sh-sm);cursor:pointer;display:flex;align-items:center;gap:10px;border:2px solid transparent;transition:box-shadow .15s,border-color .15s;animation:fadeUp .2s ease both}
+.pred-opt.selected{box-shadow:var(--sh-press);border-color:var(--accent)}
+.pred-opt-info{flex:1;min-width:0}
+.pred-opt-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pred-opt-bar{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--accent),#27855c);transition:width .4s ease}
+.pred-opt-pct{font-size:12px;font-weight:800;color:var(--accent);flex-shrink:0}
+.pred-hint{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600}
 </style>
 </head>
 <body>
@@ -1426,57 +1435,209 @@ if('serviceWorker' in navigator){
     if(currentAlimento)renderResult(currentAlimento,parseInt(this.value));
   });
 
-  fotoGo.addEventListener('click',function(){
-    if(!fotoPreview.src||fotoPreview.src==='about:blank')return;
-    fotoResult.style.display='none';
-    setStatus('Cargando modelo de IA\u2026');
-    fotoGo.disabled=true;
+  // ── Tabla nutricional Food-101 (por 100g): {n:nombre,c:kcal,p:prot,hc:carbos,f:grasas}
+  var F101={
+    'apple_pie':{n:'Pastel de manzana',c:237,p:2.4,hc:34,f:11},
+    'baby_back_ribs':{n:'Costillas de cerdo',c:291,p:25,hc:0,f:21},
+    'baklava':{n:'Baklava',c:428,p:6,hc:48,f:25},
+    'beef_carpaccio':{n:'Carpaccio de ternera',c:150,p:20,hc:2,f:7},
+    'beef_tartare':{n:'Tartar de ternera',c:168,p:20,hc:3,f:9},
+    'beet_salad':{n:'Ensalada de remolacha',c:88,p:3,hc:14,f:3},
+    'beignets':{n:'Bu\u00f1uelos',c:350,p:5,hc:42,f:18},
+    'bibimbap':{n:'Bibimbap',c:115,p:8,hc:15,f:3},
+    'bread_pudding':{n:'Pud\u00edn de pan',c:285,p:9,hc:38,f:11},
+    'breakfast_burrito':{n:'Burrito de desayuno',c:290,p:16,hc:28,f:13},
+    'bruschetta':{n:'Bruschetta',c:165,p:5,hc:22,f:7},
+    'caesar_salad':{n:'Ensalada C\u00e9sar',c:155,p:7,hc:6,f:13},
+    'cannoli':{n:'Cannoli',c:390,p:8,hc:47,f:19},
+    'caprese_salad':{n:'Ensalada Caprese',c:135,p:8,hc:4,f:10},
+    'carrot_cake':{n:'Pastel de zanahoria',c:371,p:5,hc:53,f:17},
+    'ceviche':{n:'Ceviche',c:95,p:18,hc:5,f:1},
+    'cheese_plate':{n:'Tabla de quesos',c:380,p:22,hc:3,f:31},
+    'cheesecake':{n:'Tarta de queso',c:321,p:6,hc:26,f:23},
+    'chicken_curry':{n:'Curry de pollo',c:165,p:17,hc:7,f:8},
+    'chicken_quesadilla':{n:'Quesadilla de pollo',c:255,p:18,hc:22,f:10},
+    'chicken_wings':{n:'Alitas de pollo',c:260,p:27,hc:0,f:17},
+    'chocolate_cake':{n:'Tarta de chocolate',c:371,p:5,hc:54,f:16},
+    'chocolate_mousse':{n:'Mousse de chocolate',c:248,p:5,hc:23,f:15},
+    'churros':{n:'Churros',c:358,p:6,hc:44,f:18},
+    'clam_chowder':{n:'Sopa de almejas',c:147,p:10,hc:17,f:5},
+    'club_sandwich':{n:'Club s\u00e1ndwich',c:210,p:16,hc:18,f:8},
+    'crab_cakes':{n:'Pastelillos de cangrejo',c:185,p:13,hc:13,f:9},
+    'creme_brulee':{n:'Cr\u00e8me br\u00fcl\u00e9e',c:268,p:6,hc:25,f:16},
+    'croque_madame':{n:'Croque madame',c:260,p:16,hc:22,f:12},
+    'cup_cakes':{n:'Cupcakes',c:370,p:5,hc:54,f:15},
+    'deviled_eggs':{n:'Huevos rellenos',c:185,p:13,hc:2,f:14},
+    'donuts':{n:'Donuts',c:390,p:5,hc:53,f:18},
+    'dumplings':{n:'Dumplings',c:175,p:9,hc:22,f:6},
+    'edamame':{n:'Edamame',c:122,p:11,hc:9,f:5},
+    'eggs_benedict':{n:'Huevos benedictinos',c:247,p:14,hc:16,f:15},
+    'escargots':{n:'Caracoles',c:90,p:16,hc:2,f:1},
+    'falafel':{n:'Falafel',c:333,p:13,hc:32,f:18},
+    'filet_mignon':{n:'Filete de ternera',c:224,p:28,hc:0,f:12},
+    'fish_and_chips':{n:'Fish and chips',c:290,p:17,hc:28,f:12},
+    'foie_gras':{n:'Foie gras',c:462,p:11,hc:5,f:44},
+    'french_fries':{n:'Patatas fritas',c:274,p:3,hc:36,f:14},
+    'french_onion_soup':{n:'Sopa de cebolla',c:107,p:5,hc:16,f:3},
+    'french_toast':{n:'Torrijas',c:210,p:9,hc:26,f:8},
+    'fried_calamari':{n:'Calamares fritos',c:175,p:15,hc:10,f:8},
+    'fried_rice':{n:'Arroz frito',c:163,p:5,hc:27,f:4},
+    'frozen_yogurt':{n:'Yogur helado',c:127,p:4,hc:26,f:1},
+    'garlic_bread':{n:'Pan de ajo',c:296,p:8,hc:38,f:13},
+    'gnocchi':{n:'Gnocchi',c:130,p:3,hc:28,f:1},
+    'greek_salad':{n:'Ensalada griega',c:95,p:4,hc:7,f:7},
+    'grilled_cheese_sandwich':{n:'S\u00e1ndwich de queso',c:285,p:12,hc:26,f:14},
+    'grilled_salmon':{n:'Salm\u00f3n a la plancha',c:208,p:28,hc:0,f:10},
+    'guacamole':{n:'Guacamole',c:155,p:2,hc:9,f:14},
+    'gyoza':{n:'Gyoza',c:165,p:8,hc:20,f:6},
+    'hamburger':{n:'Hamburguesa',c:295,p:17,hc:24,f:14},
+    'hot_and_sour_soup':{n:'Sopa agripicante',c:65,p:5,hc:8,f:2},
+    'hot_dog':{n:'Hot dog',c:240,p:11,hc:20,f:13},
+    'huevos_rancheros':{n:'Huevos rancheros',c:220,p:13,hc:18,f:11},
+    'hummus':{n:'H\u00fammus',c:177,p:8,hc:14,f:10},
+    'ice_cream':{n:'Helado',c:207,p:4,hc:24,f:11},
+    'lasagna':{n:'Lasa\u00f1a',c:181,p:11,hc:18,f:7},
+    'lobster_bisque':{n:'Bisque de langosta',c:195,p:12,hc:14,f:11},
+    'lobster_roll_sandwich':{n:'S\u00e1ndwich de langosta',c:310,p:20,hc:32,f:11},
+    'macaroni_and_cheese':{n:'Macarrones con queso',c:172,p:8,hc:21,f:6},
+    'macarons':{n:'Macarons',c:413,p:7,hc:72,f:12},
+    'miso_soup':{n:'Sopa miso',c:40,p:3,hc:5,f:1},
+    'mussels':{n:'Mejillones',c:172,p:24,hc:7,f:5},
+    'nachos':{n:'Nachos',c:300,p:10,hc:34,f:15},
+    'omelette':{n:'Tortilla francesa',c:155,p:11,hc:1,f:12},
+    'onion_rings':{n:'Aros de cebolla',c:280,p:4,hc:34,f:15},
+    'oysters':{n:'Ostras',c:68,p:7,hc:4,f:2},
+    'pad_thai':{n:'Pad Thai',c:193,p:12,hc:26,f:5},
+    'paella':{n:'Paella',c:185,p:16,hc:20,f:5},
+    'pancakes':{n:'Tortitas',c:227,p:7,hc:38,f:7},
+    'panna_cotta':{n:'Panna cotta',c:170,p:4,hc:14,f:11},
+    'peking_duck':{n:'Pato pek\u00edn',c:337,p:22,hc:6,f:26},
+    'pho':{n:'Pho',c:82,p:8,hc:9,f:2},
+    'pizza':{n:'Pizza',c:266,p:11,hc:33,f:10},
+    'pork_chop':{n:'Chuleta de cerdo',c:222,p:29,hc:0,f:11},
+    'poutine':{n:'Poutine',c:316,p:11,hc:35,f:16},
+    'prime_rib':{n:'Costilla de ternera',c:355,p:27,hc:0,f:27},
+    'pulled_pork_sandwich':{n:'S\u00e1ndwich de cerdo',c:285,p:22,hc:22,f:10},
+    'ramen':{n:'Ramen',c:188,p:8,hc:26,f:6},
+    'ravioli':{n:'Ravioli',c:180,p:10,hc:23,f:6},
+    'red_velvet_cake':{n:'Tarta red velvet',c:355,p:5,hc:52,f:14},
+    'risotto':{n:'Risotto',c:166,p:5,hc:29,f:4},
+    'samosa':{n:'Samosa',c:308,p:8,hc:35,f:16},
+    'sashimi':{n:'Sashimi',c:135,p:23,hc:0,f:4},
+    'scallops':{n:'Vieiras',c:111,p:21,hc:5,f:1},
+    'seaweed_salad':{n:'Ensalada de algas',c:70,p:2,hc:11,f:2},
+    'shrimp_and_grits':{n:'Gambas con s\u00e9mola',c:295,p:22,hc:25,f:11},
+    'spaghetti_bolognese':{n:'Espaguetis a la bolo\u00f1esa',c:195,p:12,hc:22,f:7},
+    'spaghetti_carbonara':{n:'Espaguetis carbonara',c:288,p:14,hc:29,f:13},
+    'spring_rolls':{n:'Rollitos de primavera',c:195,p:6,hc:22,f:9},
+    'steak':{n:'Filete de ternera',c:256,p:26,hc:0,f:17},
+    'strawberry_shortcake':{n:'Tarta de fresas',c:234,p:4,hc:35,f:9},
+    'sushi':{n:'Sushi',c:143,p:7,hc:26,f:2},
+    'tacos':{n:'Tacos',c:210,p:13,hc:20,f:8},
+    'takoyaki':{n:'Takoyaki',c:201,p:10,hc:24,f:8},
+    'tiramisu':{n:'Tir\u00e0mis\u00fa',c:299,p:7,hc:28,f:17},
+    'tuna_tartare':{n:'Tartar de at\u00fan',c:122,p:21,hc:3,f:3},
+    'waffles':{n:'Gofres',c:291,p:8,hc:37,f:13}
+  };
 
-    function doAnalysis(){
-      setStatus('Analizando imagen\u2026');
+  function normLabel(s){return (s||'').toLowerCase().replace(/\s+/g,'_');}
+
+  function resizeToBlob(img,maxW,cb){
+    var c=document.createElement('canvas');
+    var w=img.naturalWidth,h=img.naturalHeight;
+    var scale=Math.min(1,maxW/Math.max(w,h,1));
+    c.width=Math.round(w*scale);c.height=Math.round(h*scale);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    c.toBlob(cb,'image/jpeg',0.82);
+  }
+
+  var HF_ENDPOINT='https://api-inference.huggingface.co/models/nateraw/food';
+  var hfRetries=0;
+  function analyzeHF(blob){
+    return fetch(HF_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:blob})
+      .then(function(r){
+        if(r.status===503&&hfRetries<3){
+          hfRetries++;
+          return new Promise(function(res,rej){
+            setStatus('Cargando modelo de IA\u2026 espera un momento');
+            setTimeout(function(){res(analyzeHF(blob));},5000);
+          });
+        }
+        if(!r.ok)throw new Error('HF '+r.status);
+        return r.json();
+      });
+  }
+
+  function clearPredOpts(){var e=document.getElementById('pred-opts');if(e)e.remove();}
+
+  function applyFood101(info){
+    currentAlimento={calorias:info.c,proteina:info.p,carbohidratos:info.hc,grasa:info.f,nombre:info.n};
+    fotoFoodName.textContent=info.n;
+    renderResult(currentAlimento,parseInt(fotoSlider.value));
+    fotoResult.style.display='block';
+    setStatus('');
+  }
+
+  function showPredictions(preds){
+    clearPredOpts();
+    var top=preds.filter(function(p){return F101[normLabel(p.label)];}).slice(0,3);
+    if(!top.length){setStatus('No se pudo identificar el plato. Prueba otra foto.');fotoGo.disabled=false;return;}
+    var wrap=document.createElement('div');
+    wrap.id='pred-opts';
+    wrap.innerHTML='<div class="pred-hint">Toca para confirmar el alimento detectado:</div>';
+    top.forEach(function(p,i){
+      var key=normLabel(p.label);
+      var info=F101[key];
+      var pct=Math.min(100,Math.round(p.score*100));
+      var el=document.createElement('div');
+      el.className='pred-opt'+(i===0?' selected':'');
+      el.innerHTML='<div class="pred-opt-info"><div class="pred-opt-name">'+info.n+'</div><div class="pred-opt-bar" style="width:'+pct+'%"></div></div><div class="pred-opt-pct">'+pct+'%</div>';
+      el.addEventListener('click',function(){
+        document.querySelectorAll('.pred-opt').forEach(function(x){x.classList.remove('selected');});
+        el.classList.add('selected');applyFood101(info);
+      });
+      wrap.appendChild(el);
+    });
+    fotoResult.parentNode.insertBefore(wrap,fotoResult);
+    applyFood101(F101[normLabel(top[0].label)]);
+    fotoGo.disabled=false;
+  }
+
+  function doMobileNetFallback(){
+    setStatus('Usando modelo local\u2026');
+    function run(){
       mnModel.classify(fotoPreview,5).then(function(preds){
         var match=findFoodKey(preds);
-        if(!match){
-          setStatus('No reconozco el alimento. Intenta con otra foto.');
-          fotoGo.disabled=false;return;
-        }
+        if(!match){setStatus('No se pudo identificar el alimento.');fotoGo.disabled=false;return;}
         var candidates=FOOD_MAP[match.key];
         var pct=Math.round(match.prob*100);
-        // buscar primer candidato que devuelva resultado en /api/calories
         function tryNext(i){
-          if(i>=candidates.length){
-            setStatus('Alimento detectado ('+match.label+') pero sin datos nutricionales. Prueba otra foto.');
-            fotoGo.disabled=false;return;
-          }
+          if(i>=candidates.length){setStatus('Detectado ('+match.key+') pero sin datos. Prueba otra foto.');fotoGo.disabled=false;return;}
           fetch('/api/calories?food='+encodeURIComponent(candidates[i])).then(function(r){return r.json();}).then(function(d){
-            if(d.found){
-              currentAlimento=d;
-              var gramos=parseInt(fotoSlider.value);
-              fotoFoodName.textContent=d.nombre+' \u2014 confianza '+pct+'%';
-              renderResult(d,gramos);
-              fotoResult.style.display='block';
-              setStatus('');
-            } else {
-              tryNext(i+1);
-            }
+            if(d.found){currentAlimento=d;fotoFoodName.textContent=d.nombre+' \u2014 '+pct+'%';renderResult(d,parseInt(fotoSlider.value));fotoResult.style.display='block';setStatus('');}
+            else tryNext(i+1);
           }).catch(function(){tryNext(i+1);});
         }
-        tryNext(0);
-        fotoGo.disabled=false;
-      }).catch(function(){
-        setStatus('Error al analizar la imagen. Intenta de nuevo.');
-        fotoGo.disabled=false;
-      });
+        tryNext(0);fotoGo.disabled=false;
+      }).catch(function(){setStatus('Error de an\u00e1lisis local.');fotoGo.disabled=false;});
     }
+    if(mnModel){run();return;}
+    if(typeof mobilenet==='undefined'){setStatus('Modelo no disponible. Comprueba tu conexi\u00f3n.');fotoGo.disabled=false;return;}
+    mobilenet.load().then(function(m){mnModel=m;run();}).catch(function(){setStatus('No se pudo cargar el modelo.');fotoGo.disabled=false;});
+  }
 
-    if(mnModel){doAnalysis();return;}
-    if(typeof mobilenet==='undefined'){
-      setStatus('El modelo aún se está cargando\u2026 espera un momento.');
-      fotoGo.disabled=false;return;
-    }
-    mobilenet.load().then(function(m){mnModel=m;doAnalysis();}).catch(function(){
-      setStatus('No se pudo cargar el modelo. Comprueba tu conexión.');
-      fotoGo.disabled=false;
+  fotoGo.addEventListener('click',function(){
+    if(!fotoPreview.src||fotoPreview.src==='about:blank')return;
+    fotoResult.style.display='none';clearPredOpts();
+    setStatus('Analizando con IA\u2026');
+    fotoGo.disabled=true;hfRetries=0;
+    resizeToBlob(fotoPreview,640,function(blob){
+      analyzeHF(blob).then(function(preds){
+        if(!Array.isArray(preds)||!preds.length)throw new Error('empty');
+        showPredictions(preds);
+      }).catch(function(){
+        doMobileNetFallback();
+      });
     });
   });
 })();
