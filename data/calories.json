@@ -1,178 +1,2119 @@
 {
   "alimentos": [
-    {"nombre": "Manzana", "calorias": 52, "unidad": "100g", "proteina": 0.3, "carbohidratos": 13.8, "grasas": 0.2, "fibra": 2.4},
-    {"nombre": "Pera", "calorias": 57, "unidad": "100g", "proteina": 0.4, "carbohidratos": 15.2, "grasas": 0.1, "fibra": 3.1},
-    {"nombre": "Naranja", "calorias": 47, "unidad": "100g", "proteina": 0.9, "carbohidratos": 11.8, "grasas": 0.1, "fibra": 2.4},
-    {"nombre": "Platano", "calorias": 89, "unidad": "100g", "proteina": 1.1, "carbohidratos": 22.8, "grasas": 0.3, "fibra": 2.6},
-    {"nombre": "Fresa", "calorias": 32, "unidad": "100g", "proteina": 0.7, "carbohidratos": 7.7, "grasas": 0.3, "fibra": 2.0},
-    {"nombre": "Uva", "calorias": 69, "unidad": "100g", "proteina": 0.7, "carbohidratos": 18.1, "grasas": 0.2, "fibra": 0.9},
-    {"nombre": "Melocoton", "calorias": 39, "unidad": "100g", "proteina": 0.9, "carbohidratos": 9.5, "grasas": 0.3, "fibra": 1.5},
-    {"nombre": "Melon", "calorias": 34, "unidad": "100g", "proteina": 0.8, "carbohidratos": 8.2, "grasas": 0.2, "fibra": 0.9},
-    {"nombre": "Sandia", "calorias": 30, "unidad": "100g", "proteina": 0.6, "carbohidratos": 7.6, "grasas": 0.2, "fibra": 0.4},
-    {"nombre": "Kiwi", "calorias": 61, "unidad": "100g", "proteina": 1.1, "carbohidratos": 14.7, "grasas": 0.5, "fibra": 3.0},
-    {"nombre": "Pina", "calorias": 50, "unidad": "100g", "proteina": 0.5, "carbohidratos": 13.1, "grasas": 0.1, "fibra": 1.4},
-    {"nombre": "Mango", "calorias": 60, "unidad": "100g", "proteina": 0.8, "carbohidratos": 15.0, "grasas": 0.4, "fibra": 1.6},
-    {"nombre": "Aguacate", "calorias": 160, "unidad": "100g", "proteina": 2.0, "carbohidratos": 8.5, "grasas": 14.7, "fibra": 6.7},
-    {"nombre": "Cereza", "calorias": 63, "unidad": "100g", "proteina": 1.1, "carbohidratos": 16.0, "grasas": 0.2, "fibra": 2.1},
-    {"nombre": "Arandanos", "calorias": 57, "unidad": "100g", "proteina": 0.7, "carbohidratos": 14.5, "grasas": 0.3, "fibra": 2.4},
-    {"nombre": "Pechuga de Pollo", "calorias": 165, "unidad": "100g", "proteina": 31.0, "carbohidratos": 0.0, "grasas": 3.6, "fibra": 0.0},
-    {"nombre": "Muslo de Pollo", "calorias": 209, "unidad": "100g", "proteina": 26.0, "carbohidratos": 0.0, "grasas": 11.0, "fibra": 0.0},
-    {"nombre": "Salmon", "calorias": 208, "unidad": "100g", "proteina": 20.4, "carbohidratos": 0.0, "grasas": 13.4, "fibra": 0.0},
-    {"nombre": "Atun en agua", "calorias": 116, "unidad": "100g", "proteina": 25.5, "carbohidratos": 0.0, "grasas": 1.0, "fibra": 0.0},
-    {"nombre": "Merluza", "calorias": 82, "unidad": "100g", "proteina": 17.8, "carbohidratos": 0.0, "grasas": 1.0, "fibra": 0.0},
-    {"nombre": "Bacalao", "calorias": 82, "unidad": "100g", "proteina": 17.8, "carbohidratos": 0.0, "grasas": 0.7, "fibra": 0.0},
-    {"nombre": "Sardinas en aceite", "calorias": 208, "unidad": "100g", "proteina": 24.6, "carbohidratos": 0.0, "grasas": 11.5, "fibra": 0.0},
-    {"nombre": "Gambas", "calorias": 99, "unidad": "100g", "proteina": 18.0, "carbohidratos": 1.5, "grasas": 1.7, "fibra": 0.0},
-    {"nombre": "Ternera lomo", "calorias": 189, "unidad": "100g", "proteina": 26.0, "carbohidratos": 0.0, "grasas": 9.3, "fibra": 0.0},
-    {"nombre": "Cerdo lomo", "calorias": 182, "unidad": "100g", "proteina": 25.7, "carbohidratos": 0.0, "grasas": 8.7, "fibra": 0.0},
-    {"nombre": "Jamon serrano", "calorias": 241, "unidad": "100g", "proteina": 30.5, "carbohidratos": 0.3, "grasas": 13.5, "fibra": 0.0},
-    {"nombre": "Huevo", "calorias": 155, "unidad": "100g", "proteina": 13.0, "carbohidratos": 1.1, "grasas": 11.0, "fibra": 0.0},
-    {"nombre": "Clara de Huevo", "calorias": 52, "unidad": "100g", "proteina": 11.0, "carbohidratos": 0.7, "grasas": 0.2, "fibra": 0.0},
-    {"nombre": "Tofu", "calorias": 76, "unidad": "100g", "proteina": 8.1, "carbohidratos": 1.9, "grasas": 4.8, "fibra": 0.3},
-    {"nombre": "Tempeh", "calorias": 193, "unidad": "100g", "proteina": 19.0, "carbohidratos": 9.4, "grasas": 11.0, "fibra": 0.0},
-    {"nombre": "Arroz Blanco", "calorias": 130, "unidad": "100g cocido", "proteina": 2.7, "carbohidratos": 28.2, "grasas": 0.3, "fibra": 0.4},
-    {"nombre": "Arroz Integral", "calorias": 112, "unidad": "100g cocido", "proteina": 2.6, "carbohidratos": 23.5, "grasas": 0.9, "fibra": 1.8},
-    {"nombre": "Pasta cocida", "calorias": 131, "unidad": "100g", "proteina": 5.0, "carbohidratos": 25.0, "grasas": 1.1, "fibra": 1.8},
-    {"nombre": "Pasta integral cocida", "calorias": 124, "unidad": "100g", "proteina": 5.3, "carbohidratos": 23.2, "grasas": 1.1, "fibra": 3.2},
-    {"nombre": "Quinoa cocida", "calorias": 120, "unidad": "100g", "proteina": 4.4, "carbohidratos": 21.3, "grasas": 1.9, "fibra": 2.8},
-    {"nombre": "Avena", "calorias": 389, "unidad": "100g seco", "proteina": 16.9, "carbohidratos": 66.3, "grasas": 6.9, "fibra": 10.6},
-    {"nombre": "Pan blanco", "calorias": 265, "unidad": "100g", "proteina": 9.0, "carbohidratos": 49.0, "grasas": 3.2, "fibra": 2.7},
-    {"nombre": "Pan integral", "calorias": 247, "unidad": "100g", "proteina": 13.0, "carbohidratos": 41.0, "grasas": 3.4, "fibra": 6.0},
-    {"nombre": "Patata cocida", "calorias": 77, "unidad": "100g", "proteina": 2.0, "carbohidratos": 17.0, "grasas": 0.1, "fibra": 1.8},
-    {"nombre": "Boniato cocido", "calorias": 86, "unidad": "100g", "proteina": 1.6, "carbohidratos": 20.1, "grasas": 0.1, "fibra": 3.0},
-    {"nombre": "Maiz cocido", "calorias": 86, "unidad": "100g", "proteina": 3.3, "carbohidratos": 19.0, "grasas": 1.4, "fibra": 2.7},
-    {"nombre": "Cuscus cocido", "calorias": 112, "unidad": "100g", "proteina": 3.8, "carbohidratos": 23.2, "grasas": 0.2, "fibra": 1.4},
-    {"nombre": "Lentejas cocidas", "calorias": 116, "unidad": "100g", "proteina": 9.0, "carbohidratos": 20.0, "grasas": 0.4, "fibra": 7.9},
-    {"nombre": "Garbanzos cocidos", "calorias": 164, "unidad": "100g", "proteina": 8.9, "carbohidratos": 27.4, "grasas": 2.6, "fibra": 7.6},
-    {"nombre": "Alubias negras cocidas", "calorias": 132, "unidad": "100g", "proteina": 8.9, "carbohidratos": 23.7, "grasas": 0.5, "fibra": 8.7},
-    {"nombre": "Alubias blancas cocidas", "calorias": 127, "unidad": "100g", "proteina": 8.7, "carbohidratos": 22.8, "grasas": 0.5, "fibra": 6.3},
-    {"nombre": "Guisantes cocidos", "calorias": 84, "unidad": "100g", "proteina": 5.4, "carbohidratos": 15.6, "grasas": 0.4, "fibra": 5.5},
-    {"nombre": "Edamame", "calorias": 122, "unidad": "100g", "proteina": 11.9, "carbohidratos": 8.9, "grasas": 5.2, "fibra": 5.2},
-    {"nombre": "Leche entera", "calorias": 61, "unidad": "100ml", "proteina": 3.2, "carbohidratos": 4.8, "grasas": 3.3, "fibra": 0.0},
-    {"nombre": "Leche desnatada", "calorias": 35, "unidad": "100ml", "proteina": 3.4, "carbohidratos": 5.0, "grasas": 0.1, "fibra": 0.0},
-    {"nombre": "Yogur griego", "calorias": 97, "unidad": "100g", "proteina": 9.0, "carbohidratos": 3.6, "grasas": 5.0, "fibra": 0.0},
-    {"nombre": "Yogur natural", "calorias": 61, "unidad": "100g", "proteina": 3.5, "carbohidratos": 4.7, "grasas": 3.3, "fibra": 0.0},
-    {"nombre": "Queso cheddar", "calorias": 403, "unidad": "100g", "proteina": 25.0, "carbohidratos": 1.3, "grasas": 33.0, "fibra": 0.0},
-    {"nombre": "Queso manchego", "calorias": 392, "unidad": "100g", "proteina": 26.2, "carbohidratos": 0.5, "grasas": 32.0, "fibra": 0.0},
-    {"nombre": "Queso fresco", "calorias": 98, "unidad": "100g", "proteina": 11.0, "carbohidratos": 3.3, "grasas": 4.3, "fibra": 0.0},
-    {"nombre": "Requesson", "calorias": 98, "unidad": "100g", "proteina": 11.1, "carbohidratos": 3.4, "grasas": 4.3, "fibra": 0.0},
-    {"nombre": "Mantequilla", "calorias": 717, "unidad": "100g", "proteina": 0.9, "carbohidratos": 0.1, "grasas": 81.0, "fibra": 0.0},
-    {"nombre": "Zanahoria", "calorias": 41, "unidad": "100g", "proteina": 0.9, "carbohidratos": 9.6, "grasas": 0.2, "fibra": 2.8},
-    {"nombre": "Brocoli", "calorias": 34, "unidad": "100g", "proteina": 2.8, "carbohidratos": 6.6, "grasas": 0.4, "fibra": 2.6},
-    {"nombre": "Espinacas", "calorias": 23, "unidad": "100g", "proteina": 2.9, "carbohidratos": 3.6, "grasas": 0.4, "fibra": 2.2},
-    {"nombre": "Tomate", "calorias": 18, "unidad": "100g", "proteina": 0.9, "carbohidratos": 3.9, "grasas": 0.2, "fibra": 1.2},
-    {"nombre": "Pepino", "calorias": 15, "unidad": "100g", "proteina": 0.7, "carbohidratos": 3.6, "grasas": 0.1, "fibra": 0.5},
-    {"nombre": "Lechuga", "calorias": 15, "unidad": "100g", "proteina": 1.4, "carbohidratos": 2.9, "grasas": 0.2, "fibra": 1.3},
-    {"nombre": "Cebolla", "calorias": 40, "unidad": "100g", "proteina": 1.1, "carbohidratos": 9.3, "grasas": 0.1, "fibra": 1.7},
-    {"nombre": "Pimiento rojo", "calorias": 31, "unidad": "100g", "proteina": 1.0, "carbohidratos": 6.0, "grasas": 0.3, "fibra": 2.1},
-    {"nombre": "Pimiento verde", "calorias": 20, "unidad": "100g", "proteina": 0.9, "carbohidratos": 4.6, "grasas": 0.2, "fibra": 1.7},
-    {"nombre": "Coliflor", "calorias": 25, "unidad": "100g", "proteina": 1.9, "carbohidratos": 5.0, "grasas": 0.3, "fibra": 2.0},
-    {"nombre": "Calabacin", "calorias": 17, "unidad": "100g", "proteina": 1.2, "carbohidratos": 3.1, "grasas": 0.3, "fibra": 1.0},
-    {"nombre": "Calabaza", "calorias": 26, "unidad": "100g", "proteina": 1.0, "carbohidratos": 6.5, "grasas": 0.1, "fibra": 0.5},
-    {"nombre": "Berenjena", "calorias": 25, "unidad": "100g", "proteina": 1.0, "carbohidratos": 5.9, "grasas": 0.2, "fibra": 3.0},
-    {"nombre": "Champinon", "calorias": 22, "unidad": "100g", "proteina": 3.1, "carbohidratos": 3.3, "grasas": 0.3, "fibra": 1.0},
-    {"nombre": "Almendras", "calorias": 579, "unidad": "100g", "proteina": 21.2, "carbohidratos": 21.6, "grasas": 49.9, "fibra": 12.5},
-    {"nombre": "Nueces", "calorias": 654, "unidad": "100g", "proteina": 15.2, "carbohidratos": 13.7, "grasas": 65.2, "fibra": 6.7},
-    {"nombre": "Cacahuetes", "calorias": 567, "unidad": "100g", "proteina": 25.8, "carbohidratos": 16.1, "grasas": 49.2, "fibra": 8.5},
-    {"nombre": "Pistachos", "calorias": 562, "unidad": "100g", "proteina": 20.2, "carbohidratos": 27.5, "grasas": 45.4, "fibra": 10.3},
-    {"nombre": "Avellanas", "calorias": 628, "unidad": "100g", "proteina": 15.0, "carbohidratos": 16.7, "grasas": 60.8, "fibra": 9.7},
-    {"nombre": "Semillas de Chia", "calorias": 486, "unidad": "100g", "proteina": 16.5, "carbohidratos": 42.1, "grasas": 30.7, "fibra": 34.4},
-    {"nombre": "Semillas de Lino", "calorias": 534, "unidad": "100g", "proteina": 18.3, "carbohidratos": 28.9, "grasas": 42.2, "fibra": 27.3},
-    {"nombre": "Aceite de Oliva", "calorias": 884, "unidad": "100ml", "proteina": 0.0, "carbohidratos": 0.0, "grasas": 100.0, "fibra": 0.0},
-    {"nombre": "Miel", "calorias": 304, "unidad": "100g", "proteina": 0.3, "carbohidratos": 82.4, "grasas": 0.0, "fibra": 0.2},
-    {"nombre": "Chocolate negro 70%", "calorias": 600, "unidad": "100g", "proteina": 7.8, "carbohidratos": 45.9, "grasas": 43.1, "fibra": 10.9},
-    {"nombre": "Proteina whey", "calorias": 374, "unidad": "100g", "proteina": 78.0, "carbohidratos": 10.0, "grasas": 5.5, "fibra": 0.5},
-    {"nombre": "Pizza de queso", "calorias": 271, "unidad": "100g", "proteina": 11.4, "carbohidratos": 32.5, "grasas": 10.4, "fibra": 2.2},
-    {"nombre": "Hamburguesa con pan", "calorias": 295, "unidad": "100g", "proteina": 17.0, "carbohidratos": 24.0, "grasas": 14.0, "fibra": 1.0},
-    {"nombre": "Acerola", "calorias": 32, "unidad": "100g", "proteina": 0.4, "carbohidratos": 7.7, "grasas": 0.3, "fibra": 1.1},
-    {"nombre": "Semillas de alfalfa", "calorias": 23, "unidad": "100g", "proteina": 4.0, "carbohidratos": 2.1, "grasas": 0.7, "fibra": 1.9},
-    {"nombre": "Harina de avena", "calorias": 375, "unidad": "100g", "proteina": 13.2, "carbohidratos": 67.7, "grasas": 6.5, "fibra": 9.4},
-
-    {"nombre": "Pavo pechuga", "calorias": 135, "unidad": "100g", "proteina": 29.9, "carbohidratos": 0.0, "grasas": 1.5, "fibra": 0.0},
-    {"nombre": "Pollo entero asado", "calorias": 239, "unidad": "100g", "proteina": 27.3, "carbohidratos": 0.0, "grasas": 14.0, "fibra": 0.0},
-    {"nombre": "Ternera picada", "calorias": 215, "unidad": "100g", "proteina": 26.1, "carbohidratos": 0.0, "grasas": 12.0, "fibra": 0.0},
-    {"nombre": "Cordero pierna", "calorias": 258, "unidad": "100g", "proteina": 25.6, "carbohidratos": 0.0, "grasas": 17.0, "fibra": 0.0},
-    {"nombre": "Chorizo", "calorias": 455, "unidad": "100g", "proteina": 24.1, "carbohidratos": 1.9, "grasas": 38.0, "fibra": 0.0},
-    {"nombre": "Salchichas de pollo", "calorias": 172, "unidad": "100g", "proteina": 14.5, "carbohidratos": 5.0, "grasas": 11.0, "fibra": 0.0},
-    {"nombre": "Bacon", "calorias": 417, "unidad": "100g", "proteina": 12.6, "carbohidratos": 1.4, "grasas": 42.0, "fibra": 0.0},
-    {"nombre": "Pato pechuga", "calorias": 201, "unidad": "100g", "proteina": 23.5, "carbohidratos": 0.0, "grasas": 11.2, "fibra": 0.0},
-
-    {"nombre": "Dorada", "calorias": 96, "unidad": "100g", "proteina": 18.0, "carbohidratos": 0.0, "grasas": 2.5, "fibra": 0.0},
-    {"nombre": "Lubina", "calorias": 97, "unidad": "100g", "proteina": 18.4, "carbohidratos": 0.0, "grasas": 2.6, "fibra": 0.0},
-    {"nombre": "Atun fresco", "calorias": 184, "unidad": "100g", "proteina": 30.0, "carbohidratos": 0.0, "grasas": 6.3, "fibra": 0.0},
-    {"nombre": "Trucha", "calorias": 141, "unidad": "100g", "proteina": 19.9, "carbohidratos": 0.0, "grasas": 6.6, "fibra": 0.0},
-    {"nombre": "Calamar", "calorias": 92, "unidad": "100g", "proteina": 15.6, "carbohidratos": 3.1, "grasas": 1.4, "fibra": 0.0},
-    {"nombre": "Mejillones cocidos", "calorias": 172, "unidad": "100g", "proteina": 23.8, "carbohidratos": 7.4, "grasas": 4.5, "fibra": 0.0},
-    {"nombre": "Pulpo cocido", "calorias": 164, "unidad": "100g", "proteina": 29.8, "carbohidratos": 4.4, "grasas": 2.1, "fibra": 0.0},
-    {"nombre": "Langostinos", "calorias": 106, "unidad": "100g", "proteina": 20.3, "carbohidratos": 0.9, "grasas": 1.7, "fibra": 0.0},
-    {"nombre": "Cangrejo", "calorias": 97, "unidad": "100g", "proteina": 19.4, "carbohidratos": 0.0, "grasas": 1.8, "fibra": 0.0},
-    {"nombre": "Anchoas en aceite", "calorias": 210, "unidad": "100g", "proteina": 28.9, "carbohidratos": 0.0, "grasas": 10.9, "fibra": 0.0},
-
-    {"nombre": "Mozzarella", "calorias": 280, "unidad": "100g", "proteina": 28.0, "carbohidratos": 2.2, "grasas": 17.0, "fibra": 0.0},
-    {"nombre": "Parmesano", "calorias": 431, "unidad": "100g", "proteina": 38.5, "carbohidratos": 3.2, "grasas": 29.0, "fibra": 0.0},
-    {"nombre": "Queso brie", "calorias": 334, "unidad": "100g", "proteina": 20.7, "carbohidratos": 0.5, "grasas": 27.7, "fibra": 0.0},
-    {"nombre": "Kefir", "calorias": 52, "unidad": "100ml", "proteina": 3.8, "carbohidratos": 4.5, "grasas": 1.5, "fibra": 0.0},
-    {"nombre": "Leche de almendras", "calorias": 15, "unidad": "100ml", "proteina": 0.5, "carbohidratos": 0.9, "grasas": 1.0, "fibra": 0.3},
-    {"nombre": "Leche de avena", "calorias": 45, "unidad": "100ml", "proteina": 1.0, "carbohidratos": 7.5, "grasas": 1.0, "fibra": 0.5},
-    {"nombre": "Leche de soja", "calorias": 43, "unidad": "100ml", "proteina": 3.3, "carbohidratos": 2.9, "grasas": 1.8, "fibra": 0.4},
-    {"nombre": "Nata para cocinar", "calorias": 195, "unidad": "100ml", "proteina": 2.1, "carbohidratos": 3.2, "grasas": 19.6, "fibra": 0.0},
-    {"nombre": "Yogur natural 0%", "calorias": 40, "unidad": "100g", "proteina": 4.3, "carbohidratos": 5.4, "grasas": 0.2, "fibra": 0.0},
-
-    {"nombre": "Esparragos", "calorias": 20, "unidad": "100g", "proteina": 2.2, "carbohidratos": 3.9, "grasas": 0.1, "fibra": 2.1},
-    {"nombre": "Alcachofas", "calorias": 53, "unidad": "100g", "proteina": 2.9, "carbohidratos": 10.5, "grasas": 0.2, "fibra": 5.4},
-    {"nombre": "Apio", "calorias": 16, "unidad": "100g", "proteina": 0.7, "carbohidratos": 3.0, "grasas": 0.2, "fibra": 1.6},
-    {"nombre": "Puerro", "calorias": 61, "unidad": "100g", "proteina": 1.5, "carbohidratos": 14.2, "grasas": 0.3, "fibra": 1.8},
-    {"nombre": "Kale", "calorias": 49, "unidad": "100g", "proteina": 4.3, "carbohidratos": 8.8, "grasas": 0.9, "fibra": 3.6},
-    {"nombre": "Rucula", "calorias": 25, "unidad": "100g", "proteina": 2.6, "carbohidratos": 3.7, "grasas": 0.7, "fibra": 1.6},
-    {"nombre": "Coles de Bruselas", "calorias": 43, "unidad": "100g", "proteina": 3.4, "carbohidratos": 8.9, "grasas": 0.3, "fibra": 3.8},
-    {"nombre": "Ajo", "calorias": 149, "unidad": "100g", "proteina": 6.4, "carbohidratos": 33.1, "grasas": 0.5, "fibra": 2.1},
-    {"nombre": "Jengibre fresco", "calorias": 80, "unidad": "100g", "proteina": 1.8, "carbohidratos": 17.8, "grasas": 0.8, "fibra": 2.0},
-    {"nombre": "Judias verdes", "calorias": 31, "unidad": "100g", "proteina": 1.8, "carbohidratos": 7.1, "grasas": 0.1, "fibra": 3.4},
-    {"nombre": "Remolachas", "calorias": 43, "unidad": "100g", "proteina": 1.6, "carbohidratos": 9.6, "grasas": 0.2, "fibra": 2.8},
-
-    {"nombre": "Soja cocida", "calorias": 173, "unidad": "100g", "proteina": 16.6, "carbohidratos": 9.9, "grasas": 9.0, "fibra": 6.0},
-    {"nombre": "Alubias pintas cocidas", "calorias": 127, "unidad": "100g", "proteina": 8.7, "carbohidratos": 22.8, "grasas": 0.5, "fibra": 5.5},
-    {"nombre": "Habas cocidas", "calorias": 110, "unidad": "100g", "proteina": 7.6, "carbohidratos": 19.7, "grasas": 0.4, "fibra": 5.4},
-
-    {"nombre": "Tortilla de maiz", "calorias": 218, "unidad": "100g", "proteina": 5.7, "carbohidratos": 44.6, "grasas": 3.2, "fibra": 5.2},
-    {"nombre": "Pan de pita", "calorias": 275, "unidad": "100g", "proteina": 9.1, "carbohidratos": 55.7, "grasas": 1.2, "fibra": 2.2},
-    {"nombre": "Galletas de arroz", "calorias": 387, "unidad": "100g", "proteina": 8.1, "carbohidratos": 81.6, "grasas": 2.9, "fibra": 1.9},
-    {"nombre": "Polenta cocida", "calorias": 70, "unidad": "100g", "proteina": 1.5, "carbohidratos": 15.4, "grasas": 0.3, "fibra": 0.5},
-    {"nombre": "Trigo sarraceno cocido", "calorias": 92, "unidad": "100g", "proteina": 3.4, "carbohidratos": 19.9, "grasas": 0.6, "fibra": 2.7},
-    {"nombre": "Mijo cocido", "calorias": 119, "unidad": "100g", "proteina": 3.5, "carbohidratos": 23.7, "grasas": 1.0, "fibra": 1.3},
-
-    {"nombre": "Anacardos", "calorias": 553, "unidad": "100g", "proteina": 18.2, "carbohidratos": 30.2, "grasas": 43.8, "fibra": 3.3},
-    {"nombre": "Nueces de macadamia", "calorias": 718, "unidad": "100g", "proteina": 7.9, "carbohidratos": 13.8, "grasas": 75.8, "fibra": 8.6},
-    {"nombre": "Pipas de girasol", "calorias": 584, "unidad": "100g", "proteina": 20.8, "carbohidratos": 20.0, "grasas": 51.5, "fibra": 8.6},
-    {"nombre": "Pipas de calabaza", "calorias": 559, "unidad": "100g", "proteina": 30.2, "carbohidratos": 10.7, "grasas": 49.1, "fibra": 6.0},
-    {"nombre": "Sesamo", "calorias": 573, "unidad": "100g", "proteina": 17.7, "carbohidratos": 23.4, "grasas": 49.7, "fibra": 11.8},
-    {"nombre": "Mantequilla de cacahuete", "calorias": 588, "unidad": "100g", "proteina": 25.1, "carbohidratos": 20.1, "grasas": 50.4, "fibra": 6.0},
-    {"nombre": "Mantequilla de almendras", "calorias": 614, "unidad": "100g", "proteina": 20.9, "carbohidratos": 19.0, "grasas": 55.5, "fibra": 10.3},
-
-    {"nombre": "Granada", "calorias": 83, "unidad": "100g", "proteina": 1.7, "carbohidratos": 18.7, "grasas": 1.2, "fibra": 4.0},
-    {"nombre": "Papaya", "calorias": 43, "unidad": "100g", "proteina": 0.5, "carbohidratos": 10.8, "grasas": 0.3, "fibra": 1.7},
-    {"nombre": "Limon", "calorias": 29, "unidad": "100g", "proteina": 1.1, "carbohidratos": 9.3, "grasas": 0.3, "fibra": 2.8},
-    {"nombre": "Higo fresco", "calorias": 74, "unidad": "100g", "proteina": 0.8, "carbohidratos": 19.2, "grasas": 0.3, "fibra": 2.9},
-    {"nombre": "Datiles", "calorias": 277, "unidad": "100g", "proteina": 1.8, "carbohidratos": 74.9, "grasas": 0.2, "fibra": 6.7},
-    {"nombre": "Coco rallado", "calorias": 354, "unidad": "100g", "proteina": 3.3, "carbohidratos": 15.2, "grasas": 33.5, "fibra": 9.0},
-    {"nombre": "Frambuesas", "calorias": 52, "unidad": "100g", "proteina": 1.2, "carbohidratos": 11.9, "grasas": 0.7, "fibra": 6.5},
-    {"nombre": "Moras", "calorias": 43, "unidad": "100g", "proteina": 1.4, "carbohidratos": 9.6, "grasas": 0.5, "fibra": 5.3},
-    {"nombre": "Ciruelas", "calorias": 46, "unidad": "100g", "proteina": 0.7, "carbohidratos": 11.4, "grasas": 0.3, "fibra": 1.4},
-
-    {"nombre": "Cafe solo", "calorias": 2, "unidad": "100ml", "proteina": 0.3, "carbohidratos": 0.0, "grasas": 0.0, "fibra": 0.0},
-    {"nombre": "Te verde", "calorias": 1, "unidad": "100ml", "proteina": 0.2, "carbohidratos": 0.0, "grasas": 0.0, "fibra": 0.0},
-    {"nombre": "Zumo de naranja", "calorias": 45, "unidad": "100ml", "proteina": 0.7, "carbohidratos": 10.4, "grasas": 0.2, "fibra": 0.2},
-    {"nombre": "Agua de coco", "calorias": 19, "unidad": "100ml", "proteina": 0.7, "carbohidratos": 3.7, "grasas": 0.2, "fibra": 1.1},
-
-    {"nombre": "Aceite de coco", "calorias": 862, "unidad": "100ml", "proteina": 0.0, "carbohidratos": 0.0, "grasas": 100.0, "fibra": 0.0},
-    {"nombre": "Aceite de girasol", "calorias": 884, "unidad": "100ml", "proteina": 0.0, "carbohidratos": 0.0, "grasas": 100.0, "fibra": 0.0},
-    {"nombre": "Ketchup", "calorias": 101, "unidad": "100g", "proteina": 1.3, "carbohidratos": 25.0, "grasas": 0.1, "fibra": 0.5},
-    {"nombre": "Mayonesa", "calorias": 680, "unidad": "100g", "proteina": 1.0, "carbohidratos": 0.6, "grasas": 74.8, "fibra": 0.0},
-    {"nombre": "Salsa de soja", "calorias": 53, "unidad": "100ml", "proteina": 5.1, "carbohidratos": 6.7, "grasas": 0.0, "fibra": 0.8},
-
-    {"nombre": "Granola", "calorias": 471, "unidad": "100g", "proteina": 10.4, "carbohidratos": 64.0, "grasas": 18.9, "fibra": 5.6},
-    {"nombre": "Barrita de cereales", "calorias": 380, "unidad": "100g", "proteina": 7.4, "carbohidratos": 68.5, "grasas": 9.1, "fibra": 3.2},
-    {"nombre": "Patatas fritas", "calorias": 536, "unidad": "100g", "proteina": 6.3, "carbohidratos": 52.9, "grasas": 34.6, "fibra": 4.4},
-    {"nombre": "Palomitas de maiz", "calorias": 375, "unidad": "100g", "proteina": 11.1, "carbohidratos": 73.4, "grasas": 4.5, "fibra": 14.5}
+    {
+      "nombre": "Manzana",
+      "calorias": 52,
+      "unidad": "100g",
+      "proteina": 0.3,
+      "carbohidratos": 13.8,
+      "grasas": 0.2,
+      "fibra": 2.4
+    },
+    {
+      "nombre": "Pera",
+      "calorias": 57,
+      "unidad": "100g",
+      "proteina": 0.4,
+      "carbohidratos": 15.2,
+      "grasas": 0.1,
+      "fibra": 3.1
+    },
+    {
+      "nombre": "Naranja",
+      "calorias": 47,
+      "unidad": "100g",
+      "proteina": 0.9,
+      "carbohidratos": 11.8,
+      "grasas": 0.1,
+      "fibra": 2.4
+    },
+    {
+      "nombre": "Platano",
+      "calorias": 89,
+      "unidad": "100g",
+      "proteina": 1.1,
+      "carbohidratos": 22.8,
+      "grasas": 0.3,
+      "fibra": 2.6
+    },
+    {
+      "nombre": "Fresa",
+      "calorias": 32,
+      "unidad": "100g",
+      "proteina": 0.7,
+      "carbohidratos": 7.7,
+      "grasas": 0.3,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Uva",
+      "calorias": 69,
+      "unidad": "100g",
+      "proteina": 0.7,
+      "carbohidratos": 18.1,
+      "grasas": 0.2,
+      "fibra": 0.9
+    },
+    {
+      "nombre": "Melocoton",
+      "calorias": 39,
+      "unidad": "100g",
+      "proteina": 0.9,
+      "carbohidratos": 9.5,
+      "grasas": 0.3,
+      "fibra": 1.5
+    },
+    {
+      "nombre": "Melon",
+      "calorias": 34,
+      "unidad": "100g",
+      "proteina": 0.8,
+      "carbohidratos": 8.2,
+      "grasas": 0.2,
+      "fibra": 0.9
+    },
+    {
+      "nombre": "Sandia",
+      "calorias": 30,
+      "unidad": "100g",
+      "proteina": 0.6,
+      "carbohidratos": 7.6,
+      "grasas": 0.2,
+      "fibra": 0.4
+    },
+    {
+      "nombre": "Kiwi",
+      "calorias": 61,
+      "unidad": "100g",
+      "proteina": 1.1,
+      "carbohidratos": 14.7,
+      "grasas": 0.5,
+      "fibra": 3.0
+    },
+    {
+      "nombre": "Pina",
+      "calorias": 50,
+      "unidad": "100g",
+      "proteina": 0.5,
+      "carbohidratos": 13.1,
+      "grasas": 0.1,
+      "fibra": 1.4
+    },
+    {
+      "nombre": "Mango",
+      "calorias": 60,
+      "unidad": "100g",
+      "proteina": 0.8,
+      "carbohidratos": 15.0,
+      "grasas": 0.4,
+      "fibra": 1.6
+    },
+    {
+      "nombre": "Aguacate",
+      "calorias": 160,
+      "unidad": "100g",
+      "proteina": 2.0,
+      "carbohidratos": 8.5,
+      "grasas": 14.7,
+      "fibra": 6.7
+    },
+    {
+      "nombre": "Cereza",
+      "calorias": 63,
+      "unidad": "100g",
+      "proteina": 1.1,
+      "carbohidratos": 16.0,
+      "grasas": 0.2,
+      "fibra": 2.1
+    },
+    {
+      "nombre": "Arandanos",
+      "calorias": 57,
+      "unidad": "100g",
+      "proteina": 0.7,
+      "carbohidratos": 14.5,
+      "grasas": 0.3,
+      "fibra": 2.4
+    },
+    {
+      "nombre": "Pechuga de Pollo",
+      "calorias": 165,
+      "unidad": "100g",
+      "proteina": 31.0,
+      "carbohidratos": 0.0,
+      "grasas": 3.6,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Muslo de Pollo",
+      "calorias": 209,
+      "unidad": "100g",
+      "proteina": 26.0,
+      "carbohidratos": 0.0,
+      "grasas": 11.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Salmon",
+      "calorias": 208,
+      "unidad": "100g",
+      "proteina": 20.4,
+      "carbohidratos": 0.0,
+      "grasas": 13.4,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Atun en agua",
+      "calorias": 116,
+      "unidad": "100g",
+      "proteina": 25.5,
+      "carbohidratos": 0.0,
+      "grasas": 1.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Merluza",
+      "calorias": 82,
+      "unidad": "100g",
+      "proteina": 17.8,
+      "carbohidratos": 0.0,
+      "grasas": 1.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Bacalao",
+      "calorias": 82,
+      "unidad": "100g",
+      "proteina": 17.8,
+      "carbohidratos": 0.0,
+      "grasas": 0.7,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Sardinas en aceite",
+      "calorias": 208,
+      "unidad": "100g",
+      "proteina": 24.6,
+      "carbohidratos": 0.0,
+      "grasas": 11.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Gambas",
+      "calorias": 99,
+      "unidad": "100g",
+      "proteina": 18.0,
+      "carbohidratos": 1.5,
+      "grasas": 1.7,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Ternera lomo",
+      "calorias": 189,
+      "unidad": "100g",
+      "proteina": 26.0,
+      "carbohidratos": 0.0,
+      "grasas": 9.3,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Cerdo lomo",
+      "calorias": 182,
+      "unidad": "100g",
+      "proteina": 25.7,
+      "carbohidratos": 0.0,
+      "grasas": 8.7,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Jamon serrano",
+      "calorias": 241,
+      "unidad": "100g",
+      "proteina": 30.5,
+      "carbohidratos": 0.3,
+      "grasas": 13.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Huevo",
+      "calorias": 155,
+      "unidad": "100g",
+      "proteina": 13.0,
+      "carbohidratos": 1.1,
+      "grasas": 11.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Clara de Huevo",
+      "calorias": 52,
+      "unidad": "100g",
+      "proteina": 11.0,
+      "carbohidratos": 0.7,
+      "grasas": 0.2,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Tofu",
+      "calorias": 76,
+      "unidad": "100g",
+      "proteina": 8.1,
+      "carbohidratos": 1.9,
+      "grasas": 4.8,
+      "fibra": 0.3
+    },
+    {
+      "nombre": "Tempeh",
+      "calorias": 193,
+      "unidad": "100g",
+      "proteina": 19.0,
+      "carbohidratos": 9.4,
+      "grasas": 11.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Arroz Blanco",
+      "calorias": 130,
+      "unidad": "100g cocido",
+      "proteina": 2.7,
+      "carbohidratos": 28.2,
+      "grasas": 0.3,
+      "fibra": 0.4
+    },
+    {
+      "nombre": "Arroz Integral",
+      "calorias": 112,
+      "unidad": "100g cocido",
+      "proteina": 2.6,
+      "carbohidratos": 23.5,
+      "grasas": 0.9,
+      "fibra": 1.8
+    },
+    {
+      "nombre": "Pasta cocida",
+      "calorias": 131,
+      "unidad": "100g",
+      "proteina": 5.0,
+      "carbohidratos": 25.0,
+      "grasas": 1.1,
+      "fibra": 1.8
+    },
+    {
+      "nombre": "Pasta integral cocida",
+      "calorias": 124,
+      "unidad": "100g",
+      "proteina": 5.3,
+      "carbohidratos": 23.2,
+      "grasas": 1.1,
+      "fibra": 3.2
+    },
+    {
+      "nombre": "Quinoa cocida",
+      "calorias": 120,
+      "unidad": "100g",
+      "proteina": 4.4,
+      "carbohidratos": 21.3,
+      "grasas": 1.9,
+      "fibra": 2.8
+    },
+    {
+      "nombre": "Avena",
+      "calorias": 389,
+      "unidad": "100g seco",
+      "proteina": 16.9,
+      "carbohidratos": 66.3,
+      "grasas": 6.9,
+      "fibra": 10.6
+    },
+    {
+      "nombre": "Pan blanco",
+      "calorias": 265,
+      "unidad": "100g",
+      "proteina": 9.0,
+      "carbohidratos": 49.0,
+      "grasas": 3.2,
+      "fibra": 2.7
+    },
+    {
+      "nombre": "Pan integral",
+      "calorias": 247,
+      "unidad": "100g",
+      "proteina": 13.0,
+      "carbohidratos": 41.0,
+      "grasas": 3.4,
+      "fibra": 6.0
+    },
+    {
+      "nombre": "Patata cocida",
+      "calorias": 77,
+      "unidad": "100g",
+      "proteina": 2.0,
+      "carbohidratos": 17.0,
+      "grasas": 0.1,
+      "fibra": 1.8
+    },
+    {
+      "nombre": "Boniato cocido",
+      "calorias": 86,
+      "unidad": "100g",
+      "proteina": 1.6,
+      "carbohidratos": 20.1,
+      "grasas": 0.1,
+      "fibra": 3.0
+    },
+    {
+      "nombre": "Maiz cocido",
+      "calorias": 86,
+      "unidad": "100g",
+      "proteina": 3.3,
+      "carbohidratos": 19.0,
+      "grasas": 1.4,
+      "fibra": 2.7
+    },
+    {
+      "nombre": "Cuscus cocido",
+      "calorias": 112,
+      "unidad": "100g",
+      "proteina": 3.8,
+      "carbohidratos": 23.2,
+      "grasas": 0.2,
+      "fibra": 1.4
+    },
+    {
+      "nombre": "Lentejas cocidas",
+      "calorias": 116,
+      "unidad": "100g",
+      "proteina": 9.0,
+      "carbohidratos": 20.0,
+      "grasas": 0.4,
+      "fibra": 7.9
+    },
+    {
+      "nombre": "Garbanzos cocidos",
+      "calorias": 164,
+      "unidad": "100g",
+      "proteina": 8.9,
+      "carbohidratos": 27.4,
+      "grasas": 2.6,
+      "fibra": 7.6
+    },
+    {
+      "nombre": "Alubias negras cocidas",
+      "calorias": 132,
+      "unidad": "100g",
+      "proteina": 8.9,
+      "carbohidratos": 23.7,
+      "grasas": 0.5,
+      "fibra": 8.7
+    },
+    {
+      "nombre": "Alubias blancas cocidas",
+      "calorias": 127,
+      "unidad": "100g",
+      "proteina": 8.7,
+      "carbohidratos": 22.8,
+      "grasas": 0.5,
+      "fibra": 6.3
+    },
+    {
+      "nombre": "Guisantes cocidos",
+      "calorias": 84,
+      "unidad": "100g",
+      "proteina": 5.4,
+      "carbohidratos": 15.6,
+      "grasas": 0.4,
+      "fibra": 5.5
+    },
+    {
+      "nombre": "Edamame",
+      "calorias": 122,
+      "unidad": "100g",
+      "proteina": 11.9,
+      "carbohidratos": 8.9,
+      "grasas": 5.2,
+      "fibra": 5.2
+    },
+    {
+      "nombre": "Leche entera",
+      "calorias": 61,
+      "unidad": "100ml",
+      "proteina": 3.2,
+      "carbohidratos": 4.8,
+      "grasas": 3.3,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Leche desnatada",
+      "calorias": 35,
+      "unidad": "100ml",
+      "proteina": 3.4,
+      "carbohidratos": 5.0,
+      "grasas": 0.1,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Yogur griego",
+      "calorias": 97,
+      "unidad": "100g",
+      "proteina": 9.0,
+      "carbohidratos": 3.6,
+      "grasas": 5.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Yogur natural",
+      "calorias": 61,
+      "unidad": "100g",
+      "proteina": 3.5,
+      "carbohidratos": 4.7,
+      "grasas": 3.3,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Queso cheddar",
+      "calorias": 403,
+      "unidad": "100g",
+      "proteina": 25.0,
+      "carbohidratos": 1.3,
+      "grasas": 33.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Queso manchego",
+      "calorias": 392,
+      "unidad": "100g",
+      "proteina": 26.2,
+      "carbohidratos": 0.5,
+      "grasas": 32.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Queso fresco",
+      "calorias": 98,
+      "unidad": "100g",
+      "proteina": 11.0,
+      "carbohidratos": 3.3,
+      "grasas": 4.3,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Requesson",
+      "calorias": 98,
+      "unidad": "100g",
+      "proteina": 11.1,
+      "carbohidratos": 3.4,
+      "grasas": 4.3,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Mantequilla",
+      "calorias": 717,
+      "unidad": "100g",
+      "proteina": 0.9,
+      "carbohidratos": 0.1,
+      "grasas": 81.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Zanahoria",
+      "calorias": 41,
+      "unidad": "100g",
+      "proteina": 0.9,
+      "carbohidratos": 9.6,
+      "grasas": 0.2,
+      "fibra": 2.8
+    },
+    {
+      "nombre": "Brocoli",
+      "calorias": 34,
+      "unidad": "100g",
+      "proteina": 2.8,
+      "carbohidratos": 6.6,
+      "grasas": 0.4,
+      "fibra": 2.6
+    },
+    {
+      "nombre": "Espinacas",
+      "calorias": 23,
+      "unidad": "100g",
+      "proteina": 2.9,
+      "carbohidratos": 3.6,
+      "grasas": 0.4,
+      "fibra": 2.2
+    },
+    {
+      "nombre": "Tomate",
+      "calorias": 18,
+      "unidad": "100g",
+      "proteina": 0.9,
+      "carbohidratos": 3.9,
+      "grasas": 0.2,
+      "fibra": 1.2
+    },
+    {
+      "nombre": "Pepino",
+      "calorias": 15,
+      "unidad": "100g",
+      "proteina": 0.7,
+      "carbohidratos": 3.6,
+      "grasas": 0.1,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Lechuga",
+      "calorias": 15,
+      "unidad": "100g",
+      "proteina": 1.4,
+      "carbohidratos": 2.9,
+      "grasas": 0.2,
+      "fibra": 1.3
+    },
+    {
+      "nombre": "Cebolla",
+      "calorias": 40,
+      "unidad": "100g",
+      "proteina": 1.1,
+      "carbohidratos": 9.3,
+      "grasas": 0.1,
+      "fibra": 1.7
+    },
+    {
+      "nombre": "Pimiento rojo",
+      "calorias": 31,
+      "unidad": "100g",
+      "proteina": 1.0,
+      "carbohidratos": 6.0,
+      "grasas": 0.3,
+      "fibra": 2.1
+    },
+    {
+      "nombre": "Pimiento verde",
+      "calorias": 20,
+      "unidad": "100g",
+      "proteina": 0.9,
+      "carbohidratos": 4.6,
+      "grasas": 0.2,
+      "fibra": 1.7
+    },
+    {
+      "nombre": "Coliflor",
+      "calorias": 25,
+      "unidad": "100g",
+      "proteina": 1.9,
+      "carbohidratos": 5.0,
+      "grasas": 0.3,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Calabacin",
+      "calorias": 17,
+      "unidad": "100g",
+      "proteina": 1.2,
+      "carbohidratos": 3.1,
+      "grasas": 0.3,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Calabaza",
+      "calorias": 26,
+      "unidad": "100g",
+      "proteina": 1.0,
+      "carbohidratos": 6.5,
+      "grasas": 0.1,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Berenjena",
+      "calorias": 25,
+      "unidad": "100g",
+      "proteina": 1.0,
+      "carbohidratos": 5.9,
+      "grasas": 0.2,
+      "fibra": 3.0
+    },
+    {
+      "nombre": "Champinon",
+      "calorias": 22,
+      "unidad": "100g",
+      "proteina": 3.1,
+      "carbohidratos": 3.3,
+      "grasas": 0.3,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Almendras",
+      "calorias": 579,
+      "unidad": "100g",
+      "proteina": 21.2,
+      "carbohidratos": 21.6,
+      "grasas": 49.9,
+      "fibra": 12.5
+    },
+    {
+      "nombre": "Nueces",
+      "calorias": 654,
+      "unidad": "100g",
+      "proteina": 15.2,
+      "carbohidratos": 13.7,
+      "grasas": 65.2,
+      "fibra": 6.7
+    },
+    {
+      "nombre": "Cacahuetes",
+      "calorias": 567,
+      "unidad": "100g",
+      "proteina": 25.8,
+      "carbohidratos": 16.1,
+      "grasas": 49.2,
+      "fibra": 8.5
+    },
+    {
+      "nombre": "Pistachos",
+      "calorias": 562,
+      "unidad": "100g",
+      "proteina": 20.2,
+      "carbohidratos": 27.5,
+      "grasas": 45.4,
+      "fibra": 10.3
+    },
+    {
+      "nombre": "Avellanas",
+      "calorias": 628,
+      "unidad": "100g",
+      "proteina": 15.0,
+      "carbohidratos": 16.7,
+      "grasas": 60.8,
+      "fibra": 9.7
+    },
+    {
+      "nombre": "Semillas de Chia",
+      "calorias": 486,
+      "unidad": "100g",
+      "proteina": 16.5,
+      "carbohidratos": 42.1,
+      "grasas": 30.7,
+      "fibra": 34.4
+    },
+    {
+      "nombre": "Semillas de Lino",
+      "calorias": 534,
+      "unidad": "100g",
+      "proteina": 18.3,
+      "carbohidratos": 28.9,
+      "grasas": 42.2,
+      "fibra": 27.3
+    },
+    {
+      "nombre": "Aceite de Oliva",
+      "calorias": 884,
+      "unidad": "100ml",
+      "proteina": 0.0,
+      "carbohidratos": 0.0,
+      "grasas": 100.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Miel",
+      "calorias": 304,
+      "unidad": "100g",
+      "proteina": 0.3,
+      "carbohidratos": 82.4,
+      "grasas": 0.0,
+      "fibra": 0.2
+    },
+    {
+      "nombre": "Chocolate negro 70%",
+      "calorias": 600,
+      "unidad": "100g",
+      "proteina": 7.8,
+      "carbohidratos": 45.9,
+      "grasas": 43.1,
+      "fibra": 10.9
+    },
+    {
+      "nombre": "Proteina whey",
+      "calorias": 374,
+      "unidad": "100g",
+      "proteina": 78.0,
+      "carbohidratos": 10.0,
+      "grasas": 5.5,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Pizza de queso",
+      "calorias": 271,
+      "unidad": "100g",
+      "proteina": 11.4,
+      "carbohidratos": 32.5,
+      "grasas": 10.4,
+      "fibra": 2.2
+    },
+    {
+      "nombre": "Hamburguesa con pan",
+      "calorias": 295,
+      "unidad": "100g",
+      "proteina": 17.0,
+      "carbohidratos": 24.0,
+      "grasas": 14.0,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Acerola",
+      "calorias": 32,
+      "unidad": "100g",
+      "proteina": 0.4,
+      "carbohidratos": 7.7,
+      "grasas": 0.3,
+      "fibra": 1.1
+    },
+    {
+      "nombre": "Semillas de alfalfa",
+      "calorias": 23,
+      "unidad": "100g",
+      "proteina": 4.0,
+      "carbohidratos": 2.1,
+      "grasas": 0.7,
+      "fibra": 1.9
+    },
+    {
+      "nombre": "Harina de avena",
+      "calorias": 375,
+      "unidad": "100g",
+      "proteina": 13.2,
+      "carbohidratos": 67.7,
+      "grasas": 6.5,
+      "fibra": 9.4
+    },
+    {
+      "nombre": "Pavo pechuga",
+      "calorias": 135,
+      "unidad": "100g",
+      "proteina": 29.9,
+      "carbohidratos": 0.0,
+      "grasas": 1.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Pollo entero asado",
+      "calorias": 239,
+      "unidad": "100g",
+      "proteina": 27.3,
+      "carbohidratos": 0.0,
+      "grasas": 14.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Ternera picada",
+      "calorias": 215,
+      "unidad": "100g",
+      "proteina": 26.1,
+      "carbohidratos": 0.0,
+      "grasas": 12.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Cordero pierna",
+      "calorias": 258,
+      "unidad": "100g",
+      "proteina": 25.6,
+      "carbohidratos": 0.0,
+      "grasas": 17.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Chorizo",
+      "calorias": 455,
+      "unidad": "100g",
+      "proteina": 24.1,
+      "carbohidratos": 1.9,
+      "grasas": 38.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Salchichas de pollo",
+      "calorias": 172,
+      "unidad": "100g",
+      "proteina": 14.5,
+      "carbohidratos": 5.0,
+      "grasas": 11.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Bacon",
+      "calorias": 417,
+      "unidad": "100g",
+      "proteina": 12.6,
+      "carbohidratos": 1.4,
+      "grasas": 42.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Pato pechuga",
+      "calorias": 201,
+      "unidad": "100g",
+      "proteina": 23.5,
+      "carbohidratos": 0.0,
+      "grasas": 11.2,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Dorada",
+      "calorias": 96,
+      "unidad": "100g",
+      "proteina": 18.0,
+      "carbohidratos": 0.0,
+      "grasas": 2.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Lubina",
+      "calorias": 97,
+      "unidad": "100g",
+      "proteina": 18.4,
+      "carbohidratos": 0.0,
+      "grasas": 2.6,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Atun fresco",
+      "calorias": 184,
+      "unidad": "100g",
+      "proteina": 30.0,
+      "carbohidratos": 0.0,
+      "grasas": 6.3,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Trucha",
+      "calorias": 141,
+      "unidad": "100g",
+      "proteina": 19.9,
+      "carbohidratos": 0.0,
+      "grasas": 6.6,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Calamar",
+      "calorias": 92,
+      "unidad": "100g",
+      "proteina": 15.6,
+      "carbohidratos": 3.1,
+      "grasas": 1.4,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Mejillones cocidos",
+      "calorias": 172,
+      "unidad": "100g",
+      "proteina": 23.8,
+      "carbohidratos": 7.4,
+      "grasas": 4.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Pulpo cocido",
+      "calorias": 164,
+      "unidad": "100g",
+      "proteina": 29.8,
+      "carbohidratos": 4.4,
+      "grasas": 2.1,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Langostinos",
+      "calorias": 106,
+      "unidad": "100g",
+      "proteina": 20.3,
+      "carbohidratos": 0.9,
+      "grasas": 1.7,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Cangrejo",
+      "calorias": 97,
+      "unidad": "100g",
+      "proteina": 19.4,
+      "carbohidratos": 0.0,
+      "grasas": 1.8,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Anchoas en aceite",
+      "calorias": 210,
+      "unidad": "100g",
+      "proteina": 28.9,
+      "carbohidratos": 0.0,
+      "grasas": 10.9,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Mozzarella",
+      "calorias": 280,
+      "unidad": "100g",
+      "proteina": 28.0,
+      "carbohidratos": 2.2,
+      "grasas": 17.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Parmesano",
+      "calorias": 431,
+      "unidad": "100g",
+      "proteina": 38.5,
+      "carbohidratos": 3.2,
+      "grasas": 29.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Queso brie",
+      "calorias": 334,
+      "unidad": "100g",
+      "proteina": 20.7,
+      "carbohidratos": 0.5,
+      "grasas": 27.7,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Kefir",
+      "calorias": 52,
+      "unidad": "100ml",
+      "proteina": 3.8,
+      "carbohidratos": 4.5,
+      "grasas": 1.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Leche de almendras",
+      "calorias": 15,
+      "unidad": "100ml",
+      "proteina": 0.5,
+      "carbohidratos": 0.9,
+      "grasas": 1.0,
+      "fibra": 0.3
+    },
+    {
+      "nombre": "Leche de avena",
+      "calorias": 45,
+      "unidad": "100ml",
+      "proteina": 1.0,
+      "carbohidratos": 7.5,
+      "grasas": 1.0,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Leche de soja",
+      "calorias": 43,
+      "unidad": "100ml",
+      "proteina": 3.3,
+      "carbohidratos": 2.9,
+      "grasas": 1.8,
+      "fibra": 0.4
+    },
+    {
+      "nombre": "Nata para cocinar",
+      "calorias": 195,
+      "unidad": "100ml",
+      "proteina": 2.1,
+      "carbohidratos": 3.2,
+      "grasas": 19.6,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Yogur natural 0%",
+      "calorias": 40,
+      "unidad": "100g",
+      "proteina": 4.3,
+      "carbohidratos": 5.4,
+      "grasas": 0.2,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Esparragos",
+      "calorias": 20,
+      "unidad": "100g",
+      "proteina": 2.2,
+      "carbohidratos": 3.9,
+      "grasas": 0.1,
+      "fibra": 2.1
+    },
+    {
+      "nombre": "Alcachofas",
+      "calorias": 53,
+      "unidad": "100g",
+      "proteina": 2.9,
+      "carbohidratos": 10.5,
+      "grasas": 0.2,
+      "fibra": 5.4
+    },
+    {
+      "nombre": "Apio",
+      "calorias": 16,
+      "unidad": "100g",
+      "proteina": 0.7,
+      "carbohidratos": 3.0,
+      "grasas": 0.2,
+      "fibra": 1.6
+    },
+    {
+      "nombre": "Puerro",
+      "calorias": 61,
+      "unidad": "100g",
+      "proteina": 1.5,
+      "carbohidratos": 14.2,
+      "grasas": 0.3,
+      "fibra": 1.8
+    },
+    {
+      "nombre": "Kale",
+      "calorias": 49,
+      "unidad": "100g",
+      "proteina": 4.3,
+      "carbohidratos": 8.8,
+      "grasas": 0.9,
+      "fibra": 3.6
+    },
+    {
+      "nombre": "Rucula",
+      "calorias": 25,
+      "unidad": "100g",
+      "proteina": 2.6,
+      "carbohidratos": 3.7,
+      "grasas": 0.7,
+      "fibra": 1.6
+    },
+    {
+      "nombre": "Coles de Bruselas",
+      "calorias": 43,
+      "unidad": "100g",
+      "proteina": 3.4,
+      "carbohidratos": 8.9,
+      "grasas": 0.3,
+      "fibra": 3.8
+    },
+    {
+      "nombre": "Ajo",
+      "calorias": 149,
+      "unidad": "100g",
+      "proteina": 6.4,
+      "carbohidratos": 33.1,
+      "grasas": 0.5,
+      "fibra": 2.1
+    },
+    {
+      "nombre": "Jengibre fresco",
+      "calorias": 80,
+      "unidad": "100g",
+      "proteina": 1.8,
+      "carbohidratos": 17.8,
+      "grasas": 0.8,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Judias verdes",
+      "calorias": 31,
+      "unidad": "100g",
+      "proteina": 1.8,
+      "carbohidratos": 7.1,
+      "grasas": 0.1,
+      "fibra": 3.4
+    },
+    {
+      "nombre": "Remolachas",
+      "calorias": 43,
+      "unidad": "100g",
+      "proteina": 1.6,
+      "carbohidratos": 9.6,
+      "grasas": 0.2,
+      "fibra": 2.8
+    },
+    {
+      "nombre": "Soja cocida",
+      "calorias": 173,
+      "unidad": "100g",
+      "proteina": 16.6,
+      "carbohidratos": 9.9,
+      "grasas": 9.0,
+      "fibra": 6.0
+    },
+    {
+      "nombre": "Alubias pintas cocidas",
+      "calorias": 127,
+      "unidad": "100g",
+      "proteina": 8.7,
+      "carbohidratos": 22.8,
+      "grasas": 0.5,
+      "fibra": 5.5
+    },
+    {
+      "nombre": "Habas cocidas",
+      "calorias": 110,
+      "unidad": "100g",
+      "proteina": 7.6,
+      "carbohidratos": 19.7,
+      "grasas": 0.4,
+      "fibra": 5.4
+    },
+    {
+      "nombre": "Tortilla de maiz",
+      "calorias": 218,
+      "unidad": "100g",
+      "proteina": 5.7,
+      "carbohidratos": 44.6,
+      "grasas": 3.2,
+      "fibra": 5.2
+    },
+    {
+      "nombre": "Pan de pita",
+      "calorias": 275,
+      "unidad": "100g",
+      "proteina": 9.1,
+      "carbohidratos": 55.7,
+      "grasas": 1.2,
+      "fibra": 2.2
+    },
+    {
+      "nombre": "Galletas de arroz",
+      "calorias": 387,
+      "unidad": "100g",
+      "proteina": 8.1,
+      "carbohidratos": 81.6,
+      "grasas": 2.9,
+      "fibra": 1.9
+    },
+    {
+      "nombre": "Polenta cocida",
+      "calorias": 70,
+      "unidad": "100g",
+      "proteina": 1.5,
+      "carbohidratos": 15.4,
+      "grasas": 0.3,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Trigo sarraceno cocido",
+      "calorias": 92,
+      "unidad": "100g",
+      "proteina": 3.4,
+      "carbohidratos": 19.9,
+      "grasas": 0.6,
+      "fibra": 2.7
+    },
+    {
+      "nombre": "Mijo cocido",
+      "calorias": 119,
+      "unidad": "100g",
+      "proteina": 3.5,
+      "carbohidratos": 23.7,
+      "grasas": 1.0,
+      "fibra": 1.3
+    },
+    {
+      "nombre": "Anacardos",
+      "calorias": 553,
+      "unidad": "100g",
+      "proteina": 18.2,
+      "carbohidratos": 30.2,
+      "grasas": 43.8,
+      "fibra": 3.3
+    },
+    {
+      "nombre": "Nueces de macadamia",
+      "calorias": 718,
+      "unidad": "100g",
+      "proteina": 7.9,
+      "carbohidratos": 13.8,
+      "grasas": 75.8,
+      "fibra": 8.6
+    },
+    {
+      "nombre": "Pipas de girasol",
+      "calorias": 584,
+      "unidad": "100g",
+      "proteina": 20.8,
+      "carbohidratos": 20.0,
+      "grasas": 51.5,
+      "fibra": 8.6
+    },
+    {
+      "nombre": "Pipas de calabaza",
+      "calorias": 559,
+      "unidad": "100g",
+      "proteina": 30.2,
+      "carbohidratos": 10.7,
+      "grasas": 49.1,
+      "fibra": 6.0
+    },
+    {
+      "nombre": "Sesamo",
+      "calorias": 573,
+      "unidad": "100g",
+      "proteina": 17.7,
+      "carbohidratos": 23.4,
+      "grasas": 49.7,
+      "fibra": 11.8
+    },
+    {
+      "nombre": "Mantequilla de cacahuete",
+      "calorias": 588,
+      "unidad": "100g",
+      "proteina": 25.1,
+      "carbohidratos": 20.1,
+      "grasas": 50.4,
+      "fibra": 6.0
+    },
+    {
+      "nombre": "Mantequilla de almendras",
+      "calorias": 614,
+      "unidad": "100g",
+      "proteina": 20.9,
+      "carbohidratos": 19.0,
+      "grasas": 55.5,
+      "fibra": 10.3
+    },
+    {
+      "nombre": "Granada",
+      "calorias": 83,
+      "unidad": "100g",
+      "proteina": 1.7,
+      "carbohidratos": 18.7,
+      "grasas": 1.2,
+      "fibra": 4.0
+    },
+    {
+      "nombre": "Papaya",
+      "calorias": 43,
+      "unidad": "100g",
+      "proteina": 0.5,
+      "carbohidratos": 10.8,
+      "grasas": 0.3,
+      "fibra": 1.7
+    },
+    {
+      "nombre": "Limon",
+      "calorias": 29,
+      "unidad": "100g",
+      "proteina": 1.1,
+      "carbohidratos": 9.3,
+      "grasas": 0.3,
+      "fibra": 2.8
+    },
+    {
+      "nombre": "Higo fresco",
+      "calorias": 74,
+      "unidad": "100g",
+      "proteina": 0.8,
+      "carbohidratos": 19.2,
+      "grasas": 0.3,
+      "fibra": 2.9
+    },
+    {
+      "nombre": "Datiles",
+      "calorias": 277,
+      "unidad": "100g",
+      "proteina": 1.8,
+      "carbohidratos": 74.9,
+      "grasas": 0.2,
+      "fibra": 6.7
+    },
+    {
+      "nombre": "Coco rallado",
+      "calorias": 354,
+      "unidad": "100g",
+      "proteina": 3.3,
+      "carbohidratos": 15.2,
+      "grasas": 33.5,
+      "fibra": 9.0
+    },
+    {
+      "nombre": "Frambuesas",
+      "calorias": 52,
+      "unidad": "100g",
+      "proteina": 1.2,
+      "carbohidratos": 11.9,
+      "grasas": 0.7,
+      "fibra": 6.5
+    },
+    {
+      "nombre": "Moras",
+      "calorias": 43,
+      "unidad": "100g",
+      "proteina": 1.4,
+      "carbohidratos": 9.6,
+      "grasas": 0.5,
+      "fibra": 5.3
+    },
+    {
+      "nombre": "Ciruelas",
+      "calorias": 46,
+      "unidad": "100g",
+      "proteina": 0.7,
+      "carbohidratos": 11.4,
+      "grasas": 0.3,
+      "fibra": 1.4
+    },
+    {
+      "nombre": "Cafe solo",
+      "calorias": 2,
+      "unidad": "100ml",
+      "proteina": 0.3,
+      "carbohidratos": 0.0,
+      "grasas": 0.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Te verde",
+      "calorias": 1,
+      "unidad": "100ml",
+      "proteina": 0.2,
+      "carbohidratos": 0.0,
+      "grasas": 0.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Zumo de naranja",
+      "calorias": 45,
+      "unidad": "100ml",
+      "proteina": 0.7,
+      "carbohidratos": 10.4,
+      "grasas": 0.2,
+      "fibra": 0.2
+    },
+    {
+      "nombre": "Agua de coco",
+      "calorias": 19,
+      "unidad": "100ml",
+      "proteina": 0.7,
+      "carbohidratos": 3.7,
+      "grasas": 0.2,
+      "fibra": 1.1
+    },
+    {
+      "nombre": "Aceite de coco",
+      "calorias": 862,
+      "unidad": "100ml",
+      "proteina": 0.0,
+      "carbohidratos": 0.0,
+      "grasas": 100.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Aceite de girasol",
+      "calorias": 884,
+      "unidad": "100ml",
+      "proteina": 0.0,
+      "carbohidratos": 0.0,
+      "grasas": 100.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Ketchup",
+      "calorias": 101,
+      "unidad": "100g",
+      "proteina": 1.3,
+      "carbohidratos": 25.0,
+      "grasas": 0.1,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Mayonesa",
+      "calorias": 680,
+      "unidad": "100g",
+      "proteina": 1.0,
+      "carbohidratos": 0.6,
+      "grasas": 74.8,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Salsa de soja",
+      "calorias": 53,
+      "unidad": "100ml",
+      "proteina": 5.1,
+      "carbohidratos": 6.7,
+      "grasas": 0.0,
+      "fibra": 0.8
+    },
+    {
+      "nombre": "Granola",
+      "calorias": 471,
+      "unidad": "100g",
+      "proteina": 10.4,
+      "carbohidratos": 64.0,
+      "grasas": 18.9,
+      "fibra": 5.6
+    },
+    {
+      "nombre": "Barrita de cereales",
+      "calorias": 380,
+      "unidad": "100g",
+      "proteina": 7.4,
+      "carbohidratos": 68.5,
+      "grasas": 9.1,
+      "fibra": 3.2
+    },
+    {
+      "nombre": "Patatas fritas",
+      "calorias": 536,
+      "unidad": "100g",
+      "proteina": 6.3,
+      "carbohidratos": 52.9,
+      "grasas": 34.6,
+      "fibra": 4.4
+    },
+    {
+      "nombre": "Palomitas de maiz",
+      "calorias": 375,
+      "unidad": "100g",
+      "proteina": 11.1,
+      "carbohidratos": 73.4,
+      "grasas": 4.5,
+      "fibra": 14.5
+    },
+    {
+      "nombre": "Lichi",
+      "calorias": 66,
+      "unidad": "100g",
+      "proteina": 0.8,
+      "carbohidratos": 16.5,
+      "grasas": 0.4,
+      "fibra": 1.3
+    },
+    {
+      "nombre": "Maracuya",
+      "calorias": 97,
+      "unidad": "100g",
+      "proteina": 2.2,
+      "carbohidratos": 23.4,
+      "grasas": 0.7,
+      "fibra": 10.4
+    },
+    {
+      "nombre": "Albaricoque",
+      "calorias": 48,
+      "unidad": "100g",
+      "proteina": 1.4,
+      "carbohidratos": 11.1,
+      "grasas": 0.4,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Helado",
+      "calorias": 207,
+      "unidad": "100g",
+      "proteina": 3.5,
+      "carbohidratos": 23.6,
+      "grasas": 11.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Cafe con leche",
+      "calorias": 38,
+      "unidad": "100ml",
+      "proteina": 1.8,
+      "carbohidratos": 4.4,
+      "grasas": 1.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Batido",
+      "calorias": 85,
+      "unidad": "100ml",
+      "proteina": 2.5,
+      "carbohidratos": 14.0,
+      "grasas": 2.0,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Batido con leche",
+      "calorias": 112,
+      "unidad": "100ml",
+      "proteina": 3.5,
+      "carbohidratos": 18.0,
+      "grasas": 3.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Nata montada",
+      "calorias": 257,
+      "unidad": "100ml",
+      "proteina": 2.0,
+      "carbohidratos": 3.5,
+      "grasas": 26.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Croissant",
+      "calorias": 406,
+      "unidad": "100g",
+      "proteina": 8.2,
+      "carbohidratos": 45.8,
+      "grasas": 21.0,
+      "fibra": 2.1
+    },
+    {
+      "nombre": "Gofre",
+      "calorias": 291,
+      "unidad": "100g",
+      "proteina": 7.9,
+      "carbohidratos": 42.6,
+      "grasas": 10.0,
+      "fibra": 1.3
+    },
+    {
+      "nombre": "Crepe",
+      "calorias": 200,
+      "unidad": "100g",
+      "proteina": 5.9,
+      "carbohidratos": 25.7,
+      "grasas": 8.5,
+      "fibra": 0.9
+    },
+    {
+      "nombre": "Donut",
+      "calorias": 452,
+      "unidad": "100g",
+      "proteina": 7.5,
+      "carbohidratos": 51.0,
+      "grasas": 25.0,
+      "fibra": 1.5
+    },
+    {
+      "nombre": "Magdalena",
+      "calorias": 393,
+      "unidad": "100g",
+      "proteina": 6.0,
+      "carbohidratos": 54.0,
+      "grasas": 18.0,
+      "fibra": 1.2
+    },
+    {
+      "nombre": "Galleta",
+      "calorias": 458,
+      "unidad": "100g",
+      "proteina": 6.2,
+      "carbohidratos": 65.0,
+      "grasas": 20.0,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Churro",
+      "calorias": 380,
+      "unidad": "100g",
+      "proteina": 5.5,
+      "carbohidratos": 50.0,
+      "grasas": 18.0,
+      "fibra": 1.8
+    },
+    {
+      "nombre": "Torrija",
+      "calorias": 245,
+      "unidad": "100g",
+      "proteina": 7.0,
+      "carbohidratos": 33.0,
+      "grasas": 9.0,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Pastel",
+      "calorias": 350,
+      "unidad": "100g",
+      "proteina": 5.0,
+      "carbohidratos": 52.0,
+      "grasas": 14.0,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Tarta de queso",
+      "calorias": 321,
+      "unidad": "100g",
+      "proteina": 5.5,
+      "carbohidratos": 29.0,
+      "grasas": 20.0,
+      "fibra": 0.4
+    },
+    {
+      "nombre": "Brownie",
+      "calorias": 415,
+      "unidad": "100g",
+      "proteina": 5.5,
+      "carbohidratos": 55.0,
+      "grasas": 20.0,
+      "fibra": 2.5
+    },
+    {
+      "nombre": "Tiramisu",
+      "calorias": 283,
+      "unidad": "100g",
+      "proteina": 5.5,
+      "carbohidratos": 25.0,
+      "grasas": 17.0,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Flan",
+      "calorias": 140,
+      "unidad": "100g",
+      "proteina": 4.5,
+      "carbohidratos": 20.0,
+      "grasas": 4.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Natillas",
+      "calorias": 120,
+      "unidad": "100g",
+      "proteina": 4.0,
+      "carbohidratos": 18.0,
+      "grasas": 3.5,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Mousse de chocolate",
+      "calorias": 250,
+      "unidad": "100g",
+      "proteina": 5.0,
+      "carbohidratos": 22.0,
+      "grasas": 16.0,
+      "fibra": 1.5
+    },
+    {
+      "nombre": "Nachos",
+      "calorias": 503,
+      "unidad": "100g",
+      "proteina": 7.0,
+      "carbohidratos": 63.0,
+      "grasas": 25.0,
+      "fibra": 4.5
+    },
+    {
+      "nombre": "Aceituna",
+      "calorias": 145,
+      "unidad": "100g",
+      "proteina": 1.0,
+      "carbohidratos": 3.8,
+      "grasas": 15.0,
+      "fibra": 3.3
+    },
+    {
+      "nombre": "Paella",
+      "calorias": 180,
+      "unidad": "100g",
+      "proteina": 12.0,
+      "carbohidratos": 22.0,
+      "grasas": 5.0,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Risotto",
+      "calorias": 170,
+      "unidad": "100g",
+      "proteina": 6.0,
+      "carbohidratos": 26.0,
+      "grasas": 5.0,
+      "fibra": 0.8
+    },
+    {
+      "nombre": "Tortilla española",
+      "calorias": 185,
+      "unidad": "100g",
+      "proteina": 9.0,
+      "carbohidratos": 10.5,
+      "grasas": 11.5,
+      "fibra": 0.8
+    },
+    {
+      "nombre": "Croqueta",
+      "calorias": 255,
+      "unidad": "100g",
+      "proteina": 10.0,
+      "carbohidratos": 22.0,
+      "grasas": 14.0,
+      "fibra": 0.8
+    },
+    {
+      "nombre": "Ensalada",
+      "calorias": 55,
+      "unidad": "100g",
+      "proteina": 2.5,
+      "carbohidratos": 6.5,
+      "grasas": 2.5,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Sopa",
+      "calorias": 60,
+      "unidad": "100g",
+      "proteina": 3.5,
+      "carbohidratos": 8.0,
+      "grasas": 1.5,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Gazpacho",
+      "calorias": 50,
+      "unidad": "100g",
+      "proteina": 1.5,
+      "carbohidratos": 7.0,
+      "grasas": 2.0,
+      "fibra": 1.5
+    },
+    {
+      "nombre": "Hummus",
+      "calorias": 177,
+      "unidad": "100g",
+      "proteina": 8.0,
+      "carbohidratos": 14.0,
+      "grasas": 9.0,
+      "fibra": 6.0
+    },
+    {
+      "nombre": "Guacamole",
+      "calorias": 150,
+      "unidad": "100g",
+      "proteina": 2.0,
+      "carbohidratos": 8.5,
+      "grasas": 12.0,
+      "fibra": 5.0
+    },
+    {
+      "nombre": "Sushi",
+      "calorias": 143,
+      "unidad": "100g",
+      "proteina": 6.5,
+      "carbohidratos": 20.0,
+      "grasas": 3.5,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Ramen",
+      "calorias": 130,
+      "unidad": "100g",
+      "proteina": 6.0,
+      "carbohidratos": 20.0,
+      "grasas": 2.5,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Pad thai",
+      "calorias": 200,
+      "unidad": "100g",
+      "proteina": 8.0,
+      "carbohidratos": 27.0,
+      "grasas": 7.0,
+      "fibra": 1.5
+    },
+    {
+      "nombre": "Arroz frito",
+      "calorias": 163,
+      "unidad": "100g",
+      "proteina": 5.0,
+      "carbohidratos": 27.0,
+      "grasas": 4.5,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Rollitos primavera",
+      "calorias": 225,
+      "unidad": "100g",
+      "proteina": 7.0,
+      "carbohidratos": 25.0,
+      "grasas": 10.5,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Dumpling",
+      "calorias": 195,
+      "unidad": "100g",
+      "proteina": 9.0,
+      "carbohidratos": 24.0,
+      "grasas": 7.0,
+      "fibra": 1.5
+    },
+    {
+      "nombre": "Fideos cocidos",
+      "calorias": 138,
+      "unidad": "100g",
+      "proteina": 4.5,
+      "carbohidratos": 27.0,
+      "grasas": 1.0,
+      "fibra": 1.5
+    },
+    {
+      "nombre": "Curry",
+      "calorias": 195,
+      "unidad": "100g",
+      "proteina": 12.0,
+      "carbohidratos": 18.0,
+      "grasas": 8.0,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Kebab",
+      "calorias": 245,
+      "unidad": "100g",
+      "proteina": 19.0,
+      "carbohidratos": 8.0,
+      "grasas": 15.0,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Shawarma",
+      "calorias": 230,
+      "unidad": "100g",
+      "proteina": 17.0,
+      "carbohidratos": 14.0,
+      "grasas": 12.0,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Falafel",
+      "calorias": 333,
+      "unidad": "100g",
+      "proteina": 13.3,
+      "carbohidratos": 31.8,
+      "grasas": 17.8,
+      "fibra": 4.9
+    },
+    {
+      "nombre": "Burrito",
+      "calorias": 218,
+      "unidad": "100g",
+      "proteina": 11.0,
+      "carbohidratos": 26.0,
+      "grasas": 8.0,
+      "fibra": 2.5
+    },
+    {
+      "nombre": "Tacos",
+      "calorias": 226,
+      "unidad": "100g",
+      "proteina": 11.0,
+      "carbohidratos": 21.0,
+      "grasas": 11.0,
+      "fibra": 3.0
+    },
+    {
+      "nombre": "Quesadilla",
+      "calorias": 307,
+      "unidad": "100g",
+      "proteina": 15.0,
+      "carbohidratos": 26.0,
+      "grasas": 15.0,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Sandwich",
+      "calorias": 270,
+      "unidad": "100g",
+      "proteina": 13.0,
+      "carbohidratos": 30.0,
+      "grasas": 10.0,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Wrap",
+      "calorias": 245,
+      "unidad": "100g",
+      "proteina": 12.0,
+      "carbohidratos": 27.0,
+      "grasas": 9.5,
+      "fibra": 2.5
+    },
+    {
+      "nombre": "Cerveza",
+      "calorias": 43,
+      "unidad": "100ml",
+      "proteina": 0.5,
+      "carbohidratos": 3.6,
+      "grasas": 0.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Vino",
+      "calorias": 82,
+      "unidad": "100ml",
+      "proteina": 0.1,
+      "carbohidratos": 2.7,
+      "grasas": 0.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Vino tinto",
+      "calorias": 85,
+      "unidad": "100ml",
+      "proteina": 0.1,
+      "carbohidratos": 2.6,
+      "grasas": 0.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Cava",
+      "calorias": 76,
+      "unidad": "100ml",
+      "proteina": 0.3,
+      "carbohidratos": 1.8,
+      "grasas": 0.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Refresco cola",
+      "calorias": 42,
+      "unidad": "100ml",
+      "proteina": 0.0,
+      "carbohidratos": 10.6,
+      "grasas": 0.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Zumo de manzana",
+      "calorias": 47,
+      "unidad": "100ml",
+      "proteina": 0.1,
+      "carbohidratos": 11.7,
+      "grasas": 0.1,
+      "fibra": 0.2
+    },
+    {
+      "nombre": "Batido de frutas",
+      "calorias": 75,
+      "unidad": "100ml",
+      "proteina": 1.5,
+      "carbohidratos": 16.0,
+      "grasas": 0.5,
+      "fibra": 1.0
+    },
+    {
+      "nombre": "Muesli",
+      "calorias": 370,
+      "unidad": "100g",
+      "proteina": 10.0,
+      "carbohidratos": 61.0,
+      "grasas": 8.0,
+      "fibra": 7.5
+    },
+    {
+      "nombre": "Cereales con leche",
+      "calorias": 155,
+      "unidad": "100g",
+      "proteina": 4.5,
+      "carbohidratos": 30.0,
+      "grasas": 2.5,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Salchichas",
+      "calorias": 301,
+      "unidad": "100g",
+      "proteina": 12.0,
+      "carbohidratos": 3.0,
+      "grasas": 27.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Salami",
+      "calorias": 336,
+      "unidad": "100g",
+      "proteina": 22.0,
+      "carbohidratos": 1.2,
+      "grasas": 27.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Jamon cocido",
+      "calorias": 145,
+      "unidad": "100g",
+      "proteina": 19.0,
+      "carbohidratos": 1.5,
+      "grasas": 7.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Mortadela",
+      "calorias": 311,
+      "unidad": "100g",
+      "proteina": 15.0,
+      "carbohidratos": 3.0,
+      "grasas": 27.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Fuet",
+      "calorias": 430,
+      "unidad": "100g",
+      "proteina": 27.0,
+      "carbohidratos": 1.5,
+      "grasas": 35.0,
+      "fibra": 0.0
+    },
+    {
+      "nombre": "Arroz con leche",
+      "calorias": 130,
+      "unidad": "100g",
+      "proteina": 3.0,
+      "carbohidratos": 25.0,
+      "grasas": 2.5,
+      "fibra": 0.3
+    },
+    {
+      "nombre": "Seitan",
+      "calorias": 185,
+      "unidad": "100g",
+      "proteina": 25.0,
+      "carbohidratos": 14.0,
+      "grasas": 1.9,
+      "fibra": 0.6
+    },
+    {
+      "nombre": "Salsa de tomate",
+      "calorias": 82,
+      "unidad": "100g",
+      "proteina": 1.5,
+      "carbohidratos": 18.0,
+      "grasas": 0.5,
+      "fibra": 1.5
+    },
+    {
+      "nombre": "Pesto",
+      "calorias": 370,
+      "unidad": "100g",
+      "proteina": 6.0,
+      "carbohidratos": 5.0,
+      "grasas": 37.0,
+      "fibra": 2.0
+    },
+    {
+      "nombre": "Tahini",
+      "calorias": 595,
+      "unidad": "100g",
+      "proteina": 17.0,
+      "carbohidratos": 21.2,
+      "grasas": 53.8,
+      "fibra": 9.3
+    },
+    {
+      "nombre": "Mostaza",
+      "calorias": 66,
+      "unidad": "100g",
+      "proteina": 4.4,
+      "carbohidratos": 5.8,
+      "grasas": 3.3,
+      "fibra": 3.3
+    },
+    {
+      "nombre": "Yogur de soja",
+      "calorias": 62,
+      "unidad": "100g",
+      "proteina": 3.6,
+      "carbohidratos": 6.5,
+      "grasas": 2.2,
+      "fibra": 0.5
+    },
+    {
+      "nombre": "Barrita proteica",
+      "calorias": 385,
+      "unidad": "100g",
+      "proteina": 30.0,
+      "carbohidratos": 38.0,
+      "grasas": 12.0,
+      "fibra": 4.0
+    }
   ]
 }
