@@ -5,6 +5,9 @@ import json
 import os
 import re
 import unicodedata
+import base64
+from google import genai
+from google.genai import types as genai_types
 from nlp_processor import NLPProcessor
 
 app = FastAPI(title="NutriGPT")
@@ -21,19 +24,7 @@ app.add_middleware(
 nlp = NLPProcessor()
 
 CALORIES_DATA_PATH = "data/calories.json"
-NUTRITION_KNOWLEDGE_PATH = "data/nutrition_knowledge.json"
 
-ORDINALES = {
-    "primera": 1, "primero": 1, "segunda": 2, "segundo": 2,
-    "tercera": 3, "tercero": 3, "cuarta": 4, "cuarto": 4,
-    "quinta": 5, "quinto": 5, "ultima": -1, "ultimo": -1,
-}
-
-MEDICAL_RISK_KEYWORDS = {
-    "diabetes", "embarazo", "embarazada", "renal", "rinon",
-    "hipertension", "alergia", "medicacion", "trigliceridos",
-    "colesterol", "trastorno alimentario", "anemia",
-}
 
 HTML_PAGE = """<!DOCTYPE html>
 <html lang="es">
@@ -51,130 +42,159 @@ HTML_PAGE = """<!DOCTYPE html>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-button,input{-webkit-appearance:none;appearance:none;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+button,input,select{-webkit-appearance:none;appearance:none;touch-action:manipulation;user-select:none;-webkit-user-select:none;font-family:inherit}
 :root{
-  --bg:#e0e5ec;
-  --nm-d:#a3b1c6;
-  --nm-l:#ffffff;
-  --text:#31456a;
-  --muted:#7b8fa6;
-  --accent:#3a9d6e;
-  --accent-light:#cce8da;
-  --r:16px;
-  --sh:6px 6px 14px var(--nm-d),-6px -6px 14px var(--nm-l);
-  --sh-sm:3px 3px 8px var(--nm-d),-3px -3px 8px var(--nm-l);
-  --sh-in:inset 4px 4px 9px var(--nm-d),inset -4px -4px 9px var(--nm-l);
-  --sh-press:inset 2px 2px 5px var(--nm-d),inset -2px -2px 5px var(--nm-l);
+  --bg:#f0f4f8;
+  --surface:#ffffff;
+  --surface2:#f8fafc;
+  --border:#dde3ea;
+  --text:#0d1b2a;
+  --muted:#64748b;
+  --accent:#16a34a;
+  --accent-h:#15803d;
+  --accent-light:#dcfce7;
+  --accent-muted:#bbf7d0;
+  --sh-xs:0 1px 3px rgba(0,0,0,.06);
+  --sh:0 4px 20px rgba(0,0,0,.07),0 2px 8px rgba(0,0,0,.04);
+  --sh-lg:0 12px 40px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.06);
 }
 html.dark{
-  --bg:#1e2130;
-  --nm-d:#13151e;
-  --nm-l:#2a2f42;
-  --text:#c8d0e7;
-  --muted:#6e7a9a;
-  --accent:#4ade80;
-  --accent-light:#0d2318;
+  --bg:#0d1117;
+  --surface:#161b22;
+  --surface2:#0d1117;
+  --border:#30363d;
+  --text:#e6edf3;
+  --muted:#8b949e;
+  --accent:#3fb950;
+  --accent-h:#2ea043;
+  --accent-light:#0d1f0d;
+  --accent-muted:#1a3a1a;
 }
 html,body{height:100%;overflow:hidden;background:var(--bg);overscroll-behavior:none}
-body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;line-height:1.5;transition:background .3s,color .3s;display:flex;flex-direction:column}
-.app{max-width:960px;width:100%;flex:1;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);transition:background .3s;overflow:hidden}
-.header{padding:18px 22px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0}
-.icon{width:44px;height:44px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:4px 4px 10px rgba(58,157,110,.4),-2px -2px 6px rgba(255,255,255,.5)}
-html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222,128,.15)}
-.icon svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.header h1{font-size:17px;font-weight:700;letter-spacing:-.4px}
-.header p{font-size:11px;color:var(--muted);margin-top:2px}
-.header-end{margin-left:auto}
-#dm{width:40px;height:40px;background:var(--bg);border:none;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s}
-#dm:active{box-shadow:var(--sh-press);color:var(--accent)}
-#dm svg{width:17px;height:17px;fill:currentColor}
-.tabs{display:flex;gap:12px;padding:0 22px 16px;flex-shrink:0}
-.tab{flex:1;padding:11px;font-size:13px;font-weight:600;color:var(--muted);background:var(--bg);border:none;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s,background .3s}
-.tab.active{box-shadow:var(--sh-press);color:var(--accent)}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;line-height:1.5;transition:background .25s,color .25s;display:flex;flex-direction:column}
+.app{max-width:860px;width:100%;flex:1;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);transition:background .25s;overflow:hidden}
+
+/* ── Header ── */
+.header{padding:12px 18px 10px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.icon{width:38px;height:38px;background:linear-gradient(135deg,#22c55e,#15803d);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(22,163,74,.3)}
+.icon svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.header-info{flex:1;min-width:0}
+.header h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.header p{font-size:11px;color:var(--muted);margin-top:1px}
+.header-end{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.hdr-btn{width:34px;height:34px;background:transparent;border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .15s}
+.hdr-btn:hover{color:var(--text);background:var(--bg)}
+.hdr-btn svg{width:16px;height:16px;fill:currentColor}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:4px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{flex:1;padding:8px 10px;font-size:13px;font-weight:600;color:var(--muted);background:transparent;border:none;border-radius:10px;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px}
+.tab:hover{color:var(--text);background:var(--bg)}
+.tab.active{background:var(--accent-light);color:var(--accent)}
+.tab-icon{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ── Panels ── */
 .panel{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
 .panel.active{display:flex}
-.msgs{flex:1;overflow-y:auto;padding:8px 22px 14px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--nm-d) transparent;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+
+/* ── Chat ── */
+.msgs{flex:1;overflow-y:auto;padding:18px 16px 10px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .msgs::-webkit-scrollbar{width:4px}
-.msgs::-webkit-scrollbar-thumb{background:var(--nm-d);border-radius:4px}
-.m{display:flex;animation:fadeUp .22s ease both}
+.msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.m{display:flex;gap:9px;animation:fadeUp .2s ease both}
 .m.u{justify-content:flex-end}
-.b{max-width:78%;padding:12px 16px;border-radius:18px;line-height:1.7;font-size:14px}
-.m.bot .b{background:var(--bg);box-shadow:var(--sh-sm);border-radius:6px 18px 18px 18px}
-.m.u .b{background:var(--accent);color:#fff;box-shadow:4px 4px 10px rgba(58,157,110,.35),-2px -2px 6px rgba(255,255,255,.4);border-radius:18px 6px 18px 18px}
-html.dark .m.u .b{box-shadow:4px 4px 10px rgba(74,222,128,.25),-2px -2px 5px rgba(42,47,66,.8)}
-.typing .b{color:var(--muted);font-style:italic}
-.composer{padding:14px 22px 22px;display:flex;gap:10px;flex-shrink:0;background:var(--bg)}
-#inp{flex:1;padding:13px 16px;border:none;border-radius:14px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);transition:box-shadow .2s,background .3s,color .3s;user-select:auto;-webkit-user-select:auto}
-#inp:focus{box-shadow:var(--sh-in),0 0 0 2px var(--accent)}
+.m.bot{align-items:flex-start}
+.avatar{width:30px;height:30px;min-width:30px;border-radius:9px;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;box-shadow:0 2px 8px rgba(22,163,74,.2)}
+.avatar svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.b{max-width:80%;padding:12px 16px;line-height:1.75;font-size:14px}
+.m.bot .b{background:var(--surface);border:1px solid var(--border);border-radius:4px 18px 18px 18px;box-shadow:var(--sh-xs)}
+.m.u .b{background:linear-gradient(135deg,var(--accent),var(--accent-h));color:#fff;border-radius:18px 4px 18px 18px;box-shadow:0 4px 14px rgba(22,163,74,.25)}
+.typing .b{color:var(--muted);font-style:italic;background:var(--surface);border:1px solid var(--border);border-radius:4px 18px 18px 18px}
+
+/* ── Composer ── */
+.composer{padding:8px 14px 14px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-shrink:0}
+#inp{flex:1;padding:12px 18px;border:1.5px solid var(--border);border-radius:24px;font-size:15px;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s;user-select:auto;-webkit-user-select:auto}
+#inp:focus{border-color:var(--accent)}
 #inp::placeholder{color:var(--muted)}
-#btn{padding:13px 22px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:4px 4px 10px rgba(58,157,110,.4),-2px -2px 6px rgba(255,255,255,.35);transition:box-shadow .15s,transform .1s;flex-shrink:0}
-#btn:active{transform:scale(.97);box-shadow:inset 2px 2px 5px rgba(0,0,0,.18),inset -1px -1px 3px rgba(255,255,255,.1)}
-html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,128,.15)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideUp{from{transform:translateY(70px);opacity:0}to{transform:translateY(0);opacity:1}}
+#btn{width:44px;height:44px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent-h));color:#fff;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(22,163,74,.3);transition:transform .15s,box-shadow .15s}
+#btn:active{transform:scale(.92);box-shadow:0 2px 6px rgba(22,163,74,.2)}
+#btn svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 small{font-size:12px}
-.calc-wrap{flex:1;overflow-y:auto;padding:18px 22px 30px;-webkit-overflow-scrolling:touch}
-.calc-card{background:var(--bg);border-radius:22px;padding:22px;box-shadow:var(--sh);margin-bottom:18px}
-.calc-title{font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text)}
-.calc-row{margin-bottom:16px}
-.calc-row.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0}
-.calc-row.two .calc-group{margin-bottom:16px}
-.calc-group{margin-bottom:16px}
-.calc-label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.calc-inp{width:100%;padding:12px 14px;border:none;border-radius:12px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);-webkit-appearance:none;user-select:auto;-webkit-user-select:auto}
-.calc-inp:focus{box-shadow:var(--sh-in),0 0 0 2px var(--accent)}
-.calc-sel{width:100%;padding:12px 14px;border:none;border-radius:12px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-shadow:var(--sh-in);-webkit-appearance:none;cursor:pointer}
-.seg{display:flex;gap:8px;flex-wrap:wrap}
-.seg-btn{flex:1;padding:10px 8px;border:none;border-radius:12px;font-size:13px;font-weight:600;font-family:inherit;background:var(--bg);color:var(--muted);cursor:pointer;box-shadow:var(--sh-sm);transition:box-shadow .2s,color .2s;white-space:nowrap;touch-action:manipulation}
-.seg-btn.active{box-shadow:var(--sh-press);color:var(--accent)}
-.calc-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:4px 4px 10px rgba(58,157,110,.4),-2px -2px 6px rgba(255,255,255,.35);transition:box-shadow .15s,transform .1s;touch-action:manipulation;margin-top:4px}
-.calc-btn:active{transform:scale(.98);box-shadow:inset 2px 2px 5px rgba(0,0,0,.18)}
-.calc-result{background:var(--bg);border-radius:22px;padding:22px;box-shadow:var(--sh)}
-.res-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:22px}
-.res-box{background:var(--bg);border-radius:16px;padding:14px 10px;text-align:center;box-shadow:var(--sh-sm)}
-.res-box.accent{box-shadow:4px 4px 12px rgba(58,157,110,.35),-4px -4px 12px rgba(255,255,255,.5)}
-.res-val{font-size:22px;font-weight:700;color:var(--accent);line-height:1}
-.res-lbl{font-size:11px;font-weight:700;color:var(--text);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+
+/* ── Calculator ── */
+.calc-wrap{flex:1;overflow-y:auto;padding:18px;background:var(--bg);-webkit-overflow-scrolling:touch}
+.calc-card{background:var(--surface);border-radius:20px;padding:22px;box-shadow:var(--sh);margin-bottom:14px;border:1px solid var(--border)}
+.calc-title{font-size:17px;font-weight:700;margin-bottom:20px;color:var(--text);display:flex;align-items:center;gap:10px}
+.calc-title-icon{width:32px;height:32px;border-radius:9px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:17px}
+.calc-row.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calc-group{margin-bottom:14px}
+.calc-label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px}
+.calc-inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none;user-select:auto;-webkit-user-select:auto}
+.calc-inp:focus{border-color:var(--accent)}
+.calc-sel{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;background:var(--bg);color:var(--text);outline:none;cursor:pointer;transition:border-color .2s}
+.calc-sel:focus{border-color:var(--accent)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg-btn{flex:1;padding:9px 8px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:600;background:var(--bg);color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap;touch-action:manipulation}
+.seg-btn.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.calc-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent-h));color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(22,163,74,.28);transition:transform .15s,box-shadow .15s;touch-action:manipulation;margin-top:4px}
+.calc-btn:active{transform:scale(.98);box-shadow:0 2px 8px rgba(22,163,74,.15)}
+.calc-result{background:var(--surface);border-radius:20px;padding:22px;box-shadow:var(--sh);border:1px solid var(--border)}
+.res-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.res-box{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
+.res-box.accent{background:linear-gradient(135deg,var(--accent),var(--accent-h));border-color:transparent;box-shadow:0 6px 20px rgba(22,163,74,.22)}
+.res-box.accent .res-val,.res-box.accent .res-lbl,.res-box.accent .res-sub{color:#fff}
+.res-val{font-size:19px;font-weight:700;color:var(--accent);line-height:1}
+.res-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
 .res-sub{font-size:10px;color:var(--muted);margin-top:2px}
-.macro-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
-.macro-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
-.macro-box{background:var(--bg);border-radius:16px;padding:14px 10px;text-align:center;box-shadow:var(--sh-sm)}
-.macro-val{font-size:18px;font-weight:700;color:var(--text)}
-.macro-lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.macro-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.macro-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.macro-box{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center}
+.macro-val{font-size:17px;font-weight:700;color:var(--text)}
+.macro-lbl{font-size:11px;color:var(--muted);margin-top:3px}
 .macro-g{font-size:10px;color:var(--accent);font-weight:700;margin-top:2px}
-.res-note{font-size:12px;color:var(--muted);line-height:1.6;padding:12px 14px;background:var(--bg);border-radius:12px;box-shadow:var(--sh-in)}
+.res-note{font-size:12px;color:var(--muted);line-height:1.65;padding:12px 14px;background:var(--bg);border-radius:12px;border:1px solid var(--border)}
+
+/* ── Foto ── */
 @media(max-width:600px){
-  .header{padding:14px 16px 10px}
-  .tabs{padding:0 16px 12px;gap:8px}
-  .msgs{padding:8px 14px 12px}
-  .composer{padding:10px 14px 18px;gap:8px}
-  #btn{padding:13px 16px;font-size:12px}
-  .foto-wrap{padding:14px}
+  .header{padding:10px 12px 8px}
+  .tabs{padding:8px 10px}
+  .msgs{padding:12px 12px 8px;gap:10px}
+  .composer{padding:6px 10px 12px}
+  .calc-wrap{padding:12px}
+  .foto-wrap{padding:12px}
   .foto-macros{grid-template-columns:repeat(2,1fr)}
+  .res-val{font-size:16px}
+  .macro-val{font-size:15px}
 }
-.foto-wrap{flex:1;overflow-y:auto;padding:22px;display:flex;justify-content:center;align-items:flex-start}
-.foto-card{background:var(--bg);border-radius:24px;box-shadow:var(--sh);padding:28px 24px;width:100%;max-width:480px}
-.foto-title{font-size:17px;font-weight:700;margin-bottom:20px;text-align:center}
-.foto-drop{border-radius:18px;box-shadow:var(--sh-in);padding:20px;min-height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;cursor:pointer;transition:box-shadow .2s}
-.foto-drop.drag{box-shadow:inset 0 0 0 2px var(--accent),var(--sh-in)}
-#foto-preview{width:100%;border-radius:12px;max-height:260px;object-fit:contain;display:block}
-#foto-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px}
-.foto-icon{font-size:44px}
+.foto-wrap{flex:1;overflow-y:auto;padding:20px;display:flex;justify-content:center;align-items:flex-start;background:var(--bg)}
+.foto-card{background:var(--surface);border-radius:22px;box-shadow:var(--sh);border:1px solid var(--border);padding:26px 22px;width:100%;max-width:440px}
+.foto-title{font-size:18px;font-weight:700;margin-bottom:4px;text-align:center;color:var(--text)}
+.foto-subtitle{font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;line-height:1.5}
+.foto-drop{border:2px dashed var(--border);border-radius:18px;padding:28px 20px;min-height:165px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;cursor:pointer;transition:border-color .2s,background .2s;background:var(--bg)}
+.foto-drop:hover,.foto-drop.drag{border-color:var(--accent);background:var(--accent-light)}
+#foto-preview{width:100%;border-radius:14px;max-height:230px;object-fit:contain;display:block}
+#foto-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px}
+.foto-icon{font-size:38px;line-height:1}
 .foto-hint{font-size:13px;color:var(--muted);text-align:center}
-.foto-pick-btn{padding:10px 24px;background:var(--bg);border:none;border-radius:14px;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;font-family:inherit;box-shadow:var(--sh-sm);margin-top:4px}
-.foto-status{font-size:13px;color:var(--muted);text-align:center;margin:14px 0;min-height:20px}
-.foto-result{margin-top:10px}
-.foto-food-name{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px}
-.foto-kcal-big{font-size:42px;font-weight:800;color:var(--accent);text-align:center;line-height:1.1;margin-bottom:14px}
+.foto-pick-btn{padding:8px 20px;background:var(--accent-light);border:none;border-radius:11px;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;margin-top:2px;transition:background .2s}
+.foto-pick-btn:hover{background:var(--accent-muted)}
+.foto-status{font-size:13px;color:var(--muted);text-align:center;margin:12px 0;min-height:20px}
+.foto-result{margin-top:8px}
+.foto-food-name{font-size:14px;font-weight:600;text-align:center;margin-bottom:4px;color:var(--muted)}
+.foto-kcal-big{font-size:52px;font-weight:800;color:var(--accent);text-align:center;line-height:1;margin-bottom:14px;letter-spacing:-2px}
+.foto-kcal-unit{font-size:18px;font-weight:600;opacity:.7}
 .foto-portion-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .foto-slider{flex:1;min-width:80px;accent-color:var(--accent)}
-.foto-slider-val{font-size:13px;font-weight:600;color:var(--accent);min-width:44px;text-align:right}
-.foto-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.foto-macro-box{background:var(--bg);border-radius:14px;box-shadow:var(--sh-sm);padding:10px;text-align:center}
+.foto-slider-val{font-size:13px;font-weight:700;color:var(--accent);min-width:44px;text-align:right}
+.foto-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.foto-macro-box{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:11px 6px;text-align:center}
 .foto-macro-val{font-size:17px;font-weight:700;color:var(--text)}
-.foto-macro-lbl{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.foto-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.foto-macro-lbl{font-size:9px;color:var(--muted);margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.foto-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tag{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--accent-light);color:var(--accent);font-weight:600}
 .foto-disclaimer{font-size:10px;color:var(--muted);text-align:center;line-height:1.5}
 </style>
 </head>
@@ -184,24 +204,25 @@ small{font-size:12px}
     <div class="icon">
       <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 5-8 5"/></svg>
     </div>
-    <div>
+    <div class="header-info">
       <h1>NutriGPT</h1>
       <p>Asistente de nutrici\u00f3n</p>
     </div>
     <div class="header-end">
-      <button id="dm" title="Modo oscuro" aria-label="Alternar modo oscuro">
+      <button id="dm" class="hdr-btn" title="Modo oscuro" aria-label="Alternar modo oscuro">
         <svg id="dm-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
     </div>
   </div>
   <nav class="tabs">
-    <button class="tab active" data-tab="chat">Chat</button>
-    <button class="tab" data-tab="calc">Calculadora</button>
-    <button class="tab" data-tab="foto">📷 Foto</button>
+    <button class="tab active" data-tab="chat"><svg class="tab-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat</button>
+    <button class="tab" data-tab="calc"><svg class="tab-icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h4"/></svg>Calculadora</button>
+    <button class="tab" data-tab="foto"><svg class="tab-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Foto</button>
   </nav>
   <div id="panel-chat" class="panel active">
     <div class="msgs" id="msgs">
       <div class="m bot">
+        <div class="avatar"><svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 5-8 5"/></svg></div>
         <div class="b">
           Hola, soy <strong>NutriGPT</strong>.<br><br>
           Preg\u00fantame sobre recetas, calor\u00edas o nutrici\u00f3n. Por ejemplo:<br>
@@ -213,7 +234,7 @@ small{font-size:12px}
     </div>
     <div class="composer">
       <input type="text" id="inp" placeholder="Escribe tu pregunta..." autocomplete="off" enterkeyhint="send" inputmode="text">
-      <button id="btn">Enviar</button>
+      <button id="btn" aria-label="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>
   </div>
   <div id="panel-calc" class="panel">
@@ -309,6 +330,7 @@ small{font-size:12px}
     <div class="foto-wrap">
       <div class="foto-card">
         <div class="foto-title">Estimar calorías por foto</div>
+        <div class="foto-subtitle">Sube una imagen y la IA estima las calorías al instante</div>
         <div class="foto-drop" id="foto-drop">
           <input type="file" id="foto-inp" accept="image/*" capture="environment" style="display:none">
           <div id="foto-preview-wrap" style="display:none">
@@ -338,8 +360,6 @@ small{font-size:12px}
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 <script src="/app.js"></script>
 
 </body>
@@ -364,9 +384,6 @@ def tokens_relevantes(texto):
     return [t for t in normalizar_texto(texto).split() if len(t) > 2 and t not in stopwords]
 
 
-def construir_lista_html(items, limit=3):
-    return "".join(f"\u2014 {item}<br>" for item in items[:limit])
-
 
 def load_json_file(path, empty_value):
     if os.path.exists(path):
@@ -377,87 +394,7 @@ def load_json_file(path, empty_value):
 
 recipes_db = load_json_file("data/recipes_large.json", {"recetas": []})
 calories_db = load_json_file(CALORIES_DATA_PATH, {"alimentos": []})
-nutrition_knowledge = load_json_file(NUTRITION_KNOWLEDGE_PATH, {"topics": [], "food_profiles": []})
-recipes_by_id = {receta["id"]: receta for receta in recipes_db.get("recetas", [])}
 
-
-def buscar_recetas(terminos, strict=False):
-    if isinstance(terminos, str):
-        terminos = tokens_relevantes(terminos)
-    resultados = []
-    for receta in recipes_db.get("recetas", []):
-        contenido = normalizar_texto(" ".join([receta["nombre"]] + receta["ingredientes"]))
-        score = 0
-        tiene_match_directo = False
-        for termino in terminos:
-            termino_normalizado = normalizar_texto(termino)
-            if not termino_normalizado:
-                continue
-            if termino_normalizado in contenido:
-                score += 3
-                tiene_match_directo = True
-            else:
-                for token in termino_normalizado.split():
-                    if len(token) > 3 and token in contenido:
-                        score += 1
-        if score > 0 and (not strict or tiene_match_directo):
-            resultados.append((score, receta))
-    resultados.sort(key=lambda item: (-item[0], item[1].get("calorias_aprox", 0)))
-    return [receta for _, receta in resultados[:10]]
-
-
-USOS_INGREDIENTE = {
-    "melon": ["Ensalada de frutas con menta", "Batido de melón y yogur", "Gazpacho de melón", "Macedonias frescas"],
-    "sandia": ["Zumo de sandía con limón", "Granizado de sandía", "Ensalada de verano con feta y sandía", "Batido rosa refrescante"],
-    "fresa": ["Batido de fresas con leche", "Yogur con fresas y granola", "Ensalada con fresas y espinacas"],
-    "platano": ["Batido proteico de plátano", "Tostadas con plátano y mantequilla de cacahuete", "Porridge con plátano"],
-    "manzana": ["Zumo natural de manzana", "Ensalada de frutas", "Manzana al horno con canela"],
-    "naranja": ["Zumo de naranja natural", "Smoothie cítrico", "Ensalada de naranja con hinojo"],
-    "limon": ["Agua con limón", "Vinagreta de limón para ensaladas", "Limonada casera"],
-    "aguacate": ["Guacamole casero", "Tostada de aguacate con huevo", "Ensalada verde con aguacate"],
-    "tomate": ["Gazpacho andaluz", "Ensalada de tomate y mozzarella", "Salsa casera de tomate"],
-    "pepino": ["Ensalada fresca de pepino", "Gazpacho", "Agua detox con pepino y limón"],
-    "espinaca": ["Batido verde con espinacas", "Salteado de espinacas con ajo", "Ensalada de espinacas"],
-    "zanahoria": ["Zumo de zanahoria y naranja", "Crudités con hummus", "Crema de zanahoria"],
-    "brocoli": ["Brócoli al vapor con limón", "Crema de brócoli", "Salteado de brócoli con ajo"],
-    "pollo": ["Pollo a la plancha con verduras", "Pechuga al horno con especias", "Caldo de pollo casero"],
-    "salmon": ["Salmón a la plancha con limón", "Salmón al horno con miel", "Tartar de salmón"],
-    "atun": ["Ensalada de atún con huevo", "Pasta con atún y tomate", "Tataki de atún"],
-    "huevo": ["Tortilla española", "Huevos revueltos con verduras", "Huevos al plato"],
-    "arroz": ["Arroz con verduras salteadas", "Arroz caldoso", "Risotto de setas"],
-    "pasta": ["Pasta con tomate casero", "Pasta con atún", "Pasta salteada con verduras"],
-    "avena": ["Porridge con fruta", "Overnight oats", "Tortitas de avena y plátano"],
-    "yogur": ["Smoothie bowl", "Yogur con frutas y semillas", "Tzatziki"],
-    "queso": ["Tostada con queso y tomate", "Ensalada caprese", "Quesadillas de verduras"],
-    "lentejas": ["Lentejas estofadas", "Ensalada de lentejas", "Sopa de lentejas"],
-    "garbanzos": ["Hummus casero", "Ensalada de garbanzos", "Potaje de garbanzos"],
-}
-
-
-def crear_sugerencia_ingredientes(ingredientes):
-    sugerencias = []
-    for ing in ingredientes:
-        ing_norm = normalizar_texto(ing)
-        for key, ideas in USOS_INGREDIENTE.items():
-            if key in ing_norm or ing_norm in key:
-                sugerencias.extend(ideas)
-                break
-    sugerencias_unicas = list(dict.fromkeys(sugerencias))[:6]
-    ingredientes_str = " y ".join(f"<strong>{i}</strong>" for i in ingredientes[:3])
-    if sugerencias_unicas:
-        lista = "".join(f"\u2014 {s}<br>" for s in sugerencias_unicas)
-        return (
-            f"No tengo recetas guardadas con {ingredientes_str}, "
-            f"pero con esos ingredientes puedes preparar:<br><br>{lista}<br>"
-            "\u00bfQuieres detalles de alguna de estas ideas? "
-            "Tambi\u00e9n puedes explorar la pesta\u00f1a de <em>Recetas</em>."
-        )
-    return (
-        f"No encontr\u00e9 recetas con {ingredientes_str}.<br><br>"
-        "Los ingredientes con m\u00e1s recetas en mi base de datos son: "
-        "<em>pollo, arroz, salm\u00f3n, avena, huevo y legumbres</em>. "
-        "Prueba combinando alguno de ellos."
-    )
 
 
 def buscar_alimentos_similares(termino):
@@ -485,385 +422,85 @@ def buscar_alimento(termino):
     return resultados[0] if resultados else None
 
 
-def calcular_calorias_estimadas(alimento_info, cantidad):
-    valor = cantidad.get("valor")
-    unidad = cantidad.get("unidad")
-    if not valor or not unidad:
-        return None, None
-    calorias_base = alimento_info["calorias"]
-    unidad_base = normalizar_texto(alimento_info["unidad"])
-    unidad_norm = normalizar_texto(unidad)
-    factor = None
-    if "100" in unidad_base:
-        if unidad_norm in {"g", "gramo", "gramos"}:
-            factor = valor / 100
-        elif unidad_norm == "kg":
-            factor = valor * 10
-    if factor is None:
-        return None, None
-    calorias = round(calorias_base * factor, 1)
-    macros = None
-    if all(k in alimento_info for k in ("proteina", "carbohidratos", "grasas")):
-        macros = {
-            "proteina": round(alimento_info["proteina"] * factor, 1),
-            "carbohidratos": round(alimento_info["carbohidratos"] * factor, 1),
-            "grasas": round(alimento_info["grasas"] * factor, 1),
-        }
-        if "fibra" in alimento_info:
-            macros["fibra"] = round(alimento_info["fibra"] * factor, 1)
-    return calorias, macros
 
 
-def formatear_macros(alimento_info, factor=1.0):
-    if not all(k in alimento_info for k in ("proteina", "carbohidratos", "grasas")):
-        return ""
-    p = round(alimento_info["proteina"] * factor, 1)
-    c = round(alimento_info["carbohidratos"] * factor, 1)
-    g = round(alimento_info["grasas"] * factor, 1)
-    f = round(alimento_info.get("fibra", 0) * factor, 1)
-    linea = f"Prote\u00edna {p}g \u00b7 Carbohidratos {c}g \u00b7 Grasas {g}g"
-    if f:
-        linea += f" \u00b7 Fibra {f}g"
-    return f"<br><small style='color:#6b7280'>{linea}</small>"
+GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyCvHB8cuZtEU9RpZK-WDOsxQ88v0KCViD0")
+
+SYSTEM_PROMPT = (
+    "Eres NutriGPT, un asistente de nutrición experto en cocina española e internacional. "
+    "Respondes siempre en español, de forma clara, amigable y concisa. "
+    "Usa formato HTML simple: <strong> para énfasis, <br> para saltos de línea, <em> para cursiva. "
+    "No uses markdown (no uses **, ##, *, etc). "
+    "Cuando el sistema te proporcione datos nutricionales exactos de la base de datos, úsalos — son precisos. "
+    "Para estimaciones propias, indícalo brevemente. "
+    "Mantén las respuestas útiles y al punto, sin ser demasiado largas."
+)
 
 
-def formatear_detalle_receta(receta):
-    ingredientes = "".join(f"\u2014 {ing}<br>" for ing in receta["ingredientes"][:8])
-    pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:5], 1))
-    return (
-        f"<strong>{receta['nombre']}</strong><br><br>"
-        f"Aproximadamente <strong>{receta['calorias_aprox']} kcal</strong>.<br><br>"
-        f"<strong>Ingredientes:</strong><br>{ingredientes}<br>"
-        f"<strong>Preparaci\u00f3n:</strong><br>{pasos}"
-    )
-
-
-def formatear_ingredientes_receta(receta):
-    ingredientes = "".join(f"\u2014 {ing}<br>" for ing in receta["ingredientes"][:10])
-    return f"<strong>Ingredientes de {receta['nombre']}:</strong><br><br>{ingredientes}"
-
-
-def formatear_preparacion_receta(receta):
-    pasos = "".join(f"{i}. {paso}<br>" for i, paso in enumerate(receta["instrucciones"][:8], 1))
-    return f"<strong>C\u00f3mo se prepara {receta['nombre']}:</strong><br><br>{pasos}"
-
-
-def explicar_capacidades():
-    return (
-        "Hola, soy <strong>NutriGPT</strong>.<br><br>"
-        "Puedo ayudarte con:<br><br>"
-        "<strong>Recetas</strong><br>"
-        "\u2014 \u201cQu\u00e9 puedo cocinar con pollo y espinacas\u201d<br>"
-        "\u2014 \u201cDame una cena alta en prote\u00edna\u201d<br><br>"
-        "<strong>Calor\u00edas y macros</strong><br>"
-        "\u2014 \u201cCu\u00e1ntas calor\u00edas tiene el arroz\u201d<br>"
-        "\u2014 \u201cCu\u00e1ntas calor\u00edas tienen 250 g de salm\u00f3n\u201d<br><br>"
-        "<strong>Nutrici\u00f3n pr\u00e1ctica</strong><br>"
-        "\u2014 \u201cLa avena es buena para desayunar?\u201d<br>"
-        "\u2014 \u201cQu\u00e9 me conviene para perder grasa sin pasar hambre?\u201d<br><br>"
-        "Despu\u00e9s de darte recetas puedes seguir con <em>la 2</em>, "
-        "<em>dame ingredientes</em> o <em>c\u00f3mo se hace</em>."
-    )
-
-
-def es_pregunta_sobre_receta(texto_normalizado):
-    pistas = [
-        "la receta", "esa receta", "ese plato", "esa opcion", "la opcion",
-        "ingredientes", "como se hace", "preparacion", "pasos",
-        "primera", "segunda", "tercera", "cuarta", "quinta",
-    ]
-    if re.search(r"\b[1-5]\b", texto_normalizado):
-        return True
-    return any(pista in texto_normalizado for pista in pistas)
-
-
-def extraer_indice_receta(texto_normalizado, total):
-    match = re.search(r"\b([1-9])\b", texto_normalizado)
-    if match:
-        valor = int(match.group(1))
-        if 1 <= valor <= total:
-            return valor - 1
-    for palabra, indice in ORDINALES.items():
-        if palabra in texto_normalizado:
-            if indice == -1:
-                return total - 1
-            if 1 <= indice <= total:
-                return indice - 1
-    return None
-
-
-def buscar_receta_por_nombre(texto, recetas_contexto):
-    texto_normalizado = normalizar_texto(texto)
-    for receta in recetas_contexto:
-        nombre = normalizar_texto(receta["nombre"])
-        if nombre and (nombre in texto_normalizado or texto_normalizado in nombre):
-            return receta
-        tokens_nombre = set(tokens_relevantes(receta["nombre"]))
-        tokens_texto = set(tokens_relevantes(texto))
-        if tokens_nombre and len(tokens_nombre & tokens_texto) >= max(1, min(2, len(tokens_nombre))):
-            return receta
-    return None
-
-
-def obtener_recetas_contexto(contexto):
-    recipe_ids = contexto.get("last_recipe_ids", []) if contexto else []
-    return [recipes_by_id[rid] for rid in recipe_ids if rid in recipes_by_id]
-
-
-def resolver_receta_referenciada(mensaje, contexto):
-    recetas_contexto = obtener_recetas_contexto(contexto)
-    if not recetas_contexto:
-        return None
-    texto_normalizado = normalizar_texto(mensaje)
-    receta_por_nombre = buscar_receta_por_nombre(mensaje, recetas_contexto)
-    if receta_por_nombre:
-        return receta_por_nombre
-    indice = extraer_indice_receta(texto_normalizado, len(recetas_contexto))
-    if indice is not None:
-        return recetas_contexto[indice]
-    recipe_id = contexto.get("last_selected_recipe_id") if contexto else None
-    if recipe_id in recipes_by_id and (
-        re.search(r"\b(esa|ese|receta|ingredientes|pasos|preparacion)\b", texto_normalizado)
-        or "como se hace" in texto_normalizado
-    ):
-        return recipes_by_id[recipe_id]
-    return None
-
-
-def responder_detalle_receta(receta, mensaje):
-    texto_normalizado = normalizar_texto(mensaje)
-    if "ingredientes" in texto_normalizado:
-        return formatear_ingredientes_receta(receta)
-    if "como se hace" in texto_normalizado or "preparacion" in texto_normalizado or "pasos" in texto_normalizado:
-        return formatear_preparacion_receta(receta)
-    if "calorias" in texto_normalizado or "kcal" in texto_normalizado:
-        return (
-            f"<strong>{receta['nombre']}</strong><br><br>"
-            f"Esta receta ronda las <strong>{receta['calorias_aprox']} kcal</strong>."
-        )
-    return formatear_detalle_receta(receta)
-
-
-def buscar_temas_nutricion(texto):
-    texto_normalizado = normalizar_texto(texto)
-    resultados = []
-    for topic in nutrition_knowledge.get("topics", []):
-        score = 0
-        for keyword in topic.get("keywords", []):
-            if normalizar_texto(keyword) in texto_normalizado:
-                score += 2
-        if score > 0:
-            resultados.append((score, topic))
-    resultados.sort(key=lambda item: -item[0])
-    return [topic for _, topic in resultados[:3]]
-
-
-def buscar_perfil_alimento(texto, alimento=""):
-    candidatos_normalizados = [normalizar_texto(c) for c in [texto, alimento] if c]
-    for profile in nutrition_knowledge.get("food_profiles", []):
-        aliases = [normalizar_texto(profile["name"])] + [
-            normalizar_texto(a) for a in profile.get("aliases", [])
-        ]
-        for candidato in candidatos_normalizados:
-            for alias in aliases:
-                if alias and (alias in candidato or candidato in alias):
-                    return profile
-    return None
-
-
-def detectar_riesgo_medico(texto):
-    texto_normalizado = normalizar_texto(texto)
-    return any(normalizar_texto(kw) in texto_normalizado for kw in MEDICAL_RISK_KEYWORDS)
-
-
-def responder_nutricion(mensaje, analisis):
-    texto_normalizado = normalizar_texto(mensaje)
-    perfil = buscar_perfil_alimento(mensaje, analisis.get("alimento", ""))
-    temas = buscar_temas_nutricion(mensaje)
-    partes = []
-
-    if perfil:
-        partes.append(f"<strong>{perfil['name']}</strong> \u2014 {perfil['summary']}")
-        alimento_info = buscar_alimento(perfil["name"])
-        if alimento_info:
-            macro_str = formatear_macros(alimento_info)
-            partes.append(
-                f"<br><br>Aporta unas <strong>{alimento_info['calorias']} kcal</strong> "
-                f"por {alimento_info['unidad']}.{macro_str}"
-            )
-        if perfil.get("highlights"):
-            partes.append(
-                "<br><br><strong>Lo m\u00e1s \u00fatil en la pr\u00e1ctica:</strong><br>"
-                + construir_lista_html(perfil["highlights"], limit=3)
-            )
-        if perfil.get("watchouts"):
-            partes.append(f"<br><strong>Ten en cuenta:</strong> {perfil['watchouts']}")
-
-    if temas:
-        tema_principal = temas[0]
-        if not perfil:
-            partes.append(tema_principal["summary"])
-        partes.append(
-            "<br><br><strong>En la pr\u00e1ctica:</strong><br>"
-            + construir_lista_html(tema_principal["tips"], limit=3)
-        )
-
-    if not perfil and not temas:
-        partes.append(
-            "Si quieres comer mejor sin complicarte, la base es bastante simple: "
-            "prote\u00edna en cada comida, fruta o verdura a diario y alimentos poco procesados "
-            "en cantidades que puedas mantener."
-        )
-        partes.append(
-            "<br><br>Montando cada comida con tres piezas \u2014 prote\u00edna, vegetal y "
-            "carbohidrato ajustado a tu actividad \u2014 casi siempre es suficiente para mejorar."
-        )
-
-    if detectar_riesgo_medico(texto_normalizado):
-        partes.append(
-            "<br><br>Si hay una condici\u00f3n m\u00e9dica, embarazo o medicaci\u00f3n, "
-            "lo ideal es personalizarlo con un profesional."
-        )
-
-    partes.append(
-        "<br><br><em>\u00bfQuieres que lo adapte a un objetivo concreto? "
-        "Perder grasa, ganar m\u00fasculo, desayuno, cena o pre/post entreno.</em>"
-    )
-    return "".join(partes)
+def _buscar_datos_locales(mensaje):
+    texto = normalizar_texto(mensaje)
+    encontrados = []
+    for alimento in calories_db.get("alimentos", []):
+        nombre_norm = normalizar_texto(alimento.get("nombre", ""))
+        if nombre_norm and len(nombre_norm) > 2 and nombre_norm in texto:
+            encontrados.append(alimento)
+    if not encontrados:
+        try:
+            analisis = nlp.procesar(mensaje)
+            if analisis.get("alimento"):
+                candidatos = buscar_alimentos_similares(analisis["alimento"])
+                encontrados = candidatos[:3]
+        except Exception:
+            pass
+    return encontrados[:4]
 
 
 def generar_respuesta(mensaje, contexto=None):
     contexto = contexto or {}
-    analisis = nlp.procesar(mensaje)
-    intencion = analisis["intencion"]
-    palabras_clave = analisis["palabras_clave"]
-    ingredientes = analisis["ingredientes"]
-    alimento = analisis["alimento"]
-    cantidad = analisis["cantidad"]
-    texto_normalizado = normalizar_texto(mensaje)
+    historial = contexto.get("historial", [])
 
-    receta_referenciada = None
-    if intencion in {"general", "recetas"} or es_pregunta_sobre_receta(texto_normalizado):
-        receta_referenciada = resolver_receta_referenciada(mensaje, contexto)
-        if receta_referenciada and (es_pregunta_sobre_receta(texto_normalizado) or intencion == "general"):
-            contexto["last_selected_recipe_id"] = receta_referenciada["id"]
-            return {
-                "respuesta": responder_detalle_receta(receta_referenciada, mensaje),
-                "contexto": contexto,
-            }
+    datos_locales = _buscar_datos_locales(mensaje)
+    mensaje_con_datos = mensaje
+    if datos_locales:
+        datos_str = json.dumps(datos_locales, ensure_ascii=False)
+        mensaje_con_datos += f"\n[Base de datos local — usa estos datos: {datos_str}]"
 
-    if intencion == "ayuda":
-        return {"respuesta": explicar_capacidades(), "contexto": contexto}
+    contents = []
+    for turno in historial:
+        contents.append(
+            genai_types.Content(role=turno["role"], parts=[genai_types.Part(text=turno["text"])])
+        )
+    contents.append(
+        genai_types.Content(role="user", parts=[genai_types.Part(text=mensaje_con_datos)])
+    )
 
-    if intencion == "recetas":
-        terminos = ingredientes if ingredientes else palabras_clave
-        strict = bool(ingredientes)
-        recetas = buscar_recetas(terminos, strict=strict)
+    try:
+        cliente = genai.Client(api_key=GEMINI_API_KEY)
+        response = cliente.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=contents,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                max_output_tokens=600,
+                temperature=0.7,
+            ),
+        )
+        respuesta = response.text.strip() if response.text else "No pude generar una respuesta."
 
-        if recetas:
-            recetas_top = recetas[:5]
-            contexto["last_recipe_ids"] = [r["id"] for r in recetas_top]
-            contexto["last_selected_recipe_id"] = recetas_top[0]["id"]
+        historial.append({"role": "user", "text": mensaje})
+        historial.append({"role": "model", "text": respuesta})
+        contexto["historial"] = historial[-10:]
 
-            if len(recetas_top) == 1 or "detalle" in texto_normalizado or "ingredientes" in texto_normalizado:
-                return {"respuesta": formatear_detalle_receta(recetas_top[0]), "contexto": contexto}
+        return {"respuesta": respuesta, "contexto": contexto}
 
-            partes = ["Aqu\u00ed tienes opciones que encajan con lo que buscas:<br><br>"]
-            for i, receta in enumerate(recetas_top, 1):
-                contenido = normalizar_texto(" ".join([receta["nombre"]] + receta["ingredientes"]))
-                coincidencias = [t for t in terminos if normalizar_texto(t) in contenido]
-                motivo = (
-                    f" <span style='color:#6b7280;font-size:12px'>{', '.join(coincidencias[:3])}</span>"
-                    if coincidencias else ""
-                )
-                partes.append(
-                    f"<strong>{i}. {receta['nombre']}</strong> \u2014 {receta['calorias_aprox']} kcal{motivo}<br>"
-                )
-            partes.append(
-                "<br><em>Pide detalles con: la 2, dame ingredientes de la 3, "
-                "c\u00f3mo se hace la primera\u2026</em>"
-            )
-            return {"respuesta": "".join(partes), "contexto": contexto}
-
-        if ingredientes:
-            return {"respuesta": crear_sugerencia_ingredientes(ingredientes), "contexto": contexto}
-        termino_busqueda = ", ".join(terminos) if terminos else "tu consulta"
+    except Exception as e:
         return {
             "respuesta": (
-                f"No encontr\u00e9 recetas para <strong>{termino_busqueda}</strong>.<br><br>"
-                "Prueba con uno o dos ingredientes principales, como:<br>"
-                "<em>cena ligera con pollo</em> o <em>desayuno con avena</em>."
+                "Hubo un problema al conectar con la IA.<br>"
+                f"<small style='color:#6b7280'>{str(e)[:120]}</small>"
             ),
             "contexto": contexto,
         }
-
-    if intencion == "calorias":
-        candidatos = []
-        if alimento:
-            candidatos.extend(buscar_alimentos_similares(alimento))
-        for palabra in palabras_clave:
-            for candidato in buscar_alimentos_similares(palabra):
-                if candidato not in candidatos:
-                    candidatos.append(candidato)
-
-        if candidatos:
-            principal = candidatos[0]
-            partes = [f"<strong>{principal['nombre']}</strong><br><br>"]
-            partes.append(f"<strong>{principal['calorias']} kcal</strong> por {principal['unidad']}.")
-
-            calorias_estimadas, macros_estimados = calcular_calorias_estimadas(principal, cantidad)
-            if calorias_estimadas is not None:
-                partes.append(
-                    f"<br>Para {cantidad['valor']} {cantidad['unidad']}: "
-                    f"<strong>{calorias_estimadas} kcal</strong>."
-                )
-                if macros_estimados:
-                    linea = (
-                        f"Prote\u00edna {macros_estimados['proteina']}g \u00b7 "
-                        f"Carbohidratos {macros_estimados['carbohidratos']}g \u00b7 "
-                        f"Grasas {macros_estimados['grasas']}g"
-                    )
-                    if "fibra" in macros_estimados:
-                        linea += f" \u00b7 Fibra {macros_estimados['fibra']}g"
-                    partes.append(f"<br><small style='color:#6b7280'>{linea}</small>")
-            else:
-                partes.append(formatear_macros(principal))
-
-            if len(candidatos) > 1:
-                partes.append(
-                    "<br><br>Tambi\u00e9n podr\u00eda ser: "
-                    + ", ".join(item["nombre"] for item in candidatos[1:4]) + "."
-                )
-
-            partes.append(
-                "<br><br><em>\u00bfQuieres saber si encaja en tu objetivo? "
-                "Perder grasa, ganar m\u00fasculo o rendimiento deportivo.</em>"
-            )
-            return {"respuesta": "".join(partes), "contexto": contexto}
-
-        return {
-            "respuesta": (
-                "No encuentro ese alimento.<br><br>"
-                "Prueba con un nombre m\u00e1s concreto, como: "
-                "<em>pechuga de pollo</em>, <em>arroz blanco</em>, "
-                "<em>salm\u00f3n</em> o <em>manzana</em>."
-            ),
-            "contexto": contexto,
-        }
-
-    if intencion == "nutricion" or buscar_temas_nutricion(mensaje) or buscar_perfil_alimento(mensaje, alimento):
-        return {"respuesta": responder_nutricion(mensaje, analisis), "contexto": contexto}
-
-    return {
-        "respuesta": (
-            "No termin\u00e9 de entender lo que buscas.<br><br>"
-            "Puedo ayudarte con recetas, calor\u00edas o nutrici\u00f3n pr\u00e1ctica:<br>"
-            "\u2014 <em>Qu\u00e9 puedo cocinar con pollo y espinacas</em><br>"
-            "\u2014 <em>Cu\u00e1ntas calor\u00edas tiene el arroz</em><br>"
-            "\u2014 <em>La avena es buena para desayunar?</em>"
-        ),
-        "contexto": contexto,
-    }
 
 
 JS_CODE = r"""(function(){
@@ -891,9 +528,11 @@ document.querySelectorAll('.tab').forEach(function(tab){
   });
 });
 var ctx={last_recipe_ids:[],last_selected_recipe_id:null};
+var AVATAR_SVG='<svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 5-8 5"/></svg>';
 function addMsg(html,isUser,cls){
   var m=document.createElement('div');
   m.className='m '+(isUser?'u':'bot')+(cls?' '+cls:'');
+  if(!isUser){var av=document.createElement('div');av.className='avatar';av.innerHTML=AVATAR_SVG;m.appendChild(av);}
   var b=document.createElement('div');b.className='b';b.innerHTML=html;
   m.appendChild(b);msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;return m;
 }
@@ -1076,7 +715,6 @@ if('serviceWorker' in navigator){
     'protein shake':['proteina whey'],'protein powder':['proteina whey']
   };
 
-  var mnModel=null,mnLoading=false;
   var fotoDrop=document.getElementById('foto-drop');
   var fotoInp=document.getElementById('foto-inp');
   var fotoPick=document.getElementById('foto-pick');
@@ -1094,13 +732,18 @@ if('serviceWorker' in navigator){
   var fotoTags=document.getElementById('foto-tags');
 
   var currentAlimento=null;
+  var currentImageB64=null;
+  var currentImageMime='image/jpeg';
 
   function setStatus(msg){fotoStatus.textContent=msg;}
 
   function showPreview(file){
+    currentImageMime=file.type||'image/jpeg';
     var reader=new FileReader();
     reader.onload=function(e){
-      fotoPreview.src=e.target.result;
+      var dataUrl=e.target.result;
+      fotoPreview.src=dataUrl;
+      currentImageB64=dataUrl.split(',')[1];
       fotoPreviewWrap.style.display='block';
       fotoPlaceholder.style.display='none';
       fotoGo.style.display='block';
@@ -1123,33 +766,12 @@ if('serviceWorker' in navigator){
     var f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))showPreview(f);
   });
 
-  function preloadModel(){
-    if(mnModel||mnLoading)return;
-    if(typeof mobilenet==='undefined')return;
-    mnLoading=true;
-    mobilenet.load().then(function(m){mnModel=m;mnLoading=false;}).catch(function(){mnLoading=false;});
-  }
-  // Pre-cargar cuando el usuario cambia al tab de foto
-  document.querySelectorAll('.tab').forEach(function(t){
-    t.addEventListener('click',function(){if(t.dataset.tab==='foto')preloadModel();});
-  });
-
-  function findFoodKey(predictions){
-    for(var i=0;i<predictions.length;i++){
-      var lbl=predictions[i].className.toLowerCase();
-      for(var key in FOOD_MAP){
-        if(lbl.indexOf(key)>=0)return{key:key,label:lbl,prob:predictions[i].probability};
-      }
-    }
-    return null;
-  }
-
-  function renderResult(alimento, gramos){
+  function renderResult(alimento,gramos){
     var factor=gramos/100;
     var kcal=Math.round((alimento.calorias||0)*factor);
     fotoKcalBig.textContent=kcal+' kcal';
     var macros=[
-      {v:Math.round((alimento.proteina||0)*factor),l:'Proteína'},
+      {v:Math.round((alimento.proteina||0)*factor),l:'Prote\u00edna'},
       {v:Math.round((alimento.carbohidratos||0)*factor),l:'Carbos'},
       {v:Math.round((alimento.grasa||0)*factor),l:'Grasas'},
     ];
@@ -1168,56 +790,30 @@ if('serviceWorker' in navigator){
   });
 
   fotoGo.addEventListener('click',function(){
-    if(!fotoPreview.src||fotoPreview.src==='about:blank')return;
+    if(!currentImageB64)return;
     fotoResult.style.display='none';
-    setStatus('Cargando modelo de IA\u2026');
+    setStatus('Analizando imagen con IA\u2026');
     fotoGo.disabled=true;
 
-    function doAnalysis(){
-      setStatus('Analizando imagen\u2026');
-      mnModel.classify(fotoPreview,5).then(function(preds){
-        var match=findFoodKey(preds);
-        if(!match){
-          setStatus('No reconozco el alimento. Intenta con otra foto.');
-          fotoGo.disabled=false;return;
-        }
-        var candidates=FOOD_MAP[match.key];
-        var pct=Math.round(match.prob*100);
-        // buscar primer candidato que devuelva resultado en /api/calories
-        function tryNext(i){
-          if(i>=candidates.length){
-            setStatus('Alimento detectado ('+match.label+') pero sin datos nutricionales. Prueba otra foto.');
-            fotoGo.disabled=false;return;
-          }
-          fetch('/api/calories?food='+encodeURIComponent(candidates[i])).then(function(r){return r.json();}).then(function(d){
-            if(d.found){
-              currentAlimento=d;
-              var gramos=parseInt(fotoSlider.value);
-              fotoFoodName.textContent=d.nombre+' \u2014 confianza '+pct+'%';
-              renderResult(d,gramos);
-              fotoResult.style.display='block';
-              setStatus('');
-            } else {
-              tryNext(i+1);
-            }
-          }).catch(function(){tryNext(i+1);});
-        }
-        tryNext(0);
-        fotoGo.disabled=false;
-      }).catch(function(){
-        setStatus('Error al analizar la imagen. Intenta de nuevo.');
-        fotoGo.disabled=false;
-      });
-    }
-
-    if(mnModel){doAnalysis();return;}
-    if(typeof mobilenet==='undefined'){
-      setStatus('El modelo aún se está cargando\u2026 espera un momento.');
-      fotoGo.disabled=false;return;
-    }
-    mobilenet.load().then(function(m){mnModel=m;doAnalysis();}).catch(function(){
-      setStatus('No se pudo cargar el modelo. Comprueba tu conexión.');
+    fetch('/api/analyze-foto',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({image_b64:currentImageB64,mime_type:currentImageMime})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
       fotoGo.disabled=false;
+      if(d.error){setStatus(d.error);return;}
+      currentAlimento=d;
+      var gramos=parseInt(fotoSlider.value);
+      fotoFoodName.textContent=d.nombre;
+      renderResult(d,gramos);
+      fotoResult.style.display='block';
+      setStatus('');
+    })
+    .catch(function(){
+      fotoGo.disabled=false;
+      setStatus('Error al analizar la imagen. Intenta de nuevo.');
     });
   });
 })();
@@ -1240,6 +836,48 @@ async def chat(data: dict):
     mensaje = data.get("mensaje", "")
     contexto = data.get("contexto", {}) or {}
     return generar_respuesta(mensaje, contexto)
+
+
+@app.post("/api/analyze-foto")
+async def analyze_foto(data: dict):
+    image_b64 = data.get("image_b64", "")
+    mime_type = data.get("mime_type", "image/jpeg")
+    if not image_b64:
+        return {"error": "No se recibió imagen."}
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    prompt = (
+        "Eres un nutricionista experto en cocina española e internacional. "
+        "Analiza esta foto de comida y responde SOLO con un JSON válido (sin texto adicional, sin markdown) "
+        "con estos campos exactos:\n"
+        '{"nombre": "nombre del plato en español", '
+        '"calorias": kcal_por_100g_como_numero, '
+        '"proteina": gramos_por_100g, '
+        '"carbohidratos": gramos_por_100g, '
+        '"grasa": gramos_por_100g, '
+        '"fibra": gramos_por_100g_o_null, '
+        '"categoria": "categoria breve como Carne, Verdura, Cereal, Legumbre, etc."}\n'
+        "Si no puedes identificar comida en la imagen, devuelve: "
+        '{"error": "No se detecta comida en la imagen."}'
+    )
+    try:
+        image_data = base64.b64decode(image_b64)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[
+                genai_types.Part.from_bytes(data=image_data, mime_type=mime_type),
+                prompt,
+            ],
+        )
+        raw = response.text.strip() if response.text else ""
+        raw = re.sub(r"^```[a-z]*\n?", "", raw)
+        raw = re.sub(r"\n?```$", "", raw)
+        result = json.loads(raw)
+        return result
+    except (json.JSONDecodeError, ValueError):
+        return {"error": "No pude interpretar la respuesta de la IA."}
+    except Exception as e:
+        return {"error": f"Error al analizar: {str(e)}"}
 
 
 @app.get("/api/calories")
