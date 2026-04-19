@@ -1540,7 +1540,7 @@ if('serviceWorker' in navigator){
     'waffles':{n:'Gofres',c:291,p:8,hc:37,f:13}
   };
 
-  function normLabel(s){return (s||'').toLowerCase().replace(/\s+/g,'_');}
+  function normLabel(s){return (s||'').split(',')[0].trim().toLowerCase().replace(/\s+/g,'_');}
 
   function resizeToBlob(img,maxW,cb){
     var c=document.createElement('canvas');
@@ -1559,7 +1559,7 @@ if('serviceWorker' in navigator){
     xPromise=import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2')
       .then(function(mod){
         setStatus('Descargando modelo IA\u2026 (primera vez)');
-        return mod.pipeline('image-classification','Xenova/nateraw-food',{quantized:true});
+        return mod.pipeline('image-classification','Xenova/vit-base-patch16-224',{quantized:true});
       })
       .then(function(p){xPipeline=p;xPromise=null;return p;})
       .catch(function(e){xFailed=true;xPromise=null;throw e;});
@@ -1940,7 +1940,7 @@ MANIFEST = {
 }
 
 SW_CODE = r"""
-const CACHE='nutrigpt-v1';
+const CACHE='nutrigpt-v2';
 const PRECACHE=['/','/app.js'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/','/app.js'])).then(()=>self.skipWaiting()));
