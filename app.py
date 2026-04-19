@@ -1551,21 +1551,32 @@ if('serviceWorker' in navigator){
     c.toBlob(cb,'image/jpeg',0.82);
   }
 
-  var HF_ENDPOINT='https://api-inference.huggingface.co/models/nateraw/food';
-  var hfRetries=0;
-  function analyzeHF(blob){
-    return fetch(HF_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:blob})
-      .then(function(r){
-        if(r.status===503&&hfRetries<3){
-          hfRetries++;
-          return new Promise(function(res,rej){
-            setStatus('Cargando modelo de IA\u2026 espera un momento');
-            setTimeout(function(){res(analyzeHF(blob));},5000);
-          });
-        }
-        if(!r.ok)throw new Error('HF '+r.status);
-        return r.json();
-      });
+  var xPipeline=null,xPromise=null,xFailed=false;
+  function getXPipeline(){
+    if(xFailed)return Promise.reject(new Error('unavailable'));
+    if(xPipeline)return Promise.resolve(xPipeline);
+    if(xPromise)return xPromise;
+    xPromise=import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2')
+      .then(function(mod){
+        setStatus('Descargando modelo IA\u2026 (primera vez)');
+        return mod.pipeline('image-classification','Xenova/nateraw-food',{quantized:true});
+      })
+      .then(function(p){xPipeline=p;xPromise=null;return p;})
+      .catch(function(e){xFailed=true;xPromise=null;throw e;});
+    return xPromise;
+  }
+  function analyzeXenova(imgEl){
+    setStatus('Cargando modelo IA\u2026');
+    return getXPipeline().then(function(classifier){
+      setStatus('Reconociendo alimento\u2026');
+      var c=document.createElement('canvas');
+      var s=Math.min(1,512/Math.max(imgEl.naturalWidth,imgEl.naturalHeight,1));
+      c.width=Math.round(imgEl.naturalWidth*s);c.height=Math.round(imgEl.naturalHeight*s);
+      c.getContext('2d').drawImage(imgEl,0,0,c.width,c.height);
+      return classifier(c.toDataURL('image/jpeg',0.92),{topk:10});
+    }).then(function(results){
+      return results.map(function(r){return{label:r.label,score:r.score};});
+    });
   }
 
   function clearPredOpts(){var e=document.getElementById('pred-opts');if(e)e.remove();}
@@ -1629,15 +1640,12 @@ if('serviceWorker' in navigator){
   fotoGo.addEventListener('click',function(){
     if(!fotoPreview.src||fotoPreview.src==='about:blank')return;
     fotoResult.style.display='none';clearPredOpts();
-    setStatus('Analizando con IA\u2026');
-    fotoGo.disabled=true;hfRetries=0;
-    resizeToBlob(fotoPreview,640,function(blob){
-      analyzeHF(blob).then(function(preds){
-        if(!Array.isArray(preds)||!preds.length)throw new Error('empty');
-        showPredictions(preds);
-      }).catch(function(){
-        doMobileNetFallback();
-      });
+    fotoGo.disabled=true;
+    analyzeXenova(fotoPreview).then(function(preds){
+      if(!Array.isArray(preds)||!preds.length)throw new Error('empty');
+      showPredictions(preds);
+    }).catch(function(){
+      doMobileNetFallback();
     });
   });
 })();
