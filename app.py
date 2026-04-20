@@ -527,12 +527,12 @@ document.querySelectorAll('.tab').forEach(function(tab){
     document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+id);});
   });
 });
-var ctx={last_recipe_ids:[],last_selected_recipe_id:null};
-var AVATAR_SVG='<svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 5-8 5"/></svg>';
-function addMsg(html,isUser,cls){
+	var ctx={last_recipe_ids:[],last_selected_recipe_id:null};
+	var AVATAR_IMG='<img src="/icon-192.png" alt="Bot">';
+	function addMsg(html,isUser,cls){
   var m=document.createElement('div');
   m.className='m '+(isUser?'u':'bot')+(cls?' '+cls:'');
-  if(!isUser){var av=document.createElement('div');av.className='avatar';av.innerHTML=AVATAR_SVG;m.appendChild(av);}
+	  if(!isUser){var av=document.createElement('div');av.className='avatar';av.innerHTML=AVATAR_IMG;m.appendChild(av);}
   var b=document.createElement('div');b.className='b';b.innerHTML=html;
   m.appendChild(b);msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;return m;
 }
@@ -939,11 +939,33 @@ self.addEventListener('fetch',e=>{
 });
 """
 
-# SVG icon rendered as PNG placeholder (simple green circle with leaf)
-ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 {s} {s}">
-<rect width="{s}" height="{s}" rx="{r}" fill="#3a9d6e"/>
-<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="{fs}" font-family="system-ui">🥗</text>
-</svg>"""
+# Iconos en base64 generados a partir del logo oficial
+ICON_192_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAriElEQVR4nO2deXQc13Wnf/e9quoFK0GCG7ivIkVqoTZLogQttuOxpdiKB3ROFFmKx8dznInNWCPbmUxmmjiZ8dixY0XRTHzi43G0xJNEiC07tqNYliyBpETJJrVy30AIJEgABIm1l6p6784fVdVYSYJEg0ID79OhKHVXd7+uvve9e++7717C5SSVErWAaNxSr0Dg6OHa1INxnkUriWmd8vV6EK8i0GIA1cxcQURJAM5lHathvLjMnCaibgAdDG4G00FpiXeZeDed5kON9U9m81czqHZLSjYCGvX1+nINki7Hh9TV1UnUAQ2bGlT02MbHP7tK+l6tFnQnMa5j5iXCthySBDDAWoM1A8xgZgyoi6EoIICIACKQIJAQAAGsGNrzXSI6xoRdQvNLyrIbt3/hewejl9Y9UyfRADQ0DMjLBA5z4qh7pk421DXoaLar/c6DS+CJ+5j5k8y4yUo4FpihfQXta4C1ZiYGAQQmMFE4wsuiqIaCw2AAxMwgBgNETCAhhCUgLAkQwc+4PhFeJ6IfwtbPNn7+yWPhq6muoU4MnjgLzYQIViqVEvVbtjCIGABuf+wzd4L4c8x8jxV3SlkpqJwPBnwwiIiDqcII+nSBAeZwsmMCLBmzQFLCz7p9RPQzMH136+bvvxRczZTasoXqJ8A0KqzADdPY2//qoY+ywCNCiDuFJaGyHjRrP1wcRcE/31CsMAMaYBYkLBm3A6tA65dI41tb//iJfwVGWhSFoGACWPdMncwL/qMP3AxpbRGW+DBAUFmXGaSJjNAbLggzQxNYyLhDAEP7+nkof8vWLz29Axgqa+OlEMJItala2Vjf6N/wtQdmJkplPYg+Lywp/IyrAWIiyAJ8jmGawQwFMFkJR2hfaTB/J9OnUr/506c7a1O1VmN9o8I4wyPjU4BUSqC+ngHwrd9+6F7LpseEYy/1+3PMgDaCbygEzFAECKskRtr1mnyPN7/y8BM/FVBIpWg8YdNLVoBoGaqtrbX0fUu+IW3rYdYM5fk+EVmX+r4Gw7lgZl/alkWCoDz/2+LZY19tbGz0x2MSXZIChMuPf+PX718QTzpPW3H7Drc/pxDELcWlvKfBMBYYrAFipyQm/az3cjbtPvDrP/nB8UgmL/b9LloBog+65dsPXG9Z1j8Lx1rsp3Nm1jdcVpjZt5IxS7t+s+/7//7Vh5/eeSlKcFEKEH3Axm/df7eMOc+CqEy5xuQxvD8wsy8dywJzr8q5921/5AcvXqwSjFkBoje+7VsP/BbF7B+DOa59rYyja3g/YYYSlpAgynLO+8S2R57+xcUowZjs9bpn6mRjfaN/8zd//64B4VcmymN43yGCDEOkcYrZP775m79/V2N94BiP6fUXuiBySize limit. Use line ranges to read remaining content)
+ICON_512_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAB/ZUlEQVR4nO3dd4Bc13Uf/u+5970pW4AFFr0SIAGSAHuTWCCQlG11WbaykG1JpKQ4cmxHUbccx8lyf3HiQskUIydOZEcSRcmFa8mSVaxGiiDBJvYCECwgem/bp7x37/n98d5bLECUxfad/X4kFgxnZ2Znd945995zzxXQaBO0tspa3G8AYH3b+vhU9/vl2z9QV7LhXCt+ifO6SIzMV9W5Apmtos1QzBDINDXaIB71EBQUUhQgGMPvh4gICsQCLUFRVoNe8dKj0C4IjorKYYUeFJH96nWvNbLLqdlRdNH+n372G33Jl7/e2ta1AQCsx40ebW16qvvRyJDxfgE1KA34MDcCvq2tzZ94h+v+9iONQUd0nli5wEFWKOQ8A12minMgaAJQMMYEJjQQY6BeoaqAKtRr+pFQqALJ34iIxoEIRABAkv8bSW8TiBGo9/CRh/c+BlCGokME2zxkq0BftdBX1OnmuCl89eHf/kr3iQ/f2tpq7gfMeoAJwShgAjASFNLS3mIAoH1duxv4n9a23lrADHeeg7lagMuguFSB1SIy04aBMaFNArzzUO8HBHuoAh6AQiEQTT5nmn3SAPDnR0TjT7NBCSQdkqgoBApABDAQSJYUiDEQayBG4CMHF8VeVY+I4AUAzynwjIV/vCgzXvnRx79UGfhELfe0WABob2n36ePTMDCADJWqrL3tRrv+tvVu4C/iqtaWXFNT3SoreoMq3igqb4Rgic0FoQQWGjv4NNhD1SdBXgCoERUZ8BPhz4aIaoVmf1dRBcSnoxkDESPGwFiD7BrpqnEExQ4VfVQEjzqVDR0dfZs2tbVXBzyirL1trV1/2/0OIkwGhoBB5mz0/8IdH/Svvf0Dc0JrboQ1N3nvbxTIiqCQsxDrive/Drive, Docs, Sheets, Slides). Use when performing any operation with the gws CLI.
+- skill-creator: Guide for creating or updating skills that extend Manus via specialized knowledge, workflows, or tool integrations. For any modification or improvement request, MUST first read this skill and follow its update workflow instead of editing files directly.
+- similarweb-analytics: Analyze websites and domains using SimilarWeb traffic data. Get traffic metrics, engagement stats, global rankings, traffic sources, and geographic distribution for comprehensive website research.
+- bgm-prompter: MUST read this skill BEFORE entering generate mode for music tasks. Covers prompt crafting framework, structure syntax, and multi-clip strategy.
+- image_processing: Perform deterministic programmatic image operations, such as cropping, resizing, flipping, mirroring, rotating, format conversion, or multi-image stitching.
+- media_generation: Generate or modify images, videos, audio, music or speech using AI.
+- parallel_processing: Divide task into homogeneous subtasks and execute them in parallel.
+- slides_content_writing: Prepare contents before generating slide-based presentations. Must be in a separate phase from `slides_generation` and must occur before the phase with `slides_generation`.
+- slides_generation: Generate slide-based presentations, such as slide decks or PowerPoint (PPT/PPTX). Must be in a separate phase from `slides_content_writing` and must occur after the phase with `slides_content_writing`.
+- technical_writing: Produce precise, structured writing for technical or academic purposes.
+- web_development: Build and deploy interactive websites, web applications, or mobile apps. Must not co-exist with `parallel_processing` in the same phase.
+</skills>
+<github_integration>
+The user has enabled GitHub integration for this task and **explicitly selected** these repositories: mariocm13/Portfolio1
+- Always interact with GitHub using the GitHub CLI `gh` via the `shell` tool
+- GitHub CLI is already pre-configured and logged in, ready to use directly
+- Repositories need to be cloned manually using `$ gh repo clone <repo-name>`
+- When creating new repositories, always use `--private` flag by default to protect user privacy (e.g., `gh repo create <name> --private`)
+</github_integration>
+<user_profile>
+Subscription limitations:
+- The user does not have access to video generation features due to current subscription plan, MUST supportively ask the user to upgrade subscription when requesting video generation
+- The user can only generate presentations with a maximum of 12 slides, MUST supportively ask the user to upgrade subscription when requesting more than 12 slides
+- The user does not have access to generate Nano Banana (image mode) presentations, MUST supportively ask the user to upgrade subscription when requesting it
+</user_profile>
 
 
 @app.get("/manifest.json")
@@ -965,16 +987,16 @@ async def get_sw():
 @app.get("/icon-192.png")
 async def get_icon_192():
     from fastapi.responses import Response
-    svg = ICON_SVG.format(s=192, r=40, fs=120)
-    return Response(content=svg.encode(), media_type="image/svg+xml",
+    import base64
+    return Response(content=base64.b64decode(ICON_192_B64), media_type="image/png",
                     headers={"Cache-Control": "public, max-age=604800"})
 
 
 @app.get("/icon-512.png")
 async def get_icon_512():
     from fastapi.responses import Response
-    svg = ICON_SVG.format(s=512, r=100, fs=320)
-    return Response(content=svg.encode(), media_type="image/svg+xml",
+    import base64
+    return Response(content=base64.b64decode(ICON_512_B64), media_type="image/png",
                     headers={"Cache-Control": "public, max-age=604800"})
 
 
