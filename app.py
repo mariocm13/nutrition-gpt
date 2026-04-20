@@ -197,7 +197,58 @@ small{font-size:12px}
 .foto-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .tag{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--accent-light);color:var(--accent);font-weight:600}
 .foto-disclaimer{font-size:10px;color:var(--muted);text-align:center;line-height:1.5}
+/* ── Profile Modal ── */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:var(--surface);border-radius:22px 22px 0 0;padding:24px 20px 32px;width:100%;max-width:860px;box-shadow:var(--sh-lg);animation:fadeUp .25s ease both;overflow-y:auto;max-height:90vh}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:18px;color:var(--text)}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-btn{flex:1;padding:12px;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.modal-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-h));color:#fff;box-shadow:0 4px 14px rgba(22,163,74,.25)}
+.modal-btn.secondary{background:var(--bg);border:1.5px solid var(--border);color:var(--text)}
+/* ── Diary ── */
+.diary-wrap{flex:1;overflow-y:auto;padding:16px;background:var(--bg);-webkit-overflow-scrolling:touch}
+.diary-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.diary-nav-btn{background:transparent;border:1px solid var(--border);border-radius:9px;width:34px;height:34px;cursor:pointer;color:var(--muted);font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.diary-nav-btn:hover{color:var(--text);background:var(--bg)}
+.diary-date-lbl{font-size:15px;font-weight:700;color:var(--text)}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 12px}
+.summary-card-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.summary-card-val{font-size:16px;font-weight:700;color:var(--text)}
+.summary-card-goal{font-size:11px;color:var(--muted);margin-top:1px}
+.progress-bar{height:5px;border-radius:3px;background:var(--border);margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.progress-fill.ok{background:var(--accent)}
+.progress-fill.warn{background:#f59e0b}
+.progress-fill.over{background:#ef4444}
+.diary-section-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px}
+.diary-entry{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:6px}
+.diary-entry-name{flex:1;font-size:14px;font-weight:600;color:var(--text)}
+.diary-entry-meta{font-size:12px;color:var(--muted)}
+.diary-del{background:transparent;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0 4px;transition:color .15s}
+.diary-del:hover{color:#ef4444}
+.diary-empty{font-size:13px;color:var(--muted);text-align:center;padding:20px 0;font-style:italic}
+.diary-add-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:8px}
+.diary-add-form input{flex:1;min-width:120px;padding:10px 12px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s}
+.diary-add-form input:focus{border-color:var(--accent)}
+.diary-g-inp{max-width:80px;min-width:60px;flex:none}
+.diary-add-btn{padding:10px 16px;background:linear-gradient(135deg,var(--accent),var(--accent-h));color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 3px 10px rgba(22,163,74,.2);transition:transform .15s}
+.diary-add-btn:active{transform:scale(.97)}
+.diary-add-err{font-size:12px;color:#ef4444;margin-top:4px;min-height:16px}
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-top:8px}
+.chart-wrap-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.chart-fallback{font-size:13px;color:var(--muted);text-align:center;padding:20px 0;display:none}
+.add-to-diary-btn{margin-top:8px;padding:7px 14px;background:var(--accent-light);border:1px solid var(--accent-muted);border-radius:10px;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;transition:background .15s;display:inline-block}
+.add-to-diary-btn:hover{background:var(--accent-muted)}
+.alert-card{margin-top:8px;padding:10px 12px;border-radius:10px;border-left:3px solid;font-size:12px;line-height:1.5}
+.alert-card.green{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.alert-card.yellow{border-color:#f59e0b;background:#fefce8;color:#92400e}
+.alert-card.red{border-color:#ef4444;background:#fef2f2;color:#991b1b}
+html.dark .alert-card.yellow{background:#292100;color:#fbbf24}
+html.dark .alert-card.red{background:#200a0a;color:#f87171}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js" onerror="window._chartJSFailed=true"></script>
 </head>
 <body>
 <div id="splash">
@@ -250,6 +301,55 @@ small{font-size:12px}
     <div class="composer">
       <input type="text" id="inp" placeholder="Escribe tu pregunta..." autocomplete="off" enterkeyhint="send" inputmode="text">
       <button id="btn" aria-label="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
+  <div id="panel-diario" class="panel">
+    <div class="diary-wrap">
+      <div class="diary-nav">
+        <button class="diary-nav-btn" id="diary-prev">&#8592;</button>
+        <span class="diary-date-lbl" id="diary-date-lbl"></span>
+        <button class="diary-nav-btn" id="diary-next">&#8594;</button>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-card-lbl">Calor\u00edas</div>
+          <div class="summary-card-val" id="sc-kcal-val">0</div>
+          <div class="summary-card-goal" id="sc-kcal-goal">/ \u2014 kcal</div>
+          <div class="progress-bar"><div class="progress-fill ok" id="sc-kcal-bar" style="width:0%"></div></div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-lbl">Prote\u00edna</div>
+          <div class="summary-card-val" id="sc-prot-val">0g</div>
+          <div class="summary-card-goal" id="sc-prot-goal">/ \u2014 g</div>
+          <div class="progress-bar"><div class="progress-fill ok" id="sc-prot-bar" style="width:0%"></div></div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-lbl">Carbos</div>
+          <div class="summary-card-val" id="sc-carbs-val">0g</div>
+          <div class="summary-card-goal" id="sc-carbs-goal">/ \u2014 g</div>
+          <div class="progress-bar"><div class="progress-fill ok" id="sc-carbs-bar" style="width:0%"></div></div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-lbl">Grasa</div>
+          <div class="summary-card-val" id="sc-fat-val">0g</div>
+          <div class="summary-card-goal" id="sc-fat-goal">/ \u2014 g</div>
+          <div class="progress-bar"><div class="progress-fill ok" id="sc-fat-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="diary-section-title">Entradas del d\u00eda</div>
+      <div id="diary-list"></div>
+      <div class="diary-section-title">A\u00f1adir alimento</div>
+      <div class="diary-add-form">
+        <input type="text" id="diary-food-inp" placeholder="Nombre del alimento">
+        <input type="number" id="diary-g-inp" class="diary-g-inp" placeholder="g" value="100" min="1">
+        <button class="diary-add-btn" id="diary-add-btn">A\u00f1adir</button>
+      </div>
+      <div class="diary-add-err" id="diary-add-err"></div>
+      <div class="chart-wrap">
+        <div class="chart-wrap-title">\u00daltimos 7 d\u00edas \u2014 Calor\u00edas</div>
+        <canvas id="diary-chart" height="160"></canvas>
+        <div class="chart-fallback" id="chart-fallback">Gr\u00e1fica no disponible</div>
+      </div>
     </div>
   </div>
   <div id="panel-calc" class="panel">
@@ -374,6 +474,48 @@ small{font-size:12px}
       </div>
     </div>
   </div>
+  <div id="modal-perfil" class="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-title">Mi perfil</div>
+      <div class="calc-group">
+        <label class="calc-label">Nombre (opcional)</label>
+        <input type="text" id="p-nombre" class="calc-inp" placeholder="Tu nombre">
+      </div>
+      <div class="calc-row two">
+        <div class="calc-group">
+          <label class="calc-label">Edad (a\u00f1os)</label>
+          <input type="number" id="p-edad" class="calc-inp" placeholder="25" min="10" max="99">
+        </div>
+        <div class="calc-group">
+          <label class="calc-label">Peso (kg)</label>
+          <input type="number" id="p-peso" class="calc-inp" placeholder="70" min="30" max="300">
+        </div>
+      </div>
+      <div class="calc-group">
+        <label class="calc-label">Altura (cm)</label>
+        <input type="number" id="p-altura" class="calc-inp" placeholder="170" min="100" max="250">
+      </div>
+      <div class="calc-group">
+        <label class="calc-label">Sexo</label>
+        <div class="seg" id="p-sexo-seg">
+          <button class="seg-btn active" data-val="hombre">Hombre</button>
+          <button class="seg-btn" data-val="mujer">Mujer</button>
+        </div>
+      </div>
+      <div class="calc-group">
+        <label class="calc-label">Objetivo</label>
+        <div class="seg" id="p-goal-seg">
+          <button class="seg-btn active" data-val="cut">Perder grasa</button>
+          <button class="seg-btn" data-val="mant">Mantener</button>
+          <button class="seg-btn" data-val="bulk">Ganar m\u00fasculo</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="perfil-cerrar" class="modal-btn secondary">Cerrar</button>
+        <button id="perfil-guardar" class="modal-btn primary">Guardar</button>
+      </div>
+    </div>
+  </div>
 </div>
 <script src="/app.js"></script>
 
@@ -470,9 +612,18 @@ def _buscar_datos_locales(mensaje):
     return encontrados[:4]
 
 
-def generar_respuesta(mensaje, contexto=None):
+def generar_respuesta(mensaje, contexto=None, perfil=None):
     contexto = contexto or {}
     historial = contexto.get("historial", [])
+
+    perfil_info = ""
+    if perfil:
+        perfil_info = (
+            f"\nPerfil del usuario: {perfil.get('nombre','Anónimo')}, "
+            f"{perfil.get('edad',0)} años, {perfil.get('peso',0)} kg, "
+            f"{perfil.get('altura',0)} cm, sexo={perfil.get('sexo','')}, "
+            f"objetivo={perfil.get('objetivo','')}."
+        )
 
     datos_locales = _buscar_datos_locales(mensaje)
     mensaje_con_datos = mensaje
@@ -480,7 +631,7 @@ def generar_respuesta(mensaje, contexto=None):
         datos_str = json.dumps(datos_locales, ensure_ascii=False)
         mensaje_con_datos += f"\n[Base de datos local — usa estos datos: {datos_str}]"
 
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages = [{"role": "system", "content": SYSTEM_PROMPT + perfil_info}]
     for turno in historial:
         role = "assistant" if turno["role"] == "model" else "user"
         messages.append({"role": role, "content": turno["text"]})
@@ -503,7 +654,17 @@ def generar_respuesta(mensaje, contexto=None):
         historial.append({"role": "model", "text": respuesta})
         contexto["historial"] = historial[-10:]
 
-        return {"respuesta": respuesta, "contexto": contexto}
+        result = {"respuesta": respuesta, "contexto": contexto}
+        if datos_locales:
+            first = datos_locales[0]
+            result["alimento_detectado"] = {
+                "nombre": first.get("nombre", ""),
+                "kcal": first.get("kcal_100", 0),
+                "proteina": first.get("proteina_100", 0),
+                "carbos": first.get("carbos_100", 0),
+                "grasa": first.get("grasa_100", 0),
+            }
+        return result
 
     except Exception as e:
         return {
@@ -560,6 +721,65 @@ document.querySelectorAll('.nav-tab').forEach(function(tab){
     document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+id);});
   });
 });
+// ── Profile ──
+var _perfil={nombre:'',edad:0,peso:0,altura:0,sexo:'hombre',objetivo:'cut'};
+(function(){
+  try{var s=localStorage.getItem('nutria-profile');if(s)_perfil=JSON.parse(s);}catch(e){}
+  var modal=document.getElementById('modal-perfil');
+  var sexoSeg2=document.getElementById('p-sexo-seg');
+  var goalSeg2=document.getElementById('p-goal-seg');
+  function syncUI(){
+    document.getElementById('p-nombre').value=_perfil.nombre||'';
+    document.getElementById('p-edad').value=_perfil.edad||'';
+    document.getElementById('p-peso').value=_perfil.peso||'';
+    document.getElementById('p-altura').value=_perfil.altura||'';
+    sexoSeg2.querySelectorAll('.seg-btn').forEach(function(b){b.classList.toggle('active',b.dataset.val===_perfil.sexo);});
+    goalSeg2.querySelectorAll('.seg-btn').forEach(function(b){b.classList.toggle('active',b.dataset.val===_perfil.objetivo);});
+  }
+  syncUI();
+  sexoSeg2.querySelectorAll('.seg-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      sexoSeg2.querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');_perfil.sexo=b.dataset.val;
+    });
+  });
+  goalSeg2.querySelectorAll('.seg-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      goalSeg2.querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');_perfil.objetivo=b.dataset.val;
+    });
+  });
+  document.getElementById('prof-btn').addEventListener('click',function(){
+    syncUI();modal.classList.add('open');
+  });
+  document.getElementById('perfil-cerrar').addEventListener('click',function(){modal.classList.remove('open');});
+  modal.addEventListener('click',function(e){if(e.target===modal)modal.classList.remove('open');});
+  document.getElementById('perfil-guardar').addEventListener('click',function(){
+    _perfil.nombre=document.getElementById('p-nombre').value.trim();
+    _perfil.edad=parseFloat(document.getElementById('p-edad').value)||0;
+    _perfil.peso=parseFloat(document.getElementById('p-peso').value)||0;
+    _perfil.altura=parseFloat(document.getElementById('p-altura').value)||0;
+    try{localStorage.setItem('nutria-profile',JSON.stringify(_perfil));}catch(e){}
+    modal.classList.remove('open');
+    if(typeof _renderDiary==='function')_renderDiary();
+  });
+})();
+function _computeGoals(){
+  var p=_perfil;
+  if(!p.peso||!p.altura||!p.edad)return null;
+  var bmr=p.sexo==='hombre'
+    ?(10*p.peso+6.25*p.altura-5*p.edad+5)
+    :(10*p.peso+6.25*p.altura-5*p.edad-161);
+  var tdee=Math.round(bmr*1.55);
+  var objCal,protFactor,fatFactor;
+  if(p.objetivo==='cut'){objCal=Math.max(tdee-500,1200);protFactor=2.2;fatFactor=0.9;}
+  else if(p.objetivo==='bulk'){objCal=tdee+300;protFactor=2.0;fatFactor=1.0;}
+  else{objCal=tdee;protFactor=1.8;fatFactor=0.9;}
+  var protG=Math.round(protFactor*p.peso);
+  var fatG=Math.round(fatFactor*p.peso);
+  var carbG=Math.round(Math.max(objCal-protG*4-fatG*9,0)/4);
+  return{kcal:Math.round(objCal),prot:protG,carbs:carbG,fat:fatG};
+}
 	var ctx={last_recipe_ids:[],last_selected_recipe_id:null};
 	function addMsg(html,isUser,cls){
   var m=document.createElement('div');
@@ -571,9 +791,24 @@ function send(){
   var txt=inp.value.trim();if(!txt)return;
   addMsg(txt,true);inp.value='';
   var t=addMsg('Pensando...',false,'typing');
-  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensaje:txt,contexto:ctx})})
+  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensaje:txt,contexto:ctx,perfil:_perfil})})
     .then(function(r){return r.json();})
-    .then(function(d){t.remove();if(d.contexto)ctx=d.contexto;addMsg(d.respuesta);})
+    .then(function(d){
+      t.remove();
+      if(d.contexto)ctx=d.contexto;
+      var msgEl=addMsg(d.respuesta);
+      if(d.alimento_detectado){
+        var ad=d.alimento_detectado;
+        var atdBtn=document.createElement('button');
+        atdBtn.className='add-to-diary-btn';
+        atdBtn.textContent='\u2295 A\u00f1adir al diario';
+        atdBtn.addEventListener('click',function(){
+          window._diaryAddFromChat(ad.nombre,ad.kcal,ad.proteina,ad.carbos,ad.grasa);
+        });
+        msgEl.querySelector('.b').appendChild(atdBtn);
+      }
+      _runAlerts(msgEl);
+    })
     .catch(function(){t.remove();addMsg('Error de conexion. Intenta de nuevo.');});
 }
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
@@ -866,7 +1101,8 @@ async def get_js():
 async def chat(data: dict):
     mensaje = data.get("mensaje", "")
     contexto = data.get("contexto", {}) or {}
-    return generar_respuesta(mensaje, contexto)
+    perfil = data.get("perfil")
+    return generar_respuesta(mensaje, contexto, perfil=perfil)
 
 
 @app.post("/api/analyze-foto")

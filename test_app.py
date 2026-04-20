@@ -144,3 +144,42 @@ def test_no_top_tabs():
 def test_prof_btn_present():
     r = client.get("/")
     assert b'id="prof-btn"' in r.content
+
+
+# --- Feature: Profile modal ---
+
+def test_profile_modal_present():
+    r = client.get("/")
+    assert b'id="modal-perfil"' in r.content
+
+def test_profile_guardar_btn():
+    r = client.get("/")
+    assert b'id="perfil-guardar"' in r.content
+
+
+# --- Feature: Diary panel ---
+
+def test_panel_diario_present():
+    r = client.get("/")
+    assert b'id="panel-diario"' in r.content
+
+def test_weekly_chart_container():
+    r = client.get("/")
+    assert b'id="diary-chart"' in r.content
+
+def test_alimento_detectado_field():
+    r = client.post("/api/chat", json={"mensaje": "cu\u00e1ntas calor\u00edas tiene el arroz", "contexto": {}})
+    assert r.status_code == 200
+    data = r.json()
+    assert "respuesta" in data
+    if "alimento_detectado" in data:
+        ad = data["alimento_detectado"]
+        assert "nombre" in ad
+        assert "kcal" in ad
+
+
+# --- Feature: Alerts JS ---
+
+def test_run_alerts_defined_in_js():
+    r = client.get("/app.js")
+    assert b"_runAlerts" in r.content
