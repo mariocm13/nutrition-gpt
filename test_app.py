@@ -129,3 +129,18 @@ def test_calories_endpoint_unknown_food():
     assert r.status_code == 200
     data = r.json()
     assert data["found"] is False
+
+
+# --- Feature: Bottom nav ---
+
+def test_bottom_nav_present():
+    r = client.get("/")
+    assert b'class="bottom-nav"' in r.content
+
+def test_no_top_tabs():
+    r = client.get("/")
+    assert b'class="tabs"' not in r.content
+
+def test_prof_btn_present():
+    r = client.get("/")
+    assert b'id="prof-btn"' in r.content

@@ -70,7 +70,7 @@ html.dark{
   --accent-muted:#1a3a1a;
 }
 html,body{height:100%;overflow:hidden;background:var(--bg);overscroll-behavior:none}
-body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;line-height:1.5;transition:background .25s,color .25s;display:flex;flex-direction:column}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;line-height:1.5;transition:background .25s,color .25s;display:flex;flex-direction:column;padding-bottom:60px}
 .app{max-width:860px;width:100%;flex:1;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);transition:background .25s;overflow:hidden}
 
 /* ── Header ── */
@@ -85,12 +85,11 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;l
 .hdr-btn:hover{color:var(--text);background:var(--bg)}
 .hdr-btn svg{width:16px;height:16px;fill:currentColor}
 
-/* ── Tabs ── */
-.tabs{display:flex;gap:4px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
-.tab{flex:1;padding:8px 10px;font-size:13px;font-weight:600;color:var(--muted);background:transparent;border:none;border-radius:10px;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px}
-.tab:hover{color:var(--text);background:var(--bg)}
-.tab.active{background:var(--accent-light);color:var(--accent)}
-.tab-icon{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* ── Bottom Nav ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;height:60px;max-width:860px;margin:0 auto}
+.nav-tab{flex:1;height:60px;min-width:44px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .18s}
+.nav-tab.active{color:var(--accent)}
+.nav-tab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 
 /* ── Panels ── */
 .panel{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
@@ -214,15 +213,27 @@ small{font-size:12px}
       <p>Asistente de nutrici\u00f3n</p>
     </div>
     <div class="header-end">
+      <button id="prof-btn" class="hdr-btn" title="Perfil" aria-label="Perfil de usuario">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
       <button id="dm" class="hdr-btn" title="Modo oscuro" aria-label="Alternar modo oscuro">
         <svg id="dm-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
     </div>
   </div>
-  <nav class="tabs">
-    <button class="tab active" data-tab="chat"><svg class="tab-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat</button>
-    <button class="tab" data-tab="calc"><svg class="tab-icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h4"/></svg>Calculadora</button>
-    <button class="tab" data-tab="foto"><svg class="tab-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Foto</button>
+  <nav class="bottom-nav">
+    <button class="nav-tab active" data-tab="chat">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </button>
+    <button class="nav-tab" data-tab="diario">
+      <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    </button>
+    <button class="nav-tab" data-tab="calc">
+      <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4"/></svg>
+    </button>
+    <button class="nav-tab" data-tab="foto">
+      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    </button>
   </nav>
   <div id="panel-chat" class="panel active">
     <div class="msgs" id="msgs">
@@ -542,10 +553,10 @@ var saved=null;try{saved=localStorage.getItem('nutria-dark');}catch(e){}
 var prefersDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches);
 setDark(saved!==null?saved==='1':prefersDark);
 dmBtn.addEventListener('click',function(){setDark(!document.documentElement.classList.contains('dark'));});
-document.querySelectorAll('.tab').forEach(function(tab){
+document.querySelectorAll('.nav-tab').forEach(function(tab){
   tab.addEventListener('click',function(){
     var id=tab.dataset.tab;
-    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t===tab);});
+    document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.toggle('active',t===tab);});
     document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+id);});
   });
 });
