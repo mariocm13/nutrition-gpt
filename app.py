@@ -9,9 +9,9 @@ import base64
 from groq import Groq
 from nlp_processor import NLPProcessor
 
-app = FastAPI(title="NutriGPT")
+app = FastAPI(title="NutrIA")
 
-ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "https://nutrigpt.onrender.com").split(",")
+ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "https://nutria.onrender.com").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -29,12 +29,12 @@ HTML_PAGE = """<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NutriGPT</title>
+<title>NutrIA</title>
 <meta name="theme-color" content="#3a9d6e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="NutriGPT">
+<meta name="apple-mobile-web-app-title" content="NutrIA">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -207,10 +207,10 @@ small{font-size:12px}
 <div class="app">
   <div class="header">
     <div class="icon">
-      <img src="/logo.png" alt="NutriGPT logo">
+      <img src="/logo.png" alt="NutrIA logo">
     </div>
     <div class="header-info">
-      <h1>NutriGPT</h1>
+      <h1>NutrIA</h1>
       <p>Asistente de nutrici\u00f3n</p>
     </div>
     <div class="header-end">
@@ -229,7 +229,7 @@ small{font-size:12px}
       <div class="m bot">
         <div class="avatar"><svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 5-8 5"/></svg></div>
         <div class="b">
-          Hola, soy <strong>NutriGPT</strong>.<br><br>
+          Hola, soy <strong>NutrIA</strong>.<br><br>
           Preg\u00fantame sobre recetas, calor\u00edas o nutrici\u00f3n. Por ejemplo:<br>
           \u2014 <em>Qu\u00e9 puedo cocinar con pollo y arroz</em><br>
           \u2014 <em>Cu\u00e1ntas calor\u00edas tiene el salm\u00f3n</em><br>
@@ -432,7 +432,7 @@ def buscar_alimento(termino):
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 SYSTEM_PROMPT = (
-    "Eres NutriGPT, un asistente de nutrición experto en cocina española e internacional. "
+    "Eres NutrIA, un asistente de nutrición experto en cocina española e internacional. "
     "Respondes siempre en español, de forma clara, amigable y concisa. "
     "Usa formato HTML simple: <strong> para énfasis, <br> para saltos de línea, <em> para cursiva. "
     "No uses markdown (no uses **, ##, *, etc). "
@@ -534,9 +534,9 @@ var MOON='<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
 function setDark(on){
   document.documentElement.classList.toggle('dark',on);
   dmIcon.innerHTML=on?SUN:MOON;
-  try{localStorage.setItem('nutrigpt-dark',on?'1':'0');}catch(e){}
+  try{localStorage.setItem('nutria-dark',on?'1':'0');}catch(e){}
 }
-var saved=null;try{saved=localStorage.getItem('nutrigpt-dark');}catch(e){}
+var saved=null;try{saved=localStorage.getItem('nutria-dark');}catch(e){}
 var prefersDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches);
 setDark(saved!==null?saved==='1':prefersDark);
 dmBtn.addEventListener('click',function(){setDark(!document.documentElement.classList.contains('dark'));});
@@ -920,8 +920,8 @@ async def get_stats():
 
 
 MANIFEST = {
-    "name": "NutriGPT",
-    "short_name": "NutriGPT",
+    "name": "NutrIA",
+    "short_name": "NutrIA",
     "description": "Asistente de nutrición: calorías, macros, calculadora TDEE y estimación por foto",
     "start_url": "/",
     "display": "standalone",
@@ -935,7 +935,7 @@ MANIFEST = {
 }
 
 SW_CODE = r"""
-const CACHE='nutrigpt-v1';
+const CACHE='nutria-v1';
 const PRECACHE=['/','/app.js'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/','/app.js'])).then(()=>self.skipWaiting()));

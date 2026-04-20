@@ -1,4 +1,4 @@
-"""Tests for NutriGPT app endpoints and critical functionality."""
+"""Tests for NutrIA app endpoints and critical functionality."""
 import pytest
 from fastapi.testclient import TestClient
 from app import app
@@ -57,7 +57,7 @@ def test_manifest_uses_logo_png():
 def test_manifest_fields():
     r = client.get("/manifest.json")
     data = r.json()
-    assert data["name"] == "NutriGPT"
+    assert data["name"] == "NutrIA"
     assert data["display"] == "standalone"
 
 

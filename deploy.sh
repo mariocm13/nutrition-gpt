@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de automatización para NutriGPT
+# Script de automatización para NutrIA
 # Uso: ./deploy.sh "Mensaje del commit"
 
 # Colores para la consola
@@ -9,7 +9,7 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🚀 Iniciando proceso de actualización para NutriGPT...${NC}"
+echo -e "${BLUE}🚀 Iniciando proceso de actualización para NutrIA...${NC}"
 
 # 1. Verificar si se proporcionó un mensaje de commit
 if [ -z "$1" ]; then
@@ -43,4 +43,4 @@ else
     exit 1
 fi
 
-echo -e "${BLUE}✨ ¡Proceso completado! Tu NutriGPT se actualizará en unos minutos.${NC}"
+echo -e "${BLUE}✨ ¡Proceso completado! Tu NutrIA se actualizará en unos minutos.${NC}"

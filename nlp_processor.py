@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 
 
 class NLPProcessor:
-    """Procesador de lenguaje natural basado en reglas para NutriGPT."""
+    """Procesador de lenguaje natural basado en reglas para NutrIA."""
 
     def __init__(self):
         self.palabras_recetas = {

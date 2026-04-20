@@ -1,8 +1,8 @@
-# NutriGPT
+# NutrIA
 
 Asistente de nutrición web con chat inteligente, galería de recetas con fotos y base de datos nutricional completa.
 
-**Demo en vivo:** [https://nutrigpt.onrender.com](https://nutrigpt.onrender.com)
+**Demo en vivo:** [https://nutria.onrender.com](https://nutria.onrender.com)
 
 ---
 
@@ -47,8 +47,8 @@ Asistente de nutrición web con chat inteligente, galería de recetas con fotos 
 ## Instalación local
 
 ```bash
-git clone https://github.com/mariocm13/nutrition-gpt.git
-cd nutrition-gpt
+git clone https://github.com/mariocm13/nutria.git
+cd nutria
 pip install -r requirements.txt
 python app.py
 ```
@@ -82,7 +82,7 @@ POST /api/chat
 ## Estructura
 
 ```
-nutrition-gpt/
+nutria/
 ├── app.py                 # Servidor FastAPI + HTML embebido
 ├── nlp_processor.py       # Procesamiento del lenguaje natural
 ├── main.py                # Versión CLI

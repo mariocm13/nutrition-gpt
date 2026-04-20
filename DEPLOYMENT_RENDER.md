@@ -1,10 +1,10 @@
-# Guía de Despliegue en Render - NutriGPT
+# Guía de Despliegue en Render - NutrIA
 
-Esta guía te mostrará cómo desplegar tu **NutriGPT** en **Render** para que sea accesible desde cualquier lugar del mundo de forma **completamente gratuita**.
+Esta guía te mostrará cómo desplegar tu **NutrIA** en **Render** para que sea accesible desde cualquier lugar del mundo de forma **completamente gratuita**.
 
 ## Paso 1: Preparar tu Repositorio en GitHub
 
-Tu repositorio ya está listo en: `https://github.com/mariocm13/nutrition-gpt`
+Tu repositorio ya está listo en: `https://github.com/mariocm13/nutria`
 
 Asegúrate de que todos los cambios estén subidos:
 ```bash
@@ -25,7 +25,7 @@ git push origin main
 
 1. En el dashboard de Render, haz clic en **"New +"** (arriba a la derecha)
 2. Selecciona **"Web Service"**
-3. Busca y selecciona tu repositorio **`nutrition-gpt`**
+3. Busca y selecciona tu repositorio **`nutria`**
 4. Haz clic en **"Connect"**
 
 ## Paso 4: Configurar el Servicio
@@ -34,7 +34,7 @@ Completa los campos con la siguiente información:
 
 | Campo | Valor |
 | :--- | :--- |
-| **Name** | `nutrigpt` (o el nombre que prefieras) |
+| **Name** | `nutria` (o el nombre que prefieras) |
 | **Environment** | `Python 3` |
 | **Build Command** | `pip install -r requirements.txt` |
 | **Start Command** | `uvicorn app:app --host 0.0.0.0 --port $PORT` |
@@ -50,10 +50,10 @@ Completa los campos con la siguiente información:
 
 Una vez desplegado, Render te proporcionará una URL como:
 ```
-https://nutrigpt.onrender.com
+https://nutria.onrender.com
 ```
 
-**¡Esta es tu URL pública!** Puedes compartirla con cualquiera y acceder a NutriGPT desde cualquier dispositivo.
+**¡Esta es tu URL pública!** Puedes compartirla con cualquiera y acceder a NutrIA desde cualquier dispositivo.
 
 ## Información Importante sobre el Plan Gratuito
 
@@ -98,4 +98,4 @@ Una vez desplegado, puedes:
 - Personalizar el nombre del dominio (con plan de pago)
 - Integrar con otras herramientas
 
-¡Tu NutriGPT está listo para el mundo! 🌍
+¡Tu NutrIA está listo para el mundo! 🌍

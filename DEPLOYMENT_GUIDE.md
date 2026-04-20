@@ -10,9 +10,9 @@ Render es muy sencillo y detectará automáticamente tu configuración.
 
 1.  **Crear cuenta**: Regístrate en [Render.com](https://render.com/) usando tu cuenta de GitHub.
 2.  **Nuevo Web Service**: Haz clic en el botón **"New +"** y selecciona **"Web Service"**.
-3.  **Conectar Repositorio**: Busca y selecciona tu repositorio `nutrition-gpt`.
+3.  **Conectar Repositorio**: Busca y selecciona tu repositorio `nutria`.
 4.  **Configuración del servicio**:
-    *   **Name**: `nutrition-gpt-tu-nombre`
+    *   **Name**: `nutria-tu-nombre`
     *   **Environment**: `Python 3`
     *   **Build Command**: `pip install -r requirements.txt`
     *   **Start Command**: `python app.py` (o mejor: `uvicorn app:app --host 0.0.0.0 --port $PORT`)
@@ -29,7 +29,7 @@ Railway es otra opción muy rápida y moderna.
 
 1.  Entra en [Railway.app](https://railway.app/) y conecta tu GitHub.
 2.  Selecciona **"New Project"** > **"Deploy from GitHub repo"**.
-3.  Elige tu repositorio `nutrition-gpt`.
+3.  Elige tu repositorio `nutria`.
 4.  Railway detectará el archivo `requirements.txt` y desplegará la aplicación automáticamente.
 
 ---
