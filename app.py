@@ -347,7 +347,9 @@ html.dark .alert-card.red{background:#200a0a;color:#f87171}
       <div class="diary-add-err" id="diary-add-err"></div>
       <div class="chart-wrap">
         <div class="chart-wrap-title">\u00daltimos 7 d\u00edas \u2014 Calor\u00edas</div>
-        <canvas id="diary-chart" height="160"></canvas>
+        <div style="position:relative;height:160px">
+          <canvas id="diary-chart"></canvas>
+        </div>
         <div class="chart-fallback" id="chart-fallback">Gr\u00e1fica no disponible</div>
       </div>
     </div>
@@ -659,10 +661,10 @@ def generar_respuesta(mensaje, contexto=None, perfil=None):
             first = datos_locales[0]
             result["alimento_detectado"] = {
                 "nombre": first.get("nombre", ""),
-                "kcal": first.get("kcal_100", 0),
-                "proteina": first.get("proteina_100", 0),
-                "carbos": first.get("carbos_100", 0),
-                "grasa": first.get("grasa_100", 0),
+                "kcal": first.get("calorias", 0),
+                "proteina": first.get("proteina", 0),
+                "carbos": first.get("carbohidratos", 0),
+                "grasa": first.get("grasas", 0),
             }
         return result
 
@@ -1042,8 +1044,8 @@ var _renderDiary;
     fetch('/api/calories?food='+encodeURIComponent(nombre))
       .then(function(r){return r.json();})
       .then(function(d){
-        if(!d||!d.kcal_100){err.textContent='Alimento no encontrado.';return;}
-        _addEntry(nombre,gramos,{kcal:d.kcal_100,proteina:d.proteina_100,carbos:d.carbos_100,grasa:d.grasa_100});
+        if(!d||!d.calorias){err.textContent='Alimento no encontrado.';return;}
+        _addEntry(nombre,gramos,{kcal:d.calorias,proteina:d.proteina||0,carbos:d.carbohidratos||0,grasa:d.grasas||0});
         document.getElementById('diary-food-inp').value='';
         document.getElementById('diary-g-inp').value=100;
       })
