@@ -227,7 +227,6 @@ small{font-size:12px}
   <div id="panel-chat" class="panel active">
     <div class="msgs" id="msgs">
       <div class="m bot">
-        <div class="avatar"><svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 5-8 5"/></svg></div>
         <div class="b">
           Hola, soy <strong>NutrIA</strong>.<br><br>
           Preg\u00fantame sobre recetas, calor\u00edas o nutrici\u00f3n. Por ejemplo:<br>
@@ -476,6 +475,9 @@ def generar_respuesta(mensaje, contexto=None):
         messages.append({"role": role, "content": turno["text"]})
     messages.append({"role": "user", "content": mensaje_con_datos})
 
+    if not GROQ_API_KEY:
+        return {"respuesta": "El servicio de IA no está configurado. Contacta al administrador.", "contexto": contexto}
+
     try:
         cliente = Groq(api_key=GROQ_API_KEY)
         response = cliente.chat.completions.create(
@@ -548,11 +550,9 @@ document.querySelectorAll('.tab').forEach(function(tab){
   });
 });
 	var ctx={last_recipe_ids:[],last_selected_recipe_id:null};
-	var AVATAR_IMG='<img src="/icon-192.png" alt="Bot">';
 	function addMsg(html,isUser,cls){
   var m=document.createElement('div');
   m.className='m '+(isUser?'u':'bot')+(cls?' '+cls:'');
-	  if(!isUser){var av=document.createElement('div');av.className='avatar';av.innerHTML=AVATAR_IMG;m.appendChild(av);}
   var b=document.createElement('div');b.className='b';b.innerHTML=html;
   m.appendChild(b);msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;return m;
 }
