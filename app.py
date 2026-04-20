@@ -875,6 +875,231 @@ calcGo.addEventListener('click',function(){
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').catch(function(){});
 }
+// ── Diary ──
+var _renderDiary;
+(function(){
+  var _diary={};
+  var _today=new Date();
+  var _curDate=new Date(_today.getFullYear(),_today.getMonth(),_today.getDate());
+  function _dateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function _loadDiary(){try{var s=localStorage.getItem('nutria-diary');if(s)_diary=JSON.parse(s);}catch(e){}}
+  function _saveDiary(){try{localStorage.setItem('nutria-diary',JSON.stringify(_diary));}catch(e){}}
+  _loadDiary();
+  function _dayEntries(key){return _diary[key]||[];}
+  function _totals(entries){
+    return entries.reduce(function(a,e){
+      a.kcal+=(e.kcal||0);a.prot+=(e.proteina||0);a.carbs+=(e.carbos||0);a.fat+=(e.grasa||0);return a;
+    },{kcal:0,prot:0,carbs:0,fat:0});
+  }
+  function _progressClass(pct){return pct>110?'over':pct>90?'warn':'ok';}
+  function _updateBar(id,pct){
+    var el=document.getElementById(id);
+    if(!el)return;
+    el.style.width=Math.min(pct,100)+'%';
+    el.className='progress-fill '+_progressClass(pct);
+  }
+  function _renderSummary(){
+    var key=_dateKey(_curDate);
+    var t=_totals(_dayEntries(key));
+    var goals=_computeGoals();
+    document.getElementById('sc-kcal-val').textContent=Math.round(t.kcal);
+    document.getElementById('sc-prot-val').textContent=Math.round(t.prot)+'g';
+    document.getElementById('sc-carbs-val').textContent=Math.round(t.carbs)+'g';
+    document.getElementById('sc-fat-val').textContent=Math.round(t.fat)+'g';
+    if(goals){
+      document.getElementById('sc-kcal-goal').textContent='/ '+goals.kcal+' kcal';
+      document.getElementById('sc-prot-goal').textContent='/ '+goals.prot+'g';
+      document.getElementById('sc-carbs-goal').textContent='/ '+goals.carbs+'g';
+      document.getElementById('sc-fat-goal').textContent='/ '+goals.fat+'g';
+      _updateBar('sc-kcal-bar',goals.kcal>0?Math.round(t.kcal/goals.kcal*100):0);
+      _updateBar('sc-prot-bar',goals.prot>0?Math.round(t.prot/goals.prot*100):0);
+      _updateBar('sc-carbs-bar',goals.carbs>0?Math.round(t.carbs/goals.carbs*100):0);
+      _updateBar('sc-fat-bar',goals.fat>0?Math.round(t.fat/goals.fat*100):0);
+    } else {
+      ['sc-kcal-goal','sc-prot-goal','sc-carbs-goal','sc-fat-goal'].forEach(function(id){
+        var el=document.getElementById(id);if(el)el.textContent='/ \u2014';
+      });
+    }
+  }
+  function _renderList(){
+    var key=_dateKey(_curDate);
+    var entries=_dayEntries(key);
+    var list=document.getElementById('diary-list');
+    if(!entries.length){list.innerHTML='<div class="diary-empty">No hay entradas para este d\u00eda</div>';return;}
+    list.innerHTML=entries.map(function(e,i){
+      return '<div class="diary-entry">'+
+        '<span class="diary-entry-name">'+e.nombre+'</span>'+
+        '<span class="diary-entry-meta">'+e.gramos+'g \u00b7 '+Math.round(e.kcal)+' kcal</span>'+
+        '<button class="diary-del" data-idx="'+i+'">\u00d7</button>'+
+        '</div>';
+    }).join('');
+    list.querySelectorAll('.diary-del').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var idx=parseInt(btn.dataset.idx);
+        _diary[key].splice(idx,1);
+        if(!_diary[key].length)delete _diary[key];
+        _saveDiary();_render();
+      });
+    });
+  }
+  function _updateDateLabel(){
+    var opts={day:'numeric',month:'short',year:'numeric'};
+    var lbl=document.getElementById('diary-date-lbl');
+    if(lbl)lbl.textContent=_curDate.toLocaleDateString('es-ES',opts);
+    var nextBtn=document.getElementById('diary-next');
+    var todayKey=_dateKey(new Date());
+    if(nextBtn)nextBtn.disabled=_dateKey(_curDate)===todayKey;
+  }
+  var _chart=null;
+  function _renderChart(){
+    var canvas=document.getElementById('diary-chart');
+    var fallback=document.getElementById('chart-fallback');
+    if(!canvas)return;
+    if(typeof Chart==='undefined'){
+      canvas.style.display='none';
+      if(fallback)fallback.style.display='block';
+      return;
+    }
+    var labels=[],data=[];
+    for(var i=6;i>=0;i--){
+      var d=new Date(_today.getFullYear(),_today.getMonth(),_today.getDate()-i);
+      var key=_dateKey(d);
+      labels.push(d.toLocaleDateString('es-ES',{day:'numeric',month:'short'}));
+      data.push(Math.round(_totals(_dayEntries(key)).kcal));
+    }
+    var goals=_computeGoals();
+    var goalKcal=goals?goals.kcal:null;
+    var accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#16a34a';
+    if(_chart){_chart.destroy();_chart=null;}
+    var datasets=[{
+      data:data,
+      backgroundColor:accent+'99',
+      borderColor:accent,
+      borderWidth:1,
+      borderRadius:6,
+    }];
+    if(goalKcal){
+      datasets.push({
+        type:'line',
+        data:Array(7).fill(goalKcal),
+        borderColor:'#ef4444',
+        borderWidth:1.5,
+        borderDash:[4,4],
+        pointRadius:0,
+        fill:false,
+      });
+    }
+    _chart=new Chart(canvas,{
+      type:'bar',
+      data:{labels:labels,datasets:datasets},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{display:false}},
+          y:{beginAtZero:true,grid:{color:'rgba(128,128,128,.1)'}}
+        }
+      }
+    });
+  }
+  function _render(){_renderSummary();_renderList();_updateDateLabel();_renderChart();}
+  _renderDiary=_render;
+  document.getElementById('diary-prev').addEventListener('click',function(){
+    _curDate.setDate(_curDate.getDate()-1);_render();
+  });
+  document.getElementById('diary-next').addEventListener('click',function(){
+    var todayDate=new Date(_today.getFullYear(),_today.getMonth(),_today.getDate());
+    if(_curDate<todayDate){_curDate.setDate(_curDate.getDate()+1);_render();}
+  });
+  function _addEntry(nombre,gramos,data){
+    var key=_dateKey(_curDate);
+    var factor=gramos/100;
+    var entry={
+      nombre:nombre,gramos:gramos,
+      kcal:(data.kcal||0)*factor,
+      proteina:(data.proteina||0)*factor,
+      carbos:(data.carbos||0)*factor,
+      grasa:(data.grasa||0)*factor,
+    };
+    if(!_diary[key])_diary[key]=[];
+    _diary[key].push(entry);
+    _saveDiary();_render();
+  }
+  window._diaryAddFromChat=function(nombre,kcal100,prot100,carbs100,fat100){
+    document.getElementById('diary-food-inp').value=nombre;
+    document.getElementById('diary-g-inp').value=100;
+    document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab==='diario');});
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-diario');});
+    _render();
+    document.getElementById('diary-food-inp').focus();
+  };
+  document.getElementById('diary-add-btn').addEventListener('click',function(){
+    var nombre=document.getElementById('diary-food-inp').value.trim();
+    var gramos=parseFloat(document.getElementById('diary-g-inp').value)||100;
+    var err=document.getElementById('diary-add-err');
+    if(!nombre){err.textContent='Introduce el nombre del alimento.';return;}
+    err.textContent='';
+    fetch('/api/calories?food='+encodeURIComponent(nombre))
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.kcal_100){err.textContent='Alimento no encontrado.';return;}
+        _addEntry(nombre,gramos,{kcal:d.kcal_100,proteina:d.proteina_100,carbos:d.carbos_100,grasa:d.grasa_100});
+        document.getElementById('diary-food-inp').value='';
+        document.getElementById('diary-g-inp').value=100;
+      })
+      .catch(function(){err.textContent='Error al buscar el alimento.';});
+  });
+  document.getElementById('diary-food-inp').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();document.getElementById('diary-add-btn').click();}
+  });
+  document.querySelectorAll('.nav-tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      if(tab.dataset.tab==='diario')_render();
+    });
+  });
+  window._getDiaryTotals=function(){
+    return _totals(_dayEntries(_dateKey(new Date(_today.getFullYear(),_today.getMonth(),_today.getDate()))));
+  };
+})();
+// ── Alerts ──
+function _runAlerts(msgEl){
+  if(!_perfil||!_perfil.peso||!_perfil.altura||!_perfil.edad)return;
+  var t=typeof window._getDiaryTotals==='function'?window._getDiaryTotals():null;
+  if(!t||t.kcal===0)return;
+  var goals=_computeGoals();
+  if(!goals)return;
+  var checks=[
+    {key:'kcal', label:'Calor\u00edas', consumed:t.kcal,  goal:goals.kcal,  unit:'kcal'},
+    {key:'prot', label:'Prote\u00edna', consumed:t.prot,  goal:goals.prot,  unit:'g'},
+    {key:'carbs',label:'Carbos',        consumed:t.carbs, goal:goals.carbs, unit:'g'},
+    {key:'fat',  label:'Grasa',         consumed:t.fat,   goal:goals.fat,   unit:'g'},
+  ];
+  var worst=null;
+  checks.forEach(function(c){
+    if(!c.goal)return;
+    var pct=c.consumed/c.goal*100;
+    var score=0,level='',text='';
+    if(pct>110){
+      score=100;level='red';
+      text=c.label+': has superado el objetivo en ~'+Math.round(c.consumed-c.goal)+' '+c.unit;
+    } else if(pct>=90){
+      score=50;level='green';
+      text='\u00a1'+c.label+' del d\u00eda completada! ('+Math.round(pct)+'%)';
+    } else if(pct>=50){
+      score=10;level='yellow';
+      text=c.label+': te faltan ~'+Math.round(c.goal-c.consumed)+' '+c.unit;
+    } else {
+      score=20;level='red';
+      text=c.label+': solo llevas el '+Math.round(pct)+'% del objetivo';
+    }
+    if(!worst||score>worst.score)worst={score:score,level:level,text:text};
+  });
+  if(!worst)return;
+  var card=document.createElement('div');
+  card.className='alert-card '+worst.level;
+  card.textContent=worst.text;
+  msgEl.querySelector('.b').appendChild(card);
+}
 
 // ─── FOTO PANEL ───────────────────────────────────────────────
 (function(){
