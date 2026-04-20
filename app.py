@@ -46,7 +46,7 @@ HTML_PAGE = """<!DOCTYPE html>
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="NutriGPT">
 <link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
@@ -79,9 +79,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);overscroll-behavior:n
 body{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;line-height:1.5;transition:background .3s,color .3s;display:flex;flex-direction:column}
 .app{max-width:960px;width:100%;flex:1;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);transition:background .3s;overflow:hidden}
 .header{padding:18px 22px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0}
-.icon{width:46px;height:46px;background:linear-gradient(135deg,#42b87a 0%,#1f8c4e 100%);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:5px 5px 12px rgba(31,140,78,.45),-3px -3px 8px rgba(255,255,255,.65)}
+.icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:5px 5px 12px rgba(31,140,78,.45),-3px -3px 8px rgba(255,255,255,.65);overflow:hidden;background:transparent}
 html.dark .icon{box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(74,222,128,.15)}
-.icon svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icon img{width:100%;height:100%;object-fit:cover;border-radius:14px}
 .header h1{font-size:17px;font-weight:700;letter-spacing:-.4px}
 .header p{font-size:11px;color:var(--muted);margin-top:2px}
 .header-end{margin-left:auto}
@@ -114,6 +114,9 @@ html.dark #btn{box-shadow:4px 4px 10px rgba(0,0,0,.4),-2px -2px 6px rgba(74,222,
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(70px);opacity:0}to{transform:translateY(0);opacity:1}}
+#splash{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .6s ease}
+#splash.hidden{opacity:0;pointer-events:none}
+#splash video{width:100%;height:100%;object-fit:cover}
 small{font-size:12px}
 .calc-wrap{flex:1;overflow-y:auto;padding:18px 22px 30px;-webkit-overflow-scrolling:touch}
 .calc-card{background:var(--bg);border-radius:22px;padding:22px;box-shadow:var(--sh);margin-bottom:18px}
@@ -298,10 +301,13 @@ small{font-size:12px}
 </style>
 </head>
 <body>
+<div id="splash">
+  <video id="splash-video" playsinline muted autoplay></video>
+</div>
 <div class="app">
   <div class="header">
     <div class="icon">
-      <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 5-8 5"/></svg>
+      <img src="/logo.png" alt="NutriGPT logo">
     </div>
     <div>
       <h1>NutriGPT</h1>
@@ -1129,6 +1135,24 @@ def generar_respuesta(mensaje, contexto=None):
 
 
 JS_CODE = r"""(function(){
+var _splash=document.getElementById('splash');
+var _splashVideo=document.getElementById('splash-video');
+var _splashDismissed=false;
+function _dismissSplash(){
+  if(_splashDismissed)return;
+  _splashDismissed=true;
+  clearTimeout(_splashFallback);
+  _splash.classList.add('hidden');
+  _splash.addEventListener('transitionend',function(){_splash.remove();},{once:true});
+}
+var _isMobilePortrait=(window.innerWidth<=767&&window.innerHeight>window.innerWidth)
+  ||window.matchMedia('(max-width:767px) and (orientation:portrait)').matches;
+_splashVideo.src=_isMobilePortrait?'/anim-9-16.mp4':'/anim-4-3.mp4';
+_splashVideo.addEventListener('ended',_dismissSplash);
+_splash.addEventListener('click',_dismissSplash);
+_splashVideo.addEventListener('error',_dismissSplash);
+var _splashFallback=setTimeout(_dismissSplash,8000);
+_splashVideo.play().catch(_dismissSplash);
 var dmBtn=document.getElementById('dm');
 var dmIcon=document.getElementById('dm-icon');
 var msgs=document.getElementById('msgs');
@@ -1944,8 +1968,7 @@ MANIFEST = {
     "theme_color": "#3a9d6e",
     "orientation": "portrait-primary",
     "icons": [
-        {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-        {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+        {"src": "/logo.png", "sizes": "192x192 512x512 1024x1024", "type": "image/png", "purpose": "any maskable"},
     ],
     "categories": ["health", "food"],
 }
@@ -1977,12 +2000,6 @@ self.addEventListener('fetch',e=>{
 });
 """
 
-# SVG icon rendered as PNG placeholder (simple green circle with leaf)
-ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 {s} {s}">
-<rect width="{s}" height="{s}" rx="{r}" fill="#3a9d6e"/>
-<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="{fs}" font-family="system-ui">🥗</text>
-</svg>"""
-
 
 @app.get("/manifest.json")
 async def get_manifest():
@@ -2002,18 +2019,50 @@ async def get_sw():
 
 @app.get("/icon-192.png")
 async def get_icon_192():
-    from fastapi.responses import Response
-    svg = ICON_SVG.format(s=192, r=40, fs=120)
-    return Response(content=svg.encode(), media_type="image/svg+xml",
-                    headers={"Cache-Control": "public, max-age=604800"})
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/logo.png", status_code=302)
 
 
 @app.get("/icon-512.png")
 async def get_icon_512():
-    from fastapi.responses import Response
-    svg = ICON_SVG.format(s=512, r=100, fs=320)
-    return Response(content=svg.encode(), media_type="image/svg+xml",
-                    headers={"Cache-Control": "public, max-age=604800"})
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/logo.png", status_code=302)
+
+
+@app.get("/logo.png")
+async def get_logo():
+    from fastapi.responses import FileResponse
+    import os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Logo.png")
+    return FileResponse(path, media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=604800"})
+
+
+@app.get("/anim-9-16.mp4")
+async def get_anim_9_16():
+    from fastapi.responses import FileResponse
+    import os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Animación_9_16.mp4")
+    return FileResponse(path, media_type="video/mp4",
+                        headers={"Cache-Control": "public, max-age=604800"})
+
+
+@app.get("/anim-4-3.mp4")
+async def get_anim_4_3():
+    from fastapi.responses import FileResponse
+    import os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Animación_4_3.mp4")
+    return FileResponse(path, media_type="video/mp4",
+                        headers={"Cache-Control": "public, max-age=604800"})
+
+
+@app.get("/anim-1-1.mp4")
+async def get_anim_1_1():
+    from fastapi.responses import FileResponse
+    import os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Animación_1_1.mp4")
+    return FileResponse(path, media_type="video/mp4",
+                        headers={"Cache-Control": "public, max-age=604800"})
 
 
 if __name__ == "__main__":
