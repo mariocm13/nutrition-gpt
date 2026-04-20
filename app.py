@@ -523,6 +523,9 @@ function _dismissSplash(){
 var _isMobilePortrait=(window.innerWidth<=767&&window.innerHeight>window.innerWidth)
   ||window.matchMedia('(max-width:767px) and (orientation:portrait)').matches;
 _splashVideo.src=_isMobilePortrait?'/anim-9-16.mp4':'/anim-4-3.mp4';
+_splashVideo.addEventListener('timeupdate',function(){
+  if(_splashVideo.duration&&_splashVideo.currentTime>=_splashVideo.duration-1.5)_dismissSplash();
+});
 _splashVideo.addEventListener('ended',_dismissSplash);
 _splash.addEventListener('click',_dismissSplash);
 _splashVideo.addEventListener('error',_dismissSplash);
