@@ -6,8 +6,7 @@ import os
 import re
 import unicodedata
 import base64
-from google import genai
-from google.genai import types as genai_types
+from groq import Groq
 from nlp_processor import NLPProcessor
 
 app = FastAPI(title="NutriGPT")
@@ -430,7 +429,7 @@ def buscar_alimento(termino):
 
 
 
-GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 SYSTEM_PROMPT = (
     "Eres NutriGPT, un asistente de nutrición experto en cocina española e internacional. "
@@ -471,27 +470,21 @@ def generar_respuesta(mensaje, contexto=None):
         datos_str = json.dumps(datos_locales, ensure_ascii=False)
         mensaje_con_datos += f"\n[Base de datos local — usa estos datos: {datos_str}]"
 
-    contents = []
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     for turno in historial:
-        contents.append(
-            genai_types.Content(role=turno["role"], parts=[genai_types.Part(text=turno["text"])])
-        )
-    contents.append(
-        genai_types.Content(role="user", parts=[genai_types.Part(text=mensaje_con_datos)])
-    )
+        role = "assistant" if turno["role"] == "model" else "user"
+        messages.append({"role": role, "content": turno["text"]})
+    messages.append({"role": "user", "content": mensaje_con_datos})
 
     try:
-        cliente = genai.Client(api_key=GEMINI_API_KEY)
-        response = cliente.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=contents,
-            config=genai_types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                max_output_tokens=600,
-                temperature=0.7,
-            ),
+        cliente = Groq(api_key=GROQ_API_KEY)
+        response = cliente.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            max_tokens=600,
+            temperature=0.7,
         )
-        respuesta = response.text.strip() if response.text else "No pude generar una respuesta."
+        respuesta = response.choices[0].message.content.strip()
 
         historial.append({"role": "user", "text": mensaje})
         historial.append({"role": "model", "text": respuesta})
@@ -872,7 +865,6 @@ async def analyze_foto(data: dict):
     if not image_b64:
         return {"error": "No se recibió imagen."}
 
-    client = genai.Client(api_key=GEMINI_API_KEY)
     prompt = (
         "Eres un nutricionista experto en cocina española e internacional. "
         "Analiza esta foto de comida y responde SOLO con un JSON válido (sin texto adicional, sin markdown) "
@@ -888,15 +880,19 @@ async def analyze_foto(data: dict):
         '{"error": "No se detecta comida en la imagen."}'
     )
     try:
-        image_data = base64.b64decode(image_b64)
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=[
-                genai_types.Part.from_bytes(data=image_data, mime_type=mime_type),
-                prompt,
-            ],
+        client = Groq(api_key=GROQ_API_KEY)
+        response = client.chat.completions.create(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{image_b64}"}},
+                ],
+            }],
+            max_tokens=300,
         )
-        raw = response.text.strip() if response.text else ""
+        raw = response.choices[0].message.content.strip()
         raw = re.sub(r"^```[a-z]*\n?", "", raw)
         raw = re.sub(r"\n?```$", "", raw)
         result = json.loads(raw)
