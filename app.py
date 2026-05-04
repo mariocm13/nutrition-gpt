@@ -13,7 +13,7 @@ app = FastAPI(title="NutrIA")
 
 ALLOWED_ORIGINS = os.environ.get(
     "ALLOWED_ORIGINS",
-    "https://nutria.vercel.app",
+    "https://nutrition-gpt-eta.vercel.app",
 ).split(",")
 app.add_middleware(
     CORSMiddleware,
