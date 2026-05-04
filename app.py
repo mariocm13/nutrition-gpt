@@ -11,7 +11,10 @@ from nlp_processor import NLPProcessor
 
 app = FastAPI(title="NutrIA")
 
-ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "https://nutria.onrender.com").split(",")
+ALLOWED_ORIGINS = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "https://nutria.vercel.app",
+).split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,

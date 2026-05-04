@@ -2,7 +2,7 @@
 
 Asistente de nutrición web con chat inteligente, galería de recetas con fotos y base de datos nutricional completa.
 
-**Demo en vivo:** [https://nutria.onrender.com](https://nutria.onrender.com)
+**Demo en vivo:** [https://nutria.vercel.app](https://nutria.vercel.app)
 
 ---
 
@@ -40,7 +40,7 @@ Asistente de nutrición web con chat inteligente, galería de recetas con fotos 
 | Frontend | HTML/CSS/JS vanilla (sin frameworks) |
 | NLP | Procesador propio en `nlp_processor.py` |
 | Datos | JSON local + Google Drive (recetas) |
-| Despliegue | Render |
+| Despliegue | Vercel |
 
 ---
 
@@ -97,7 +97,7 @@ nutria/
 
 ## Despliegue
 
-El proyecto se despliega automáticamente en Render al hacer push a `main`.
+El proyecto se despliega automáticamente en Vercel al hacer push a `main`.
 
 ```bash
 ./deploy.sh "descripción del cambio"

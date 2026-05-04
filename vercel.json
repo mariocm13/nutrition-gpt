@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "includeFiles": "{data/**,app.py,nlp_processor.py,Logo.png,NutrIALogo.png,Animación_1_1.mp4,Animación_4_3.mp4,Animación_9_16.mp4}"
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/api/index.py" }
+  ]
+}

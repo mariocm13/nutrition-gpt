@@ -36,8 +36,8 @@ git push origin main
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Cambios subidos con éxito a GitHub.${NC}"
-    echo -e "${GREEN}🚀 Render detectará los cambios y comenzará el despliegue automáticamente.${NC}"
-    echo -e "${BLUE}🔗 Puedes seguir el progreso en: https://dashboard.render.com/${NC}"
+    echo -e "${GREEN}🚀 Vercel detectará los cambios y comenzará el despliegue automáticamente.${NC}"
+    echo -e "${BLUE}🔗 Puedes seguir el progreso en: https://vercel.com/dashboard${NC}"
 else
     echo -e "${RED}❌ Error al subir a GitHub. Verifica tu conexión o permisos.${NC}"
     exit 1
