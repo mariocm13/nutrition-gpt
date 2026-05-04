@@ -251,6 +251,10 @@ html.dark .alert-card.red{background:#200a0a;color:#f87171}
 <script src="https://cdn.jsdelivr.net/npm/chart.js" onerror="window._chartJSFailed=true"></script>
 </head>
 <body>
+<script>
+  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
 <div id="splash">
   <video id="splash-video" playsinline muted autoplay></video>
 </div>
