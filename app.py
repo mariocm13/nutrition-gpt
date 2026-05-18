@@ -1077,10 +1077,6 @@ html.dark .alert-card.red{background:#240a0a;color:#f87171}
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
       <span class="nav-lbl">Foto IA</span>
     </button>
-    <div class="side-foot">
-      <span class="side-foot-dot" aria-hidden="true"></span>
-      <span>IA activa \u00b7 Groq</span>
-    </div>
   </aside>
 
   <!-- Main column -->
@@ -1094,7 +1090,7 @@ html.dark .alert-card.red{background:#240a0a;color:#f87171}
         <div class="brand-name">NutrIA</div>
       </div>
       <div class="topbar-title">
-        <h1 id="topbar-title-text">Chat con NutrIA <span class="tt-tag">IA</span></h1>
+        <h1 id="topbar-title-text">NutrIA</h1>
         <p id="topbar-title-sub">Pregunta lo que quieras sobre nutrici\u00f3n</p>
       </div>
       <div class="topbar-end">
@@ -1641,22 +1637,9 @@ var saved=null;try{saved=localStorage.getItem('nutria-dark');}catch(e){}
 var prefersDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches);
 setDark(saved!==null?saved==='1':prefersDark);
 dmBtn.addEventListener('click',function(){setDark(!document.documentElement.classList.contains('dark'));});
-var TAB_TITLES={
-  chat:{t:'Chat con NutrIA',s:'Pregunta lo que quieras sobre nutrición',tag:'IA'},
-  diario:{t:'Diario nutricional',s:'Tu registro diario de calorías y macros',tag:'Hoy'},
-  calc:{t:'Calculadora de macros',s:'BMR, TDEE y reparto de macronutrientes',tag:'Plan'},
-  foto:{t:'Análisis por foto',s:'Estima calorías y macros desde una imagen',tag:'IA'}
-};
 function _setActiveTab(id){
   document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===id);});
   document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+id);});
-  var meta=TAB_TITLES[id];
-  if(meta){
-    var th=document.getElementById('topbar-title-text');
-    var ts=document.getElementById('topbar-title-sub');
-    if(th){th.innerHTML=meta.t+(meta.tag?' <span class="tt-tag">'+meta.tag+'</span>':'');}
-    if(ts){ts.textContent=meta.s;}
-  }
 }
 window._setActiveTab=_setActiveTab;
 document.querySelectorAll('.nav-tab').forEach(function(tab){
